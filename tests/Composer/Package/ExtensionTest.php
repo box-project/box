@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer\Package;
 
 use Exception;
-use KevinGH\Box\Composer\Throwable\InvalidExtensionName;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -49,13 +48,13 @@ final class ExtensionTest extends TestCase
     #[DataProvider('extensionProvider')]
     public function test_it_can_parse_an_extension_name(
         string $packageName,
-        Exception|Extension $expected,
+        ?Extension $expected,
     ): void {
         if ($expected instanceof Exception) {
             $this->expectExceptionObject($expected);
         }
 
-        $actual = Extension::parse($packageName);
+        $actual = Extension::tryToParse($packageName);
 
         self::assertEquals($expected, $actual);
     }
@@ -69,12 +68,12 @@ final class ExtensionTest extends TestCase
 
         yield 'not an extension package' => [
             'laminas/laminas-code',
-            InvalidExtensionName::forName('laminas/laminas-code'),
+            null,
         ];
 
         yield 'not an extension package (confusing case)' => [
             'ext/http',
-            InvalidExtensionName::forName('ext/http'),
+            null,
         ];
 
         yield 'Zend opcache extension' => [
@@ -106,13 +105,9 @@ final class ExtensionTest extends TestCase
     #[DataProvider('polyfillExtensionProvider')]
     public function test_it_can_parse_an_extension_from_an_extension_polyfill_package_name(
         string $packageName,
-        Exception|Extension $expected,
+        ?Extension $expected,
     ): void {
-        if ($expected instanceof Exception) {
-            $this->expectExceptionObject($expected);
-        }
-
-        $actual = Extension::parsePolyfill($packageName);
+        $actual = Extension::tryToParsePolyfill($packageName);
 
         self::assertEquals($expected, $actual);
     }
@@ -126,12 +121,12 @@ final class ExtensionTest extends TestCase
 
         yield 'not an extension package' => [
             'laminas/laminas-code',
-            InvalidExtensionName::forPolyfillPackage('laminas/laminas-code'),
+            null,
         ];
 
         yield 'extension name' => [
             'ext-http',
-            InvalidExtensionName::forPolyfillPackage('ext-http'),
+            null,
         ];
 
         yield 'Symfony extension polyfill' => [
@@ -141,7 +136,7 @@ final class ExtensionTest extends TestCase
 
         yield 'Symfony PHP polyfill' => [
             'symfony/polyfill-php72',
-            InvalidExtensionName::forPolyfillPackage('symfony/polyfill-php72'),
+            null,
         ];
     }
 

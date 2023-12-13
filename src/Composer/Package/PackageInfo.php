@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Package;
 
+use function array_filter;
 use function array_key_exists;
+use function array_keys;
+use function array_map;
 
 /**
  * @private
@@ -53,12 +56,13 @@ final readonly class PackageInfo
 
         // TODO: remove the following code in 5.0.
         $packageName = $this->packageInfo['name'];
+        $polyfilledExtension = Extension::tryToParsePolyfill($packageName);
 
-        $extensions = Extension::isExtensionPolyfill($packageName)
-            ? [Extension::parsePolyfill($packageName)]
-            : [];
-
-        return new Extensions($extensions);
+        return new Extensions(
+            null === $polyfilledExtension
+                ? []
+                : [$polyfilledExtension],
+        );
     }
 
     public function getConflictingExtensions(): Extensions
@@ -71,14 +75,14 @@ final readonly class PackageInfo
      */
     public static function parseExtensions(array $constraints): Extensions
     {
-        $extensions = [];
-
-        foreach ($constraints as $packageName => $constraint) {
-            if (Extension::isExtension($packageName)) {
-                $extensions[] = Extension::parse($packageName);
-            }
-        }
-
-        return new Extensions($extensions);
+        return new Extensions(
+            array_filter(
+                array_map(
+                    Extension::tryToParse(...),
+                    array_keys($constraints),
+                ),
+                static fn (?Extension $extension) => null !== $extension,
+            ),
+        );
     }
 }

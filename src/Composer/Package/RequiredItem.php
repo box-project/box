@@ -49,8 +49,6 @@ final readonly class RequiredItem
     {
         $name = $this->getName();
 
-        return Extension::isExtensionPolyfill($name)
-            ? Extension::parsePolyfill($name)
-            : null;
+        return Extension::tryToParsePolyfill($name);
     }
 }
