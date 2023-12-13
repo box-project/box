@@ -26,7 +26,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
-                    ini-values: phar.readonly=0
+                    ini-values: phar.readonly=0, opcache.enable_cli=1
                     extensions: opcache
                     tools: composer
                     coverage: none
@@ -67,7 +67,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
-                    ini-values: phar.readonly=0
+                    ini-values: phar.readonly=0, opcache.enable_cli=1
                     extensions: opcache
                     tools: composer
                     coverage: none
