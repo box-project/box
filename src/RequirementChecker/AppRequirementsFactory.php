@@ -16,6 +16,7 @@ namespace KevinGH\Box\RequirementChecker;
 
 use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
 use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Package\Extension;
 use KevinGH\Box\Composer\Package\PackageInfo;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use function array_diff_key;
@@ -102,26 +103,26 @@ final class AppRequirementsFactory
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        [$extensionRequirements, $extensionConflicts] = self::collectExtensionRequirements(
+        $extensions = self::collectExtensionRequirements(
             $composerJson,
             $composerLock,
             $compressionAlgorithm,
         );
 
-        foreach ($extensionRequirements as $extension => $packages) {
-            foreach ($packages as $package) {
+        foreach ($extensions->getRequiredExtensions() as $extensionName => $packageNames) {
+            foreach ($packageNames as $packageName) {
                 $requirements[] = Requirement::forRequiredExtension(
-                    $extension,
-                    self::SELF_PACKAGE === $package ? null : $package,
+                    $extensionName,
+                    self::SELF_PACKAGE === $packageName ? null : $packageName,
                 );
             }
         }
 
-        foreach ($extensionConflicts as $extension => $packages) {
-            foreach ($packages as $package) {
+        foreach ($extensions->getConflictingExtensions() as $extensionName => $packageNames) {
+            foreach ($packageNames as $packageName) {
                 $requirements[] = Requirement::forConflictingExtension(
-                    $extension,
-                    self::SELF_PACKAGE === $package ? null : $package,
+                    $extensionName,
+                    self::SELF_PACKAGE === $packageName ? null : $packageName,
                 );
             }
         }
@@ -132,14 +133,12 @@ final class AppRequirementsFactory
     /**
      * Collects the extension required. It also accounts for the polyfills, i.e. if the polyfill
      * `symfony/polyfill-mbstring` is provided then the extension `ext-mbstring` will not be required.
-     *
-     * @return array{array<string, list<string>>, array<string, list<string>>}
      */
     private static function collectExtensionRequirements(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
-    ): array {
+    ): ExtensionRegistry {
         $extensions = new ExtensionRegistry();
 
         $compressionAlgorithmRequiredExtension = $compressionAlgorithm->getRequiredExtension();
@@ -166,52 +165,41 @@ final class AppRequirementsFactory
         return $extensions;
     }
 
-    /**
-     * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
-     *
-     * @return array{array<string, true>, array<string, list<string>>, array<string, list<string>>}
-     */
     private static function collectComposerJsonExtensionRequirements(
         DecodedComposerJson $composerJson,
         ExtensionRegistry $extensionRegistry,
-    ): array {
-        $polyfills = [];
-        $conflicts = [];
-
+    ): void {
+        // TODO: check that the extensions provided by the package itself are accounted for.
+        // TODO: as we add the constraints, check that we do not override the already registered constraints.
         foreach ($composerJson->getRequiredItems() as $packageInfo) {
             $polyfilledExtension = $packageInfo->getPolyfilledExtension();
 
             if (null !== $polyfilledExtension) {
-                $polyfills[$polyfilledExtension] = true;
+                $extensionRegistry->addProvidedExtension($polyfilledExtension, self::SELF_PACKAGE);
 
                 continue;
             }
 
             foreach ($packageInfo->getRequiredExtensions() as $extension) {
-                $requirements[$extension] = [self::SELF_PACKAGE];
+                $extensionRegistry->addRequiredExtension(
+                    $extension,
+                    self::SELF_PACKAGE,
+                );
             }
         }
 
         foreach ($composerJson->getConflictingExtensions() as $extension) {
-            $conflicts[$extension] = [self::SELF_PACKAGE];
+            $extensionRegistry->addConflictingExtension(
+                $extension,
+                self::SELF_PACKAGE,
+            );
         }
-
-        return [
-            $polyfills,
-            $requirements,
-            $conflicts,
-        ];
     }
 
-    /**
-     * @param array<string, list<string>> $requirements The key is the extension name and the value the list of sources (app literal string or the package name).
-     *
-     * @return array{array<string, true>, array<string, list<string>>, array<string, list<string>>}
-     */
     private static function collectComposerLockExtensionRequirements(
         DecodedComposerLock $composerLock,
         ExtensionRegistry $extensions,
-    ): array {
+    ): void {
         foreach ($composerLock->getPackages() as $packageInfo) {
             foreach ($packageInfo->getPolyfilledExtensions() as $polyfilledExtension) {
                 $extensions->addProvidedExtension(
@@ -228,10 +216,11 @@ final class AppRequirementsFactory
             }
 
             foreach ($packageInfo->getConflictingExtensions() as $extension) {
-                $conflicts[$extension][] = $packageInfo->getName();
+                $extensions->addConflictingExtension(
+                    $extension,
+                    $packageInfo->getName(),
+                );
             }
         }
-
-        return [$polyfills, $requirements, $conflicts];
     }
 }
