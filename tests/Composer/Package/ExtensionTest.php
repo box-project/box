@@ -1,23 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Composer\Package;
 
 use Exception;
 use KevinGH\Box\Composer\Throwable\InvalidExtensionName;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \KevinGH\Box\Composer\Package\Extension
+ * @internal
  */
+#[CoversClass(\KevinGH\Box\Composer\Package\Extension::class)]
 final class ExtensionTest extends TestCase
 {
     #[DataProvider('extensionPackageNameProvider')]
     public function test_it_can_say_if_a_composer_package_name_is_an_extension(
         string $packageName,
         bool $expected,
-    ): void
-    {
+    ): void {
         $actual = Extension::isExtension($packageName);
 
         self::assertSame($expected, $actual);
@@ -36,9 +49,8 @@ final class ExtensionTest extends TestCase
     #[DataProvider('extensionProvider')]
     public function test_it_can_parse_an_extension_name(
         string $packageName,
-        Extension|Exception $expected,
-    ): void
-    {
+        Exception|Extension $expected,
+    ): void {
         if ($expected instanceof Exception) {
             $this->expectExceptionObject($expected);
         }
@@ -75,8 +87,7 @@ final class ExtensionTest extends TestCase
     public function test_it_can_say_if_a_composer_package_name_is_a_polyfill_for_an_extension(
         string $packageName,
         bool $expected,
-    ): void
-    {
+    ): void {
         $actual = Extension::isExtensionPolyfill($packageName);
 
         self::assertSame($expected, $actual);
@@ -95,9 +106,8 @@ final class ExtensionTest extends TestCase
     #[DataProvider('polyfillExtensionProvider')]
     public function test_it_can_parse_an_extension_from_an_extension_polyfill_package_name(
         string $packageName,
-        Extension|Exception $expected,
-    ): void
-    {
+        Exception|Extension $expected,
+    ): void {
         if ($expected instanceof Exception) {
             $this->expectExceptionObject($expected);
         }
@@ -139,8 +149,7 @@ final class ExtensionTest extends TestCase
     public function test_it_is_stringeable(
         Extension $extension,
         string $expected,
-    ): void
-    {
+    ): void {
         $actual = $extension->__toString();
 
         self::assertSame($expected, $actual);

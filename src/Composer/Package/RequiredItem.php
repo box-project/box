@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Package;
 
-use function array_key_exists;
 use function key;
 
 /**

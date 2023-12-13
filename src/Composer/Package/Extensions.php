@@ -2,6 +2,16 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the box project.
+ *
+ * (c) Kevin Herrera <kevin@herrera.io>
+ *     Théo Fidry <theo.fidry@gmail.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
 namespace KevinGH\Box\Composer\Package;
 
 use ArrayIterator;
@@ -10,13 +20,13 @@ use IteratorAggregate;
 use Traversable;
 use function count;
 
-final class Extensions implements IteratorAggregate, Countable
+final readonly class Extensions implements IteratorAggregate, Countable
 {
     /**
-     *@param Extension[] $extensions
+     * @param Extension[] $extensions
      */
     public function __construct(
-        public readonly array $extensions = []
+        public array $extensions = []
     ) {
     }
 

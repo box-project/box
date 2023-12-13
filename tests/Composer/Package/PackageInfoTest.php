@@ -14,13 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Package;
 
-use KevinGH\Box\Composer\Package\ExtensionsAssertion;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use function array_map;
 use function json_decode;
-use function strval;
 
 /**
  * @internal
