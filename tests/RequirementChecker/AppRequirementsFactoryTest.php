@@ -42,7 +42,10 @@ class AppRequirementsFactoryTest extends TestCase
             $compressionAlgorithm,
         );
 
-        self::assertEquals($expected, $actual);
+        self::assertEquals(
+            (new Requirements($expected))->toArray(),
+            $actual->toArray(),
+        );
     }
 
     public static function lockContentsProvider(): iterable
