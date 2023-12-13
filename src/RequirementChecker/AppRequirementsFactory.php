@@ -17,13 +17,7 @@ namespace KevinGH\Box\RequirementChecker;
 use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
 use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Composer\Package\Extension;
-use KevinGH\Box\Composer\Package\PackageInfo;
 use KevinGH\Box\Phar\CompressionAlgorithm;
-use function array_diff_key;
-use function array_filter;
-use function array_map;
-use function array_merge_recursive;
-use function array_values;
 
 /**
  * Collect the list of requirements for running the application.
@@ -32,153 +26,97 @@ use function array_values;
  */
 final class AppRequirementsFactory
 {
-    private const SELF_PACKAGE = '__APPLICATION__';
+    private const SELF_PACKAGE = null;
 
     public static function create(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): Requirements {
-        return self::configureExtensionRequirements(
-            self::retrievePhpVersionRequirements($composerJson, $composerLock),
-            $composerJson,
-            $composerLock,
-            $compressionAlgorithm,
-        );
+        $requirementsBuilder = new RequirementsBuilder();
+
+        self::retrievePhpVersionRequirements($requirementsBuilder, $composerJson, $composerLock);
+        self::collectExtensionRequirementsFromCompressionAlgorithm($requirementsBuilder, $compressionAlgorithm);
+        self::collectComposerLockExtensionRequirements($composerLock, $requirementsBuilder);
+        self::collectComposerJsonExtensionRequirements($composerJson, $requirementsBuilder);
+
+        return $requirementsBuilder->build();
     }
 
-    /**
-     * @return list<Requirement>
-     */
     private static function retrievePhpVersionRequirements(
+        RequirementsBuilder $requirementsBuilder,
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
-    ): array {
+    ): void {
         // If the application has a constraint on the PHP version, it is the authority.
-        return $composerLock->hasRequiredPhpVersion() || $composerJson->hasRequiredPhpVersion()
-            ? self::retrievePHPRequirementFromPlatform($composerJson, $composerLock)
-            : self::retrievePHPRequirementFromPackages($composerLock);
+        $composerLock->hasRequiredPhpVersion() || $composerJson->hasRequiredPhpVersion()
+            ? self::retrievePHPRequirementFromPlatform($requirementsBuilder, $composerJson, $composerLock)
+            : self::retrievePHPRequirementFromPackages($requirementsBuilder, $composerLock);
     }
 
-    /**
-     * @return list<Requirement>
-     */
     private static function retrievePHPRequirementFromPlatform(
+        RequirementsBuilder $requirementsBuilder,
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
-    ): array {
+    ): void {
         $requiredPhpVersion = $composerLock->getRequiredPhpVersion() ?? $composerJson->getRequiredPhpVersion();
 
-        return null === $requiredPhpVersion ? [] : [Requirement::forPHP($requiredPhpVersion, null)];
+        if (null !== $requiredPhpVersion) {
+            $requirementsBuilder->addRequirement(
+                Requirement::forPHP($requiredPhpVersion, self::SELF_PACKAGE),
+            );
+        }
     }
 
-    /**
-     * @return list<Requirement>
-     */
-    private static function retrievePHPRequirementFromPackages(DecodedComposerLock $composerLock): array
-    {
-        return array_values(
-            array_map(
-                static fn (PackageInfo $packageInfo) => Requirement::forPHP(
-                    $packageInfo->getRequiredPhpVersion(),
-                    $packageInfo->getName(),
-                ),
-                array_filter(
-                    $composerLock->getPackages(),
-                    static fn (PackageInfo $packageInfo) => $packageInfo->hasRequiredPhpVersion(),
-                ),
-            ),
-        );
-    }
-
-    /**
-     * @param list<Requirement> $requirements
-     */
-    private static function configureExtensionRequirements(
-        array $requirements,
-        DecodedComposerJson $composerJson,
+    private static function retrievePHPRequirementFromPackages(
+        RequirementsBuilder $requirementsBuilder,
         DecodedComposerLock $composerLock,
-        CompressionAlgorithm $compressionAlgorithm,
-    ): Requirements {
-        $extensions = self::collectExtensionRequirements(
-            $composerJson,
-            $composerLock,
-            $compressionAlgorithm,
-        );
-
-        foreach ($extensions->getRequiredExtensions() as $extensionName => $packageNames) {
-            foreach ($packageNames as $packageName) {
-                $requirements[] = Requirement::forRequiredExtension(
-                    $extensionName,
-                    self::SELF_PACKAGE === $packageName ? null : $packageName,
+    ): void {
+        foreach ($composerLock->getPackages() as $packageInfo) {
+            if ($packageInfo->hasRequiredPhpVersion()) {
+                $requirementsBuilder->addRequirement(
+                    Requirement::forPHP(
+                        $packageInfo->getRequiredPhpVersion(),
+                        $packageInfo->getName(),
+                    ),
                 );
             }
         }
-
-        foreach ($extensions->getConflictingExtensions() as $extensionName => $packageNames) {
-            foreach ($packageNames as $packageName) {
-                $requirements[] = Requirement::forConflictingExtension(
-                    $extensionName,
-                    self::SELF_PACKAGE === $packageName ? null : $packageName,
-                );
-            }
-        }
-
-        return new Requirements($requirements);
     }
 
     /**
      * Collects the extension required. It also accounts for the polyfills, i.e. if the polyfill
      * `symfony/polyfill-mbstring` is provided then the extension `ext-mbstring` will not be required.
      */
-    private static function collectExtensionRequirements(
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+    private static function collectExtensionRequirementsFromCompressionAlgorithm(
+        RequirementsBuilder $requirementsBuilder,
         CompressionAlgorithm $compressionAlgorithm,
-    ): ExtensionRegistry {
-        $extensions = new ExtensionRegistry();
-
+    ): void {
         $compressionAlgorithmRequiredExtension = $compressionAlgorithm->getRequiredExtension();
 
         if (null !== $compressionAlgorithmRequiredExtension) {
-            $extensions->addRequiredExtension(
+            $requirementsBuilder->addRequiredExtension(
                 new Extension($compressionAlgorithmRequiredExtension),
                 self::SELF_PACKAGE,
             );
         }
-
-        foreach ($composerLock->getPlatformExtensions() as $extension) {
-            $extensions->addRequiredExtension($extension, self::SELF_PACKAGE);
-        }
-
-        // If the lock is present it is the authority. If not fallback on the .json. It is pointless to check both
-        // since they will contain redundant information.
-        // TODO: to check but I think we should check the installed.json file instead
-        // This would allow to avoid to have to care about the case where the .lock may
-        // not be present for whatever reason.
-        self::collectComposerLockExtensionRequirements($composerLock, $extensions);
-        self::collectComposerJsonExtensionRequirements($composerJson, $extensions);
-
-        return $extensions;
     }
 
     private static function collectComposerJsonExtensionRequirements(
         DecodedComposerJson $composerJson,
-        ExtensionRegistry $extensionRegistry,
+        RequirementsBuilder $requirementsBuilder,
     ): void {
-        // TODO: check that the extensions provided by the package itself are accounted for.
-        // TODO: as we add the constraints, check that we do not override the already registered constraints.
         foreach ($composerJson->getRequiredItems() as $packageInfo) {
             $polyfilledExtension = $packageInfo->getPolyfilledExtension();
 
             if (null !== $polyfilledExtension) {
-                $extensionRegistry->addProvidedExtension($polyfilledExtension, self::SELF_PACKAGE);
+                $requirementsBuilder->addProvidedExtension($polyfilledExtension, self::SELF_PACKAGE);
 
                 continue;
             }
 
             foreach ($packageInfo->getRequiredExtensions() as $extension) {
-                $extensionRegistry->addRequiredExtension(
+                $requirementsBuilder->addRequiredExtension(
                     $extension,
                     self::SELF_PACKAGE,
                 );
@@ -186,7 +124,7 @@ final class AppRequirementsFactory
         }
 
         foreach ($composerJson->getConflictingExtensions() as $extension) {
-            $extensionRegistry->addConflictingExtension(
+            $requirementsBuilder->addConflictingExtension(
                 $extension,
                 self::SELF_PACKAGE,
             );
@@ -195,25 +133,29 @@ final class AppRequirementsFactory
 
     private static function collectComposerLockExtensionRequirements(
         DecodedComposerLock $composerLock,
-        ExtensionRegistry $extensions,
+        RequirementsBuilder $requirementsBuilder,
     ): void {
+        foreach ($composerLock->getPlatformExtensions() as $extension) {
+            $requirementsBuilder->addRequiredExtension($extension, self::SELF_PACKAGE);
+        }
+
         foreach ($composerLock->getPackages() as $packageInfo) {
             foreach ($packageInfo->getPolyfilledExtensions() as $polyfilledExtension) {
-                $extensions->addProvidedExtension(
+                $requirementsBuilder->addProvidedExtension(
                     $polyfilledExtension,
                     $packageInfo->getName(),
                 );
             }
 
             foreach ($packageInfo->getRequiredExtensions() as $extension) {
-                $extensions->addRequiredExtension(
+                $requirementsBuilder->addRequiredExtension(
                     $extension,
                     $packageInfo->getName(),
                 );
             }
 
             foreach ($packageInfo->getConflictingExtensions() as $extension) {
-                $extensions->addConflictingExtension(
+                $requirementsBuilder->addConflictingExtension(
                     $extension,
                     $packageInfo->getName(),
                 );
