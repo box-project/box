@@ -1,0 +1,25 @@
+{
+    "require": {
+        "php": "*",
+        "ext-aerospike": "*",
+        "ext-http": "*",
+        "ext-zend-opcache": "*",
+        "paragonie/sodium_compat": "^1.20",
+        "phpseclib/mcrypt_compat": "^2.0",
+        "laminas/laminas-code": "^4.13",
+        "symfony/polyfill-mbstring": "^1.28",
+        "symfony/polyfill-php72": "^1.28"
+    },
+    "conflict": {
+        "ext-apache": "*",
+        "ext-bcmath": "*",
+        "symfony/polyfill-php83": "*"
+    },
+    "provide": {
+        "ext-crypto": "*",
+        "ext-calendar": "*"
+    },
+    "require-dev": {
+        "symfony/polyfill-iconv": "^1.28"
+    }
+}
