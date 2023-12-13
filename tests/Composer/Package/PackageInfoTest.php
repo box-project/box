@@ -14,10 +14,13 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Package;
 
+use KevinGH\Box\Composer\Package\ExtensionsAssertion;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use function array_map;
 use function json_decode;
+use function strval;
 
 /**
  * @internal
@@ -309,8 +312,8 @@ final class PackageInfoTest extends TestCase
         self::assertSame($expectedName, $actual->getName());
         self::assertSame($expectedRequiredPhpVersion, $actual->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $actual->hasRequiredPhpVersion());
-        self::assertSame($expectedRequiredExtensions, $actual->getRequiredExtensions());
-        self::assertSame($expectedPolyfilledExtensions, $actual->getPolyfilledExtensions());
-        self::assertSame($expectedConflictingExtensions, $actual->getConflictingExtensions());
+        ExtensionsAssertion::assertEqual($expectedRequiredExtensions, $actual->getRequiredExtensions());
+        ExtensionsAssertion::assertEqual($expectedPolyfilledExtensions, $actual->getPolyfilledExtensions());
+        ExtensionsAssertion::assertEqual($expectedConflictingExtensions, $actual->getConflictingExtensions());
     }
 }

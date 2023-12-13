@@ -41,28 +41,17 @@ final readonly class RequiredItem
         return key($this->packageInfo);
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getRequiredExtensions(): array
+    public function getRequiredExtensions(): Extensions
     {
         return PackageInfo::parseExtensions($this->packageInfo);
     }
 
-    public function getPolyfilledExtension(): ?string
+    public function getPolyfilledExtension(): ?Extension
     {
         $name = $this->getName();
 
-        if (array_key_exists($name, self::POLYFILL_MAP)) {
-            return self::POLYFILL_MAP[$name];
-        }
-
-        if (1 !== preg_match(self::SYMFONY_POLYFILL_REGEX, $name, $matches)) {
-            return null;
-        }
-
-        $extension = $matches['extension'];
-
-        return str_starts_with($extension, 'php') ? null : $extension;
+        return Extension::isExtensionPolyfill($name)
+            ? Extension::parsePolyfill($name)
+            : null;
     }
 }

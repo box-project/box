@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Artifact;
 
+use KevinGH\Box\Composer\Package\ExtensionsAssertion;
 use KevinGH\Box\Composer\Package\PackageInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -187,7 +188,7 @@ class DecodedComposerLockTest extends TestCase
         self::assertSame($expectedIsEmpty, $composerLock->isEmpty());
         self::assertSame($expectedRequiredPhpVersion, $composerLock->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $composerLock->hasRequiredPhpVersion());
-        self::assertSame($expectedPlatformExtensions, $composerLock->getPlatformExtensions());
+        ExtensionsAssertion::assertEqual($expectedPlatformExtensions, $composerLock->getPlatformExtensions());
         self::assertEquals($expectedPackages, $composerLock->getPackages());
     }
 }
