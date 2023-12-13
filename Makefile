@@ -45,6 +45,7 @@ PHPBENCH_BIN = vendor-bin/phpbench/vendor/bin/phpbench
 PHPBENCH = $(PHPBENCH_BIN)
 PHPBENCH_WITH_COMPACTORS_VENDOR_DIR = fixtures/bench/with-compactors/vendor
 PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR = fixtures/bench/without-compactors/vendor
+PHPBENCH_REQUIREMENT_CHECKER_VENDOR_DIR = fixtures/bench/requirement-checker/vendor
 
 RECTOR_BIN = vendor-bin/rector/vendor/bin/rector
 RECTOR = $(RECTOR_BIN)
@@ -267,7 +268,10 @@ _infection_ci: $(INFECTION_BIN) $(COVERAGE_XML_DIR) $(COVERAGE_JUNIT) vendor
 
 .PHONY: phpbench
 phpbench: 		 ## Runs PHPBench
-phpbench: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+phpbench: $(PHPBENCH_BIN) \
+			$(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) \
+			$(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR) \
+			$(PHPBENCH_REQUIREMENT_CHECKER_VENDOR_DIR)
 	$(MAKE) _phpbench
 
 .PHONY: _phpbench
@@ -276,12 +280,18 @@ _phpbench:
 	php bin/bench-test.php
 
 .PHONY: phpbench_pr
-phpbench_pr: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+phpbench_pr: $(PHPBENCH_BIN) \
+		$(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) \
+		$(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR) \
+		$(PHPBENCH_REQUIREMENT_CHECKER_VENDOR_DIR)
 	$(PHPBENCH) run tests/Benchmark --report=benchmark --dump-file=dist/bench-result.xml --ref=main
 	php bin/bench-test.php
 
 .PHONY: phpbench_main
-phpbench_main: $(PHPBENCH_BIN) $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR)
+phpbench_main: $(PHPBENCH_BIN) \
+		$(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) \
+		$(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR) \
+		$(PHPBENCH_REQUIREMENT_CHECKER_VENDOR_DIR)
 	$(PHPBENCH) run tests/Benchmark --report=benchmark --tag=main
 
 
@@ -522,6 +532,10 @@ $(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR):
 	touch -c $@
 
 $(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR):
+	composer install --working-dir=$$(dirname $@)
+	touch -c $@
+
+$(PHPBENCH_REQUIREMENT_CHECKER_VENDOR_DIR):
 	composer install --working-dir=$$(dirname $@)
 	touch -c $@
 
