@@ -34,14 +34,11 @@ final class AppRequirementsFactory
 {
     private const SELF_PACKAGE = '__APPLICATION__';
 
-    /**
-     * @return list<Requirement> Configured requirements
-     */
     public static function create(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
-    ): array {
+    ): Requirements {
         return self::configureExtensionRequirements(
             self::retrievePhpVersionRequirements($composerJson, $composerLock),
             $composerJson,
@@ -102,7 +99,7 @@ final class AppRequirementsFactory
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
-    ): array {
+    ): Requirements {
         $extensions = self::collectExtensionRequirements(
             $composerJson,
             $composerLock,
@@ -127,7 +124,7 @@ final class AppRequirementsFactory
             }
         }
 
-        return $requirements;
+        return new Requirements($requirements);
     }
 
     /**
