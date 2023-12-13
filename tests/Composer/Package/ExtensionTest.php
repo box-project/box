@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-#[CoversClass(\KevinGH\Box\Composer\Package\Extension::class)]
+#[CoversClass(Extension::class)]
 final class ExtensionTest extends TestCase
 {
     #[DataProvider('extensionPackageNameProvider')]
