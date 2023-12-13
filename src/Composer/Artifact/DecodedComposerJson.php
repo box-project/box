@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Artifact;
 
+use KevinGH\Box\Composer\Package\Extensions;
 use KevinGH\Box\Composer\Package\PackageInfo;
 use KevinGH\Box\Composer\Package\RequiredItem;
 use function array_keys;
@@ -53,10 +54,7 @@ final readonly class DecodedComposerJson
         );
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getConflictingExtensions(): array
+    public function getConflictingExtensions(): Extensions
     {
         return PackageInfo::parseExtensions(
             $this->composerJsonDecodedContents['conflict'] ?? [],

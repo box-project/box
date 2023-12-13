@@ -14,29 +14,17 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Package;
 
+use function array_filter;
 use function array_key_exists;
+use function array_keys;
+use function array_map;
+use function array_values;
 
 /**
  * @private
  */
 final readonly class PackageInfo
 {
-    private const EXTENSION_REGEX = '/^ext-(?<extension>.+)$/';
-
-    // Some extensions name differs in how they are registered in composer.json
-    // and the name used when doing a `extension_loaded()` check.
-    // See https://github.com/box-project/box/issues/653.
-    private const EXTENSION_NAME_MAP = [
-        'zend-opcache' => 'zend opcache',
-    ];
-
-    private const POLYFILL_MAP = [
-        'paragonie/sodium_compat' => 'libsodium',
-        'phpseclib/mcrypt_compat' => 'mcrypt',
-    ];
-
-    private const SYMFONY_POLYFILL_REGEX = '/symfony\/polyfill-(?<extension>.+)/';
-
     public function __construct(private array $packageInfo)
     {
     }
@@ -56,66 +44,48 @@ final readonly class PackageInfo
         return null !== $this->getRequiredPhpVersion();
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getRequiredExtensions(): array
+    public function getRequiredExtensions(): Extensions
     {
         return self::parseExtensions($this->packageInfo['require'] ?? []);
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getPolyfilledExtensions(): array
+    public function getPolyfilledExtensions(): Extensions
     {
         if (array_key_exists('provide', $this->packageInfo)) {
             return self::parseExtensions($this->packageInfo['provide']);
         }
 
         // TODO: remove the following code in 5.0.
-        $name = $this->packageInfo['name'];
+        $packageName = $this->packageInfo['name'];
+        $polyfilledExtension = Extension::tryToParsePolyfill($packageName);
 
-        if (array_key_exists($name, self::POLYFILL_MAP)) {
-            return [self::POLYFILL_MAP[$name]];
-        }
-
-        if (1 !== preg_match(self::SYMFONY_POLYFILL_REGEX, $name, $matches)) {
-            return [];
-        }
-
-        $extension = $matches['extension'];
-
-        return str_starts_with($extension, 'php') ? [] : [$extension];
+        return new Extensions(
+            null === $polyfilledExtension
+                ? []
+                : [$polyfilledExtension],
+        );
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getConflictingExtensions(): array
+    public function getConflictingExtensions(): Extensions
     {
-        return array_key_exists('conflict', $this->packageInfo)
-            ? self::parseExtensions($this->packageInfo['conflict'])
-            : [];
+        return self::parseExtensions($this->packageInfo['conflict'] ?? []);
     }
 
     /**
      * @param array<string, string> $constraints
-     *
-     * @return list<string>
      */
-    public static function parseExtensions(array $constraints): array
+    public static function parseExtensions(array $constraints): Extensions
     {
-        $extensions = [];
-
-        foreach ($constraints as $package => $constraint) {
-            if (preg_match(self::EXTENSION_REGEX, $package, $matches)) {
-                $extension = $matches['extension'];
-
-                $extensions[] = self::EXTENSION_NAME_MAP[$extension] ?? $extension;
-            }
-        }
-
-        return $extensions;
+        return new Extensions(
+            array_values(
+                array_filter(
+                    array_map(
+                        Extension::tryToParse(...),
+                        array_keys($constraints),
+                    ),
+                    static fn (?Extension $extension) => null !== $extension,
+                ),
+            ),
+        );
     }
 }

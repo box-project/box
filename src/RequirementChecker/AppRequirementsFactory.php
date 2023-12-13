@@ -149,7 +149,7 @@ final class AppRequirementsFactory
         }
 
         foreach ($composerLock->getPlatformExtensions() as $extension) {
-            $requirements[$extension] = [self::SELF_PACKAGE];
+            $requirements[(string) $extension] = [self::SELF_PACKAGE];
         }
 
         // If the lock is present it is the authority. If not fallback on the .json. It is pointless to check both
@@ -182,18 +182,18 @@ final class AppRequirementsFactory
             $polyfilledExtension = $packageInfo->getPolyfilledExtension();
 
             if (null !== $polyfilledExtension) {
-                $polyfills[$polyfilledExtension] = true;
+                $polyfills[(string) $polyfilledExtension] = true;
 
                 continue;
             }
 
             foreach ($packageInfo->getRequiredExtensions() as $extension) {
-                $requirements[$extension] = [self::SELF_PACKAGE];
+                $requirements[(string) $extension] = [self::SELF_PACKAGE];
             }
         }
 
         foreach ($composerJson->getConflictingExtensions() as $extension) {
-            $conflicts[$extension] = [self::SELF_PACKAGE];
+            $conflicts[(string) $extension] = [self::SELF_PACKAGE];
         }
 
         return [
@@ -217,15 +217,15 @@ final class AppRequirementsFactory
 
         foreach ($composerLock->getPackages() as $packageInfo) {
             foreach ($packageInfo->getPolyfilledExtensions() as $polyfilledExtension) {
-                $polyfills[$polyfilledExtension] = true;
+                $polyfills[(string) $polyfilledExtension] = true;
             }
 
             foreach ($packageInfo->getRequiredExtensions() as $extension) {
-                $requirements[$extension][] = $packageInfo->getName();
+                $requirements[(string) $extension][] = $packageInfo->getName();
             }
 
             foreach ($packageInfo->getConflictingExtensions() as $extension) {
-                $conflicts[$extension][] = $packageInfo->getName();
+                $conflicts[(string) $extension][] = $packageInfo->getName();
             }
         }
 

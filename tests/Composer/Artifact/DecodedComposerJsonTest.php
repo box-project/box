@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Artifact;
 
+use KevinGH\Box\Composer\Package\ExtensionsAssertion;
 use KevinGH\Box\Composer\Package\RequiredItem;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -165,6 +166,6 @@ class DecodedComposerJsonTest extends TestCase
         self::assertSame($expectedRequiredPhpVersion, $composerJson->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $composerJson->hasRequiredPhpVersion());
         self::assertEquals($expectedRequiredItems, $composerJson->getRequiredItems());
-        self::assertSame($expectedConflictingExtensions, $composerJson->getConflictingExtensions());
+        ExtensionsAssertion::assertEqual($expectedConflictingExtensions, $composerJson->getConflictingExtensions());
     }
 }

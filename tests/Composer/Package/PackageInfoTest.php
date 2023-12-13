@@ -309,8 +309,8 @@ final class PackageInfoTest extends TestCase
         self::assertSame($expectedName, $actual->getName());
         self::assertSame($expectedRequiredPhpVersion, $actual->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $actual->hasRequiredPhpVersion());
-        self::assertSame($expectedRequiredExtensions, $actual->getRequiredExtensions());
-        self::assertSame($expectedPolyfilledExtensions, $actual->getPolyfilledExtensions());
-        self::assertSame($expectedConflictingExtensions, $actual->getConflictingExtensions());
+        ExtensionsAssertion::assertEqual($expectedRequiredExtensions, $actual->getRequiredExtensions());
+        ExtensionsAssertion::assertEqual($expectedPolyfilledExtensions, $actual->getPolyfilledExtensions());
+        ExtensionsAssertion::assertEqual($expectedConflictingExtensions, $actual->getConflictingExtensions());
     }
 }

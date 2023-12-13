@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Artifact;
 
+use KevinGH\Box\Composer\Package\Extensions;
 use KevinGH\Box\Composer\Package\PackageInfo;
 use function array_map;
 
@@ -44,10 +45,7 @@ final readonly class DecodedComposerLock
         return null !== $this->getRequiredPhpVersion();
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getPlatformExtensions(): array
+    public function getPlatformExtensions(): Extensions
     {
         return PackageInfo::parseExtensions($this->composerLockDecodedContents['platform'] ?? []);
     }
