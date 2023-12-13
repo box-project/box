@@ -142,18 +142,18 @@ class RequirementsDumperTest extends TestCase
                   1 =>
                   array (
                     'type' => 'extension',
-                    'condition' => 'zlib',
-                    'source' => NULL,
-                    'message' => 'This application requires the extension "zlib".',
-                    'helpMessage' => 'This application requires the extension "zlib". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
-                  ),
-                  2 =>
-                  array (
-                    'type' => 'extension',
                     'condition' => 'json',
                     'source' => 'acme/foo',
                     'message' => 'The package "acme/foo" requires the extension "json".',
                     'helpMessage' => 'The package "acme/foo" requires the extension "json". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
+                  ),
+                  2 =>
+                  array (
+                    'type' => 'extension',
+                    'condition' => 'zlib',
+                    'source' => NULL,
+                    'message' => 'This application requires the extension "zlib".',
+                    'helpMessage' => 'This application requires the extension "zlib". You either need to enable it or request the application to be shipped with a polyfill for this extension.',
                   ),
                 );
                 PHP,
