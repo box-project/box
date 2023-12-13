@@ -18,6 +18,7 @@ use function array_filter;
 use function array_key_exists;
 use function array_keys;
 use function array_map;
+use function array_values;
 
 /**
  * @private
@@ -76,12 +77,14 @@ final readonly class PackageInfo
     public static function parseExtensions(array $constraints): Extensions
     {
         return new Extensions(
-            array_filter(
-                array_map(
-                    Extension::tryToParse(...),
-                    array_keys($constraints),
+            array_values(
+                array_filter(
+                    array_map(
+                        Extension::tryToParse(...),
+                        array_keys($constraints),
+                    ),
+                    static fn (?Extension $extension) => null !== $extension,
                 ),
-                static fn (?Extension $extension) => null !== $extension,
             ),
         );
     }

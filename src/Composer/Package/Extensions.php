@@ -23,7 +23,7 @@ use function count;
 final readonly class Extensions implements IteratorAggregate, Countable
 {
     /**
-     * @param Extension[] $extensions
+     * @param list<Extension> $extensions
      */
     public function __construct(
         public array $extensions = []
