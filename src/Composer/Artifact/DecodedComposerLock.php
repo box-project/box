@@ -24,20 +24,20 @@ use function array_map;
 final readonly class DecodedComposerLock
 {
     /**
-     * @param array $composerLockDecodedContents Decoded JSON contents of the `composer.lock` file
+     * @param array $decodedContents Decoded JSON contents of the `composer.lock` file
      */
-    public function __construct(private array $composerLockDecodedContents)
+    public function __construct(private array $decodedContents)
     {
     }
 
     public function isEmpty(): bool
     {
-        return [] === $this->composerLockDecodedContents;
+        return [] === $this->decodedContents;
     }
 
     public function getRequiredPhpVersion(): ?string
     {
-        return $this->composerLockDecodedContents['platform']['php'] ?? null;
+        return $this->decodedContents['platform']['php'] ?? null;
     }
 
     public function hasRequiredPhpVersion(): bool
@@ -47,17 +47,17 @@ final readonly class DecodedComposerLock
 
     public function getPlatformExtensions(): Extensions
     {
-        return PackageInfo::parseExtensions($this->composerLockDecodedContents['platform'] ?? []);
+        return PackageInfo::parseExtensions($this->decodedContents['platform'] ?? []);
     }
 
     /**
-     * @return PackageInfo
+     * @return PackageInfo[]
      */
     public function getPackages(): array
     {
         return array_map(
             static fn (array $package) => new PackageInfo($package),
-            $this->composerLockDecodedContents['packages'] ?? [],
+            $this->decodedContents['packages'] ?? [],
         );
     }
 }
