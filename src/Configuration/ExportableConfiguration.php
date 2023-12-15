@@ -16,7 +16,7 @@ namespace KevinGH\Box\Configuration;
 
 use Closure;
 use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Composer\Artifact\ComposerFile;
+use KevinGH\Box\Composer\Artifact\ComposerArtifact;
 use KevinGH\Box\MapFile;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
@@ -52,14 +52,18 @@ final readonly class ExportableConfiguration
             $normalizePath($configuration->getConfigurationFile()),
             $configuration->getAlias(),
             $configuration->getBasePath(),
-            new ComposerFile(
-                $normalizePath($composerJson),
-                $configuration->getDecodedComposerJsonContents() ?? [],
-            ),
-            new ComposerFile(
-                $normalizePath($composerLock),
-                $configuration->getDecodedComposerLockContents() ?? [],
-            ),
+            null === $composerJson
+                ? null
+                : new ComposerArtifact(
+                    $normalizePath($composerJson),
+                    $configuration->getDecodedComposerJsonContents()->decodedContents,
+                ),
+            null === $composerLock
+                ? null
+                : new ComposerArtifact(
+                    $normalizePath($composerLock),
+                    $configuration->getDecodedComposerLockContents()->decodedContents,
+                ),
             $normalizePaths($configuration->getFiles()),
             $normalizePaths($configuration->getBinaryFiles()),
             $configuration->hasAutodiscoveredFiles(),
@@ -113,21 +117,21 @@ final readonly class ExportableConfiguration
 
     /** @noinspection PhpPropertyOnlyWrittenInspection */
     private function __construct(
-        private ?string $file,
-        private string $alias,
-        private string $basePath,
-        private ComposerFile $composerJson,
-        private ComposerFile $composerLock,
-        private array $files,
-        private array $binaryFiles,
-        private bool $autodiscoveredFiles,
-        private bool $dumpAutoload,
-        private bool $excludeComposerFiles,
-        private bool $excludeDevFiles,
+        private ?string          $file,
+        private string           $alias,
+        private string           $basePath,
+        private ComposerArtifact $composerJson,
+        private ComposerArtifact $composerLock,
+        private array            $files,
+        private array            $binaryFiles,
+        private bool             $autodiscoveredFiles,
+        private bool             $dumpAutoload,
+        private bool             $excludeComposerFiles,
+        private bool             $excludeDevFiles,
         private array|Compactors $compactors,
-        private string $compressionAlgorithm,
-        private null|int|string $fileMode,
-        private ?string $mainScriptPath,
+        private string           $compressionAlgorithm,
+        private null|int|string  $fileMode,
+        private ?string          $mainScriptPath,
         private ?string $mainScriptContents,
         private MapFile $fileMapper,
         private mixed $metadata,

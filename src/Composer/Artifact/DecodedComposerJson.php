@@ -25,15 +25,15 @@ use function array_keys;
 final readonly class DecodedComposerJson
 {
     /**
-     * @param array $composerJsonDecodedContents Decoded JSON contents of the `composer.json` file
+     * @param array $decodedContents Decoded JSON contents of the `composer.json` file
      */
-    public function __construct(private array $composerJsonDecodedContents)
+    public function __construct(public array $decodedContents)
     {
     }
 
     public function getRequiredPhpVersion(): ?string
     {
-        return $this->composerJsonDecodedContents['require']['php'] ?? null;
+        return $this->decodedContents['require']['php'] ?? null;
     }
 
     public function hasRequiredPhpVersion(): bool
@@ -46,7 +46,7 @@ final readonly class DecodedComposerJson
      */
     public function getRequiredItems(): array
     {
-        $require = $this->composerJsonDecodedContents['require'] ?? [];
+        $require = $this->decodedContents['require'] ?? [];
 
         return array_map(
             static fn (string $packageName) => new RequiredItem([$packageName => $require[$packageName]]),
@@ -57,7 +57,12 @@ final readonly class DecodedComposerJson
     public function getConflictingExtensions(): Extensions
     {
         return PackageInfo::parseExtensions(
-            $this->composerJsonDecodedContents['conflict'] ?? [],
+            $this->decodedContents['conflict'] ?? [],
         );
+    }
+
+    public function getVendorDir(): ?string
+    {
+        return $this->decodedContents['config']['vendor-dir'] ?? null;
     }
 }

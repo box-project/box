@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
 use Symfony\Component\Filesystem\Path;
 use function array_column;
 use function array_filter;
@@ -27,6 +28,9 @@ use const DIRECTORY_SEPARATOR;
  */
 final class ComposerConfiguration
 {
+    // TODO: move more things of this class into the decoded
+    private const DEFAULT_VENDOR_DIR = 'vendor';
+
     /**
      * Attempts to locate the `composer.json` and `composer.lock` files in the provided base-path in order to collect
      * all the dev packages.
@@ -80,17 +84,9 @@ final class ComposerConfiguration
         );
     }
 
-    public static function retrieveVendorDir(array $composerJsonDecodedContents): string
+    public static function retrieveVendorDir(?DecodedComposerJson $composerJson): string
     {
-        if (false === array_key_exists('config', $composerJsonDecodedContents)) {
-            return 'vendor';
-        }
-
-        if (false === array_key_exists('vendor-dir', $composerJsonDecodedContents['config'])) {
-            return 'vendor';
-        }
-
-        return $composerJsonDecodedContents['config']['vendor-dir'];
+        return $composerJson?->getVendorDir() ?? self::DEFAULT_VENDOR_DIR;
     }
 
     /**
