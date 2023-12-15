@@ -601,16 +601,18 @@ final class Compile implements CommandAware
             return;
         }
 
-        if (null !== ($stub = $config->getStubPath())) {
+        $stubPath = $config->getStubPath();
+
+        if (null !== $stubPath) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,
                 sprintf(
                     'Using stub file: %s',
-                    $stub,
+                    $stubPath,
                 ),
             );
 
-            $box->registerStub($stub);
+            $box->registerStub($stubPath);
 
             return;
         }

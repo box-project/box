@@ -23,6 +23,7 @@ use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\PhpScoper;
 use KevinGH\Box\Compactor\Placeholder;
+use KevinGH\Box\Filesystem\LocalPharFile;
 use KevinGH\Box\Parallelization\ParallelFileProcessor;
 use KevinGH\Box\Parallelization\ParallelizationDecider;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -47,6 +48,7 @@ use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
 use function sprintf;
+use function strval;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -62,7 +64,7 @@ final class Box implements Countable
     private bool $buffering = false;
 
     /**
-     * @var array<string, string> Relative file path as key and file contents as value
+     * @var array<string, LocalPharFile>
      */
     private array $bufferedFiles = [];
 
@@ -132,8 +134,11 @@ final class Box implements Countable
         }
 
         try {
-            foreach ($this->bufferedFiles as $file => $contents) {
-                FS::dumpFile($file, $contents);
+            foreach ($this->bufferedFiles as $file) {
+                FS::dumpFile(
+                    $file->path,
+                    $file->contents,
+                );
             }
 
             if (null !== $dumpAutoload) {
@@ -294,7 +299,7 @@ final class Box implements Countable
     {
         Assert::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
-        $files = array_map('strval', $files);
+        $files = array_map(strval(...), $files);
 
         if ($binary) {
             foreach ($files as $file) {
@@ -304,8 +309,8 @@ final class Box implements Countable
             return;
         }
 
-        foreach ($this->processContents($files) as [$file, $contents]) {
-            $this->bufferedFiles[$file] = $contents;
+        foreach ($this->processContents($files) as $file) {
+            $this->bufferedFiles[$file->path] = $file;
         }
     }
 
@@ -328,7 +333,12 @@ final class Box implements Countable
 
         $local = ($this->mapFile)($file);
 
-        $this->bufferedFiles[$local] = $binary ? $contents : $this->compactors->compact($local, $contents);
+        $this->bufferedFiles[$local] = new LocalPharFile(
+            $local,
+            $binary ?
+                $contents :
+                $this->compactors->compact($local, $contents),
+        );
 
         return $local;
     }
@@ -445,8 +455,7 @@ final class Box implements Countable
     /**
      * @param string[] $files
      *
-     * @return array array of tuples where the first element is the local file path (path inside the PHAR) and the
-     *               second element is the processed contents
+     * @return LocalPharFile[]
      */
     private function processContents(array $files): array
     {
@@ -472,7 +481,7 @@ final class Box implements Countable
     /**
      * @param string[] $files
      *
-     * @return list<array{string, string}>
+     * @return LocalPharFile[]
      */
     private static function processFilesSynchronously(
         array $files,
@@ -480,17 +489,17 @@ final class Box implements Countable
         MapFile $mapFile,
         Compactors $compactors,
     ): array {
-        $processFile = static function (string $file) use ($mapFile, $compactors): array {
+        $processFile = static function (string $file) use ($mapFile, $compactors): LocalPharFile {
             $contents = FS::getFileContents($file);
 
             $local = $mapFile($file);
 
             $processedContents = $compactors->compact($local, $contents);
 
-            return [
+            return new LocalPharFile(
                 $local,
                 $processedContents,
-            ];
+            );
         };
 
         return array_map($processFile, $files);
