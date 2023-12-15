@@ -23,11 +23,13 @@ use KevinGH\Box\Console\Command\Diff;
 use KevinGH\Box\Console\Command\Extract;
 use KevinGH\Box\Console\Command\GenerateDockerFile;
 use KevinGH\Box\Console\Command\Info;
+use KevinGH\Box\Console\Command\Info\Requirements as InfoRequirements;
 use KevinGH\Box\Console\Command\Info\Signature as InfoSignature;
 use KevinGH\Box\Console\Command\Namespace_;
 use KevinGH\Box\Console\Command\Process;
 use KevinGH\Box\Console\Command\Validate;
 use KevinGH\Box\Console\Command\Verify;
+use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use function trim;
@@ -98,6 +100,9 @@ final class Application implements FidryApplication
             new Info(),
             new Info('info:general'),
             new InfoSignature(),
+            new InfoRequirements(
+                new AppRequirementsFactory(),
+            ),
             new CheckSignature(),
             new Process(),
             new Extract(),
