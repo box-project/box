@@ -37,18 +37,26 @@ final class RequirementsDumper
 
     private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../res/requirement-checker';
 
+    public function __construct(
+        private AppRequirementsFactory $requirementsFactory,
+    ) {
+    }
+
     /**
      * @return list<array{string, string}>
      */
-    public static function dump(
+    public function dump(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        Assert::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
+        Assert::directory(
+            self::REQUIREMENT_CHECKER_PATH,
+            'Expected the requirement checker to have been dumped',
+        );
 
         $filesWithContents = [
-            self::dumpRequirementsConfig(
+            $this->dumpRequirementsConfig(
                 $composerJson,
                 $composerLock,
                 $compressionAlgorithm,
@@ -63,19 +71,19 @@ final class RequirementsDumper
         foreach ($requirementCheckerFiles as $file) {
             $filesWithContents[] = [
                 $file->getRelativePathname(),
-                FS::getFileContents($file->getPathname()),
+                $file->getContents(),
             ];
         }
 
         return $filesWithContents;
     }
 
-    private static function dumpRequirementsConfig(
+    private function dumpRequirementsConfig(
         DecodedComposerJson $composerJson,
         DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        $requirements = AppRequirementsFactory::create(
+        $requirements = $this->requirementsFactory->create(
             $composerJson,
             $composerLock,
             $compressionAlgorithm,

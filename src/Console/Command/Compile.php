@@ -111,8 +111,10 @@ final class Compile implements CommandAware
 
     private const DEBUG_DIR = '.box_dump';
 
-    public function __construct(private readonly string $header)
-    {
+    public function __construct(
+        private readonly string $header,
+        private readonly RequirementsDumper $requirementsDumper,
+    ) {
     }
 
     public function getConfiguration(): CommandConfiguration
@@ -270,7 +272,12 @@ final class Compile implements CommandAware
         // file used for debugging purposes and the Composer dump autoloading will not work correctly otherwise.
         $main = self::registerMainScript($config, $box, $logger);
 
-        $check = self::registerRequirementsChecker($config, $box, $logger);
+        $check = self::registerRequirementsChecker(
+            $config,
+            $box,
+            $this->requirementsDumper,
+            $logger,
+        );
 
         self::addFiles($config, $box, $logger, $io);
 
@@ -550,7 +557,12 @@ final class Compile implements CommandAware
         return $localMain;
     }
 
-    private static function registerRequirementsChecker(Configuration $config, Box $box, CompilerLogger $logger): bool
+    private static function registerRequirementsChecker(
+        Configuration $config,
+        Box $box,
+        RequirementsDumper $requirementsDumper,
+        CompilerLogger $logger,
+    ): bool
     {
         if (false === $config->checkRequirements()) {
             $logger->log(
@@ -566,7 +578,7 @@ final class Compile implements CommandAware
             'Adding requirements checker',
         );
 
-        $checkFiles = RequirementsDumper::dump(
+        $checkFiles = $requirementsDumper->dump(
             new DecodedComposerJson($config->getDecodedComposerJsonContents() ?? []),
             new DecodedComposerLock($config->getDecodedComposerLockContents() ?? []),
             $config->getCompressionAlgorithm(),

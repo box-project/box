@@ -30,6 +30,15 @@ use function sort;
 #[CoversClass(RequirementsDumper::class)]
 class RequirementsDumperTest extends TestCase
 {
+    private RequirementsDumper $dumper;
+
+    protected function setUp(): void
+    {
+        $this->dumper = new RequirementsDumper(
+            new AppRequirementsFactory(),
+        );
+    }
+
     #[DataProvider('jsonAndLockContentsProvider')]
     public function test_it_dumps_the_requirement_checker_files(
         DecodedComposerJson $decodedComposerJsonContents,
@@ -37,7 +46,7 @@ class RequirementsDumperTest extends TestCase
         CompressionAlgorithm $compressionAlgorithm,
         string $expectedRequirement,
     ): void {
-        $checkFiles = RequirementsDumper::dump(
+        $checkFiles = $this->dumper->dump(
             $decodedComposerJsonContents,
             $decodedComposerLockContents,
             $compressionAlgorithm,
