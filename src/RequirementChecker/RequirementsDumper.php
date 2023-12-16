@@ -41,16 +41,16 @@ final class RequirementsDumper
      * @return list<array{string, string}>
      */
     public static function dump(
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+        ?DecodedComposerJson $composerJson,
+        ?DecodedComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
         Assert::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
 
         $filesWithContents = [
             self::dumpRequirementsConfig(
-                $composerJson,
-                $composerLock,
+                $composerJson ?? new DecodedComposerJson('', []),
+                $composerLock ?? new DecodedComposerLock('', []),
                 $compressionAlgorithm,
             ),
         ];

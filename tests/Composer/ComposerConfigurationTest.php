@@ -241,7 +241,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
-                new DecodedComposerJson([]),
+                new DecodedComposerJson('', []),
                 null,
                 $excludeDevPackages,
             ),
@@ -251,8 +251,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
     #[DataProvider('excludeDevFilesSettingProvider')]
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file(): void
     {
-        $composerJson = new DecodedComposerJson([]);
-        $composerLock = new DecodedComposerLock(json_decode(self::COMPOSER_LOCK_SAMPLE, true));
+        $composerJson = new DecodedComposerJson('', []);
+        $composerLock = self::createComposerLockSample();
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
         FS::mkdir('vendor/doctrine/instantiator');
@@ -279,8 +279,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_2(): void
     {
-        $composerJson = new DecodedComposerJson(['config' => []]);
-        $composerLock = new DecodedComposerLock(json_decode(self::COMPOSER_LOCK_SAMPLE, true));
+        $composerJson = new DecodedComposerJson('', ['config' => []]);
+        $composerLock = self::createComposerLockSample();
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
         FS::mkdir('vendor/doctrine/instantiator');
@@ -307,8 +307,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_ignores_non_existent_dev_packages_found_in_the_lock_file(): void
     {
-        $composerJson = new DecodedComposerJson([]);
-        $composerLock = new DecodedComposerLock(json_decode(self::COMPOSER_LOCK_SAMPLE, true));
+        $composerJson = new DecodedComposerJson('', []);
+        $composerLock = self::createComposerLockSample();
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
         // Doctrine Instantiator vendor does not exists
@@ -334,12 +334,15 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_in_a_custom_vendor_directory(): void
     {
-        $composerJson = new DecodedComposerJson([
-            'config' => [
-                'vendor-dir' => 'custom-vendor',
+        $composerJson = new DecodedComposerJson(
+            '',
+            [
+                'config' => [
+                    'vendor-dir' => 'custom-vendor',
+                ],
             ],
-        ]);
-        $composerLock = new DecodedComposerLock(json_decode(self::COMPOSER_LOCK_SAMPLE, true));
+        );
+        $composerLock = self::createComposerLockSample();
 
         FS::mkdir('custom-vendor/bamarni/composer-bin-plugin');
         FS::mkdir('vendor/doctrine/instantiator');  // Wrong directory
@@ -370,109 +373,112 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_even_if_no_dev_package_is_registered(): void
     {
-        $composerJson = new DecodedComposerJson([]);
+        $composerJson = new DecodedComposerJson('', []);
 
-        $composerLock = new DecodedComposerLock(json_decode(
-            <<<'JSON'
-                {
-                    "_readme": [
-                        "This file locks the dependencies of your project to a known state",
-                        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
-                        "This file is @generated automatically"
-                    ],
-                    "content-hash": "c9ae998336c74a11e44be3255b6abceb",
-                    "packages": [
-                        {
-                            "name": "amphp/amp",
-                            "version": "v2.0.6",
-                            "source": {
-                                "type": "git",
-                                "url": "https://github.com/amphp/amp.git",
-                                "reference": "4a742beb59615f36ed998e2dc210e36576e44c44"
-                            },
-                            "dist": {
-                                "type": "zip",
-                                "url": "https://api.github.com/repos/amphp/amp/zipball/4a742beb59615f36ed998e2dc210e36576e44c44",
-                                "reference": "4a742beb59615f36ed998e2dc210e36576e44c44",
-                                "shasum": ""
-                            },
-                            "require": {
-                                "php": ">=7"
-                            },
-                            "require-dev": {
-                                "amphp/phpunit-util": "^1",
-                                "friendsofphp/php-cs-fixer": "^2.3",
-                                "phpstan/phpstan": "^0.8.5",
-                                "phpunit/phpunit": "^6.0.9",
-                                "react/promise": "^2"
-                            },
-                            "type": "library",
-                            "extra": {
-                                "branch-alias": {
-                                    "dev-master": "2.0.x-dev"
-                                }
-                            },
-                            "autoload": {
-                                "psr-4": {
-                                    "Amp\\": "lib"
+        $composerLock = new DecodedComposerLock(
+            '',
+            json_decode(
+                <<<'JSON'
+                    {
+                        "_readme": [
+                            "This file locks the dependencies of your project to a known state",
+                            "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+                            "This file is @generated automatically"
+                        ],
+                        "content-hash": "c9ae998336c74a11e44be3255b6abceb",
+                        "packages": [
+                            {
+                                "name": "amphp/amp",
+                                "version": "v2.0.6",
+                                "source": {
+                                    "type": "git",
+                                    "url": "https://github.com/amphp/amp.git",
+                                    "reference": "4a742beb59615f36ed998e2dc210e36576e44c44"
                                 },
-                                "files": [
-                                    "lib/functions.php",
-                                    "lib/Internal/functions.php"
-                                ]
-                            },
-                            "notification-url": "https://packagist.org/downloads/",
-                            "license": [
-                                "MIT"
-                            ],
-                            "authors": [
-                                {
-                                    "name": "Bob Weinand",
-                                    "email": "bobwei9@hotmail.com"
+                                "dist": {
+                                    "type": "zip",
+                                    "url": "https://api.github.com/repos/amphp/amp/zipball/4a742beb59615f36ed998e2dc210e36576e44c44",
+                                    "reference": "4a742beb59615f36ed998e2dc210e36576e44c44",
+                                    "shasum": ""
                                 },
-                                {
-                                    "name": "Niklas Keller",
-                                    "email": "me@kelunik.com"
+                                "require": {
+                                    "php": ">=7"
                                 },
-                                {
-                                    "name": "Daniel Lowrey",
-                                    "email": "rdlowrey@php.net"
+                                "require-dev": {
+                                    "amphp/phpunit-util": "^1",
+                                    "friendsofphp/php-cs-fixer": "^2.3",
+                                    "phpstan/phpstan": "^0.8.5",
+                                    "phpunit/phpunit": "^6.0.9",
+                                    "react/promise": "^2"
                                 },
-                                {
-                                    "name": "Aaron Piotrowski",
-                                    "email": "aaron@trowski.com"
-                                }
-                            ],
-                            "description": "A non-blocking concurrency framework for PHP applications.",
-                            "homepage": "http://amphp.org/amp",
-                            "keywords": [
-                                "async",
-                                "asynchronous",
-                                "awaitable",
-                                "concurrency",
-                                "event",
-                                "event-loop",
-                                "future",
-                                "non-blocking",
-                                "promise"
-                            ],
-                            "time": "2018-01-27T19:18:05+00:00"
-                        }
-                    ],
-                    "aliases": [],
-                    "minimum-stability": "stable",
-                    "stability-flags": [],
-                    "prefer-stable": false,
-                    "prefer-lowest": false,
-                    "platform": {
-                        "php": "^7.1",
-                        "ext-phar": "*"
-                    },
-                    "platform-dev": []
-                }
-                JSON,
-            true,
-        ));
+                                "type": "library",
+                                "extra": {
+                                    "branch-alias": {
+                                        "dev-master": "2.0.x-dev"
+                                    }
+                                },
+                                "autoload": {
+                                    "psr-4": {
+                                        "Amp\\": "lib"
+                                    },
+                                    "files": [
+                                        "lib/functions.php",
+                                        "lib/Internal/functions.php"
+                                    ]
+                                },
+                                "notification-url": "https://packagist.org/downloads/",
+                                "license": [
+                                    "MIT"
+                                ],
+                                "authors": [
+                                    {
+                                        "name": "Bob Weinand",
+                                        "email": "bobwei9@hotmail.com"
+                                    },
+                                    {
+                                        "name": "Niklas Keller",
+                                        "email": "me@kelunik.com"
+                                    },
+                                    {
+                                        "name": "Daniel Lowrey",
+                                        "email": "rdlowrey@php.net"
+                                    },
+                                    {
+                                        "name": "Aaron Piotrowski",
+                                        "email": "aaron@trowski.com"
+                                    }
+                                ],
+                                "description": "A non-blocking concurrency framework for PHP applications.",
+                                "homepage": "http://amphp.org/amp",
+                                "keywords": [
+                                    "async",
+                                    "asynchronous",
+                                    "awaitable",
+                                    "concurrency",
+                                    "event",
+                                    "event-loop",
+                                    "future",
+                                    "non-blocking",
+                                    "promise"
+                                ],
+                                "time": "2018-01-27T19:18:05+00:00"
+                            }
+                        ],
+                        "aliases": [],
+                        "minimum-stability": "stable",
+                        "stability-flags": [],
+                        "prefer-stable": false,
+                        "prefer-lowest": false,
+                        "platform": {
+                            "php": "^7.1",
+                            "ext-phar": "*"
+                        },
+                        "platform-dev": []
+                    }
+                    JSON,
+                true,
+            ),
+        );
 
         FS::mkdir('custom-vendor/bamarni/composer-bin-plugin');
         FS::mkdir('vendor/doctrine/instantiator');  // Wrong directory
@@ -518,22 +524,33 @@ class ComposerConfigurationTest extends FileSystemTestCase
         ];
 
         yield 'no custom vendor-dir' => [
-            new DecodedComposerJson([]),
+            new DecodedComposerJson('', []),
             'vendor',
         ];
 
         yield 'no custom vendor-dir in config' => [
-            new DecodedComposerJson(['config' => ['platform' => ['php' => '7.2']]]),
+            new DecodedComposerJson('', ['config' => ['platform' => ['php' => '7.2']]]),
             'vendor',
         ];
 
         yield 'custom vendor-dir' => [
-            new DecodedComposerJson([
-                'config' => [
-                    'vendor-dir' => 'custom-vendor',
+            new DecodedComposerJson(
+                '',
+                [
+                    'config' => [
+                        'vendor-dir' => 'custom-vendor',
+                    ],
                 ],
-            ]),
+            ),
             'custom-vendor',
         ];
+    }
+
+    private static function createComposerLockSample(): DecodedComposerLock
+    {
+        return new DecodedComposerLock(
+            '',
+            json_decode(self::COMPOSER_LOCK_SAMPLE, true),
+        );
     }
 }

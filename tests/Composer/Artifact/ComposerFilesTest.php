@@ -28,8 +28,8 @@ class ComposerFilesTest extends TestCase
     #[DataProvider('validInstantiatorsProvider')]
     public function test_it_can_be_created(
         Closure $create,
-        ?ComposerFile $expectedComposerJson,
-        ?ComposerFile $expectedComposerLock,
+        ?DecodedComposerJson $expectedComposerJson,
+        ?DecodedComposerLock $expectedComposerLock,
         ?ComposerFile $expectedInstalledJson,
         array $expectedPaths,
     ): void {
@@ -48,8 +48,8 @@ class ComposerFilesTest extends TestCase
     public static function validInstantiatorsProvider(): iterable
     {
         yield (static function (): array {
-            $json = new ComposerFile('path/to/composer.json', ['name' => 'composer.json']);
-            $lock = new ComposerFile('path/to/composer.lock', ['name' => 'composer.lock']);
+            $json = new DecodedComposerJson('path/to/composer.json', ['name' => 'composer.json']);
+            $lock = new DecodedComposerLock('path/to/composer.lock', ['name' => 'composer.lock']);
             $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
 
             return [
@@ -66,7 +66,7 @@ class ComposerFilesTest extends TestCase
         })();
 
         yield (static function (): array {
-            $json = new ComposerFile('path/to/composer.json', ['name' => 'composer.json']);
+            $json = new DecodedComposerJson('path/to/composer.json', ['name' => 'composer.json']);
             $lock = null;
             $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
 

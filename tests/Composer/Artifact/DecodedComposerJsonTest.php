@@ -35,7 +35,10 @@ class DecodedComposerJsonTest extends TestCase
         array $expectedRequiredItems,
         array $expectedConflictingExtensions,
     ): void {
-        $actual = new DecodedComposerJson(json_decode($composerJsonContents, true));
+        $actual = new DecodedComposerJson(
+            '',
+            json_decode($composerJsonContents, true),
+        );
 
         self::assertStateIs(
             $actual,

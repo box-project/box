@@ -21,18 +21,18 @@ use function array_values;
 final readonly class ComposerFiles
 {
     public function __construct(
-        private ?ComposerFile $composerJson = null,
-        private ?ComposerFile $composerLock = null,
+        private ?DecodedComposerJson $composerJson = null,
+        private ?DecodedComposerLock $composerLock = null,
         private ?ComposerFile $installedJson = null,
     ) {
     }
 
-    public function getComposerJson(): ?ComposerFile
+    public function getComposerJson(): ?DecodedComposerJson
     {
         return $this->composerJson;
     }
 
-    public function getComposerLock(): ?ComposerFile
+    public function getComposerLock(): ?DecodedComposerLock
     {
         return $this->composerLock;
     }
@@ -50,7 +50,7 @@ final readonly class ComposerFiles
         return array_values(
             array_filter(
                 array_map(
-                    static fn (?ComposerFile $file): ?string => $file?->path,
+                    static fn (null|ComposerFile|DecodedComposerJson|DecodedComposerLock $file): ?string => $file?->path,
                     [$this->composerJson, $this->composerLock, $this->installedJson],
                 ),
             ),

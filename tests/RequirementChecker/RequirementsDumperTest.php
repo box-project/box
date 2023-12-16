@@ -102,8 +102,8 @@ class RequirementsDumperTest extends TestCase
     public static function jsonAndLockContentsProvider(): iterable
     {
         yield [
-            new DecodedComposerJson([]),
-            new DecodedComposerLock([]),
+            new DecodedComposerJson('', []),
+            new DecodedComposerLock('', []),
             CompressionAlgorithm::NONE,
             <<<'PHP'
                 <?php
@@ -114,18 +114,21 @@ class RequirementsDumperTest extends TestCase
         ];
 
         yield [
-            new DecodedComposerJson([]),
-            new DecodedComposerLock([
-                'packages' => [
-                    [
-                        'name' => 'acme/foo',
-                        'require' => [
-                            'php' => '^7.4',
-                            'ext-json' => '*',
+            new DecodedComposerJson('', []),
+            new DecodedComposerLock(
+                '',
+                [
+                    'packages' => [
+                        [
+                            'name' => 'acme/foo',
+                            'require' => [
+                                'php' => '^7.4',
+                                'ext-json' => '*',
+                            ],
                         ],
                     ],
                 ],
-            ]),
+            ),
             CompressionAlgorithm::GZ,
             <<<'PHP'
                 <?php
