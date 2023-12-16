@@ -22,6 +22,7 @@ use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\NullCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
+use KevinGH\Box\Composer\Artifact\ComposerFile;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -315,28 +316,35 @@ class ConfigurationTest extends ConfigurationTestCase
     #[DataProvider('jsonFilesProvider')]
     public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
         callable $setup,
-        ?string $expectedJson,
+        ?string $expectedJsonPath,
         ?array $expectedJsonContents,
-        ?string $expectedLock,
+        ?string $expectedLockPath,
         ?array $expectedLockContents,
     ): void {
         $setup();
 
-        if (null !== $expectedJson) {
-            $expectedJson = $this->tmp.DIRECTORY_SEPARATOR.$expectedJson;
+        if (null !== $expectedJsonPath) {
+            $expectedJsonPath = $this->tmp.DIRECTORY_SEPARATOR.$expectedJsonPath;
         }
 
-        if (null !== $expectedLock) {
-            $expectedLock = $this->tmp.DIRECTORY_SEPARATOR.$expectedLock;
+        if (null !== $expectedLockPath) {
+            $expectedLockPath = $this->tmp.DIRECTORY_SEPARATOR.$expectedLockPath;
         }
+
+        $expectedJson = new ComposerFile(
+            $expectedJsonPath,
+            $expectedJsonContents ?? [],
+        );
+
+        $expectedLock = new ComposerFile(
+            $expectedLockPath,
+            $expectedLockContents ?? [],
+        );
 
         $this->reloadConfig();
 
-        self::assertSame($expectedJson, $this->config->getComposerJson());
-        self::assertSame($expectedJsonContents, $this->config->getDecodedComposerJsonContents());
-
-        self::assertSame($expectedLock, $this->config->getComposerLock());
-        self::assertSame($expectedLockContents, $this->config->getDecodedComposerLockContents());
+        self::assertEquals($expectedJson, $this->config->getComposerJson());
+        self::assertEquals($expectedLock, $this->config->getComposerLock());
 
         self::assertSame([], $this->config->getRecommendations());
         self::assertSame([], $this->config->getWarnings());
@@ -2962,11 +2970,9 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getBinaryFiles());
         self::assertSame([], $this->config->getCompactors()->toArray());
         self::assertFalse($this->config->hasAutodiscoveredFiles());
-        self::assertNull($this->config->getComposerJson());
-        self::assertNull($this->config->getComposerLock());
+        self::assertNotNull($this->config->getComposerJson());
+        self::assertNotNull($this->config->getComposerLock());
         self::assertSame(CompressionAlgorithm::NONE, $this->config->getCompressionAlgorithm());
-        self::assertNull($this->config->getDecodedComposerJsonContents());
-        self::assertNull($this->config->getDecodedComposerLockContents());
         self::assertSame($this->tmp.'/box.json', $this->config->getConfigurationFile());
         self::assertEquals(
             new MapFile($this->tmp, []),

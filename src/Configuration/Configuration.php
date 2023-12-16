@@ -495,24 +495,14 @@ final class Configuration
         return $this->basePath;
     }
 
-    public function getComposerJson(): ?string
+    public function getComposerJson(): ComposerFile
     {
-        return $this->composerJson->path;
+        return $this->composerJson;
     }
 
-    public function getDecodedComposerJsonContents(): ?array
+    public function getComposerLock(): ComposerFile
     {
-        return null === $this->composerJson->path ? null : $this->composerJson->decodedContents;
-    }
-
-    public function getComposerLock(): ?string
-    {
-        return $this->composerLock->path;
-    }
-
-    public function getDecodedComposerLockContents(): ?array
-    {
-        return null === $this->composerLock->path ? null : $this->composerLock->decodedContents;
+        return $this->composerLock;
     }
 
     /**

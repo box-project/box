@@ -53,12 +53,12 @@ final readonly class ExportableConfiguration
             $configuration->getAlias(),
             $configuration->getBasePath(),
             new ComposerFile(
-                $normalizePath($composerJson),
-                $configuration->getDecodedComposerJsonContents() ?? [],
+                $normalizePath($composerJson->path),
+                $composerJson->decodedContents,
             ),
             new ComposerFile(
-                $normalizePath($composerLock),
-                $configuration->getDecodedComposerLockContents() ?? [],
+                $normalizePath($composerLock->path),
+                $composerLock->decodedContents,
             ),
             $normalizePaths($configuration->getFiles()),
             $normalizePaths($configuration->getBinaryFiles()),
