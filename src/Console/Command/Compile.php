@@ -567,8 +567,8 @@ final class Compile implements CommandAware
         );
 
         $checkFiles = RequirementsDumper::dump(
-            new DecodedComposerJson($config->getDecodedComposerJsonContents() ?? []),
-            new DecodedComposerLock($config->getDecodedComposerLockContents() ?? []),
+            new DecodedComposerJson($config->getComposerJson()->getDecodedContents()),
+            new DecodedComposerLock($config->getComposerLock()->getDecodedContents()),
             $config->getCompressionAlgorithm(),
         );
 
@@ -682,7 +682,7 @@ final class Compile implements CommandAware
         if ($config->excludeComposerFiles()) {
             $box->removeComposerArtefacts(
                 ComposerConfiguration::retrieveVendorDir(
-                    new DecodedComposerJson($config->getDecodedComposerJsonContents() ?? []),
+                    new DecodedComposerJson($config->getComposerJson()->getDecodedContents()),
                 ),
             );
         }
