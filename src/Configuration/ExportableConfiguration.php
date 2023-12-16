@@ -52,14 +52,18 @@ final readonly class ExportableConfiguration
             $normalizePath($configuration->getConfigurationFile()),
             $configuration->getAlias(),
             $configuration->getBasePath(),
-            new ComposerFile(
-                $normalizePath($composerJson->path),
-                $composerJson->decodedContents,
-            ),
-            new ComposerFile(
-                $normalizePath($composerLock->path),
-                $composerLock->decodedContents,
-            ),
+            null === $composerJson
+                ? null
+                : new ComposerFile(
+                    $normalizePath($composerJson->path),
+                    $composerJson->decodedContents,
+                ),
+            null === $composerLock
+                ? null
+                : new ComposerFile(
+                    $normalizePath($composerLock->path),
+                    $composerLock->decodedContents,
+                ),
             $normalizePaths($configuration->getFiles()),
             $normalizePaths($configuration->getBinaryFiles()),
             $configuration->hasAutodiscoveredFiles(),
@@ -116,8 +120,8 @@ final readonly class ExportableConfiguration
         private ?string $file,
         private string $alias,
         private string $basePath,
-        private ComposerFile $composerJson,
-        private ComposerFile $composerLock,
+        private ?ComposerFile $composerJson,
+        private ?ComposerFile $composerLock,
         private array $files,
         private array $binaryFiles,
         private bool $autodiscoveredFiles,

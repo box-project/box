@@ -226,7 +226,7 @@ final class Configuration
 
         $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
 
-        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles->getComposerJson()->decodedContents, $logger);
+        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles->getComposerJson()?->decodedContents, $logger);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath, $mainScriptPath, $logger);
@@ -255,8 +255,8 @@ final class Configuration
 
         $checkRequirements = self::retrieveCheckRequirements(
             $raw,
-            null !== $composerFiles->getComposerJson()->path,
-            null !== $composerFiles->getComposerLock()->path,
+            null !== $composerFiles->getComposerJson()?->path,
+            null !== $composerFiles->getComposerLock()?->path,
             false === $isStubGenerated && null === $stubPath,
             $logger,
         );
@@ -265,8 +265,8 @@ final class Configuration
 
         $devPackages = ComposerConfiguration::retrieveDevPackages(
             $basePath,
-            new DecodedComposerJson($composerFiles->getComposerJson()->decodedContents),
-            new DecodedComposerLock($composerFiles->getComposerLock()->decodedContents),
+            new DecodedComposerJson($composerFiles->getComposerJson()?->decodedContents ?? []),
+            new DecodedComposerLock($composerFiles->getComposerLock()?->decodedContents ?? []),
             $excludeDevPackages,
         );
 
@@ -422,8 +422,8 @@ final class Configuration
         private readonly ?string $file,
         private readonly string $alias,
         private readonly string $basePath,
-        private readonly ComposerFile $composerJson,
-        private readonly ComposerFile $composerLock,
+        private readonly ?ComposerFile $composerJson,
+        private readonly ?ComposerFile $composerLock,
         private readonly array $files,
         private readonly array $binaryFiles,
         private readonly bool $autodiscoveredFiles,
@@ -495,12 +495,12 @@ final class Configuration
         return $this->basePath;
     }
 
-    public function getComposerJson(): ComposerFile
+    public function getComposerJson(): ?ComposerFile
     {
         return $this->composerJson;
     }
 
-    public function getComposerLock(): ComposerFile
+    public function getComposerLock(): ?ComposerFile
     {
         return $this->composerLock;
     }
@@ -848,7 +848,7 @@ final class Configuration
         if ($autodiscoverFiles || $forceFilesAutodiscovery) {
             [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
                 $basePath,
-                $composerFiles->getComposerJson()->decodedContents,
+                $composerFiles->getComposerJson()?->decodedContents,
                 $devPackages,
                 $composerFiles->getPaths(),
                 $excludedPaths,
@@ -912,7 +912,7 @@ final class Configuration
         array $devPackages,
         ConfigurationLogger $logger,
     ): array {
-        $binaryFiles = self::retrieveFiles($raw, self::FILES_BIN_KEY, $basePath, ComposerFiles::createEmpty(), $alwaysExcludedPaths, $logger);
+        $binaryFiles = self::retrieveFiles($raw, self::FILES_BIN_KEY, $basePath, new ComposerFiles(), $alwaysExcludedPaths, $logger);
 
         $binaryDirectories = self::retrieveDirectories(
             $raw,
@@ -952,8 +952,8 @@ final class Configuration
 
         $excludedFiles = array_flip($excludedFiles);
         $files = array_filter([
-            $composerFiles->getComposerJson()->path,
-            $composerFiles->getComposerLock()->path,
+            $composerFiles->getComposerJson()?->path,
+            $composerFiles->getComposerLock()?->path,
         ]);
 
         if (false === isset($raw->{$key})) {
@@ -1541,22 +1541,22 @@ final class Configuration
         self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, null);
 
         $canDumpAutoload = (
-            null !== $composerFiles->getComposerJson()->path
+            null !== $composerFiles->getComposerJson()?->path
             && (
                 // The composer.lock and installed.json are optional (e.g. if there is no dependencies installed)
                 // but when one is present, the other must be as well otherwise the dumped autoloader will be broken
                 (
-                    null === $composerFiles->getComposerLock()->path
-                    && null === $composerFiles->getInstalledJson()->path
+                    null === $composerFiles->getComposerLock()?->path
+                    && null === $composerFiles->getInstalledJson()?->path
                 )
                 || (
-                    null !== $composerFiles->getComposerLock()->path
-                    && null !== $composerFiles->getInstalledJson()->path
+                    null !== $composerFiles->getComposerLock()?->path
+                    && null !== $composerFiles->getInstalledJson()?->path
                 )
                 || (
-                    null === $composerFiles->getComposerLock()->path
-                    && null !== $composerFiles->getInstalledJson()->path
-                    && [] === $composerFiles->getInstalledJson()->decodedContents
+                    null === $composerFiles->getComposerLock()?->path
+                    && null !== $composerFiles->getInstalledJson()?->path
+                    && [] === $composerFiles->getInstalledJson()?->decodedContents
                 )
             )
         );
@@ -1815,12 +1815,12 @@ final class Configuration
         );
     }
 
-    private static function retrieveComposerFile(string $path): ComposerFile
+    private static function retrieveComposerFile(string $path): ?ComposerFile
     {
         $json = new Json();
 
         if (false === file_exists($path) || false === is_file($path) || false === is_readable($path)) {
-            return ComposerFile::createEmpty();
+            return null;
         }
 
         try {

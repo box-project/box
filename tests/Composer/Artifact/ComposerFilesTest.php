@@ -28,9 +28,9 @@ class ComposerFilesTest extends TestCase
     #[DataProvider('validInstantiatorsProvider')]
     public function test_it_can_be_created(
         Closure $create,
-        ComposerFile $expectedComposerJson,
-        ComposerFile $expectedComposerLock,
-        ComposerFile $expectedInstalledJson,
+        ?ComposerFile $expectedComposerJson,
+        ?ComposerFile $expectedComposerLock,
+        ?ComposerFile $expectedInstalledJson,
         array $expectedPaths,
     ): void {
         /** @var ComposerFiles $actual */
@@ -67,7 +67,7 @@ class ComposerFilesTest extends TestCase
 
         yield (static function (): array {
             $json = new ComposerFile('path/to/composer.json', ['name' => 'composer.json']);
-            $lock = ComposerFile::createEmpty();
+            $lock = null;
             $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
 
             return [
@@ -82,12 +82,12 @@ class ComposerFilesTest extends TestCase
             ];
         })();
 
-        yield (static fn (): array => [
-            static fn (): ComposerFiles => ComposerFiles::createEmpty(),
-            ComposerFile::createEmpty(),
-            ComposerFile::createEmpty(),
-            ComposerFile::createEmpty(),
+        yield [
+            static fn () => new ComposerFiles(),
+            null,
+            null,
+            null,
             [],
-        ])();
+        ];
     }
 }
