@@ -358,7 +358,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
             self::assertSame(
                 <<<EOF
-                    Expected the file "{$composerJson}" to be a valid composer.json file but an error has been found: Parse error on line 1:
+                    Expected the file "{$composerJson}" to be a valid JSON file but an error has been found: Parse error on line 1:
 
                     ^
                     Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
@@ -383,7 +383,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
             self::assertSame(
                 <<<EOF
-                    Expected the file "{$composerLock}" to be a valid composer.json file but an error has been found: Parse error on line 1:
+                    Expected the file "{$composerLock}" to be a valid JSON file but an error has been found: Parse error on line 1:
 
                     ^
                     Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
