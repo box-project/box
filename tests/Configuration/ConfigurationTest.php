@@ -316,10 +316,10 @@ class ConfigurationTest extends ConfigurationTestCase
     #[DataProvider('jsonFilesProvider')]
     public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
         callable $setup,
-        ?string  $expectedJsonPath,
-        ?array   $expectedJsonContents,
-        ?string  $expectedLockPath,
-        ?array   $expectedLockContents,
+        ?string $expectedJsonPath,
+        ?array $expectedJsonContents,
+        ?string $expectedLockPath,
+        ?array $expectedLockContents,
     ): void {
         $setup();
 
