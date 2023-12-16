@@ -1217,11 +1217,10 @@ final class Configuration
     ): array {
         $toString = static fn (SplFileInfo|string $file): string => (string) $file;
 
-        if (null !== $decodedJsonContents && array_key_exists('vendor-dir', $decodedJsonContents)) {
-            $vendorDir = self::normalizePath($decodedJsonContents['vendor-dir'], $basePath);
-        } else {
-            $vendorDir = self::normalizePath('vendor', $basePath);
-        }
+        $vendorDir = self::normalizePath(
+            $decodedJsonContents['config']['vendor-dir'] ?? 'vendor',
+            $basePath,
+        );
 
         if (file_exists($vendorDir)) {
             // Note that some files may not exist. For example installed.json does not exist at all if no dependencies
