@@ -16,35 +16,21 @@ namespace KevinGH\Box\Composer\Artifact;
 
 use Webmozart\Assert\Assert;
 
-final class ComposerFile
+final readonly class ComposerFile
 {
-    private readonly ?string $path;
-    private readonly array $contents;
-
     public static function createEmpty(): self
     {
         return new self(null, []);
     }
 
-    public function __construct(?string $path, array $contents)
-    {
+    public function __construct(
+        public ?string $path,
+        public array $decodedContents,
+    ) {
         Assert::nullOrNotEmpty($path);
 
         if (null === $path) {
-            Assert::same([], $contents);
+            Assert::same([], $decodedContents);
         }
-
-        $this->path = $path;
-        $this->contents = $contents;
-    }
-
-    public function getPath(): ?string
-    {
-        return $this->path;
-    }
-
-    public function getDecodedContents(): array
-    {
-        return $this->contents;
     }
 }
