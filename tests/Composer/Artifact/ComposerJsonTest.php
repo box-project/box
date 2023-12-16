@@ -35,10 +35,7 @@ class ComposerJsonTest extends TestCase
         array $expectedRequiredItems,
         array $expectedConflictingExtensions,
     ): void {
-        $actual = new ComposerJson(
-            '',
-            json_decode($composerJsonContents, true),
-        );
+        $actual = self::createComposerJsonFromContents($composerJsonContents);
 
         self::assertStateIs(
             $actual,
@@ -157,6 +154,76 @@ class ComposerJsonTest extends TestCase
             ],
             ['http'],
         ];
+    }
+
+    #[DataProvider('binProvider')]
+    public function test_it_can_give_the_first_bin_file(
+        string $composerJsonContents,
+        ?string $expected,
+    ): void
+    {
+        $composerJson = self::createComposerJsonFromContents($composerJsonContents);
+
+        $actual = $composerJson->getFirstBin();
+
+        self::assertSame($expected, $actual);
+    }
+
+    public static function binProvider(): iterable
+    {
+        yield 'empty' => [
+            '{}',
+            null,
+        ];
+
+        yield 'empty bin' => [
+            <<<'JSON'
+            {
+                "bin": null
+            }
+            JSON,
+            null,
+        ];
+
+        yield 'single bin' => [
+            <<<'JSON'
+            {
+                "bin": "bin/app.php"
+            }
+            JSON,
+            'bin/app.php',
+        ];
+
+        yield 'single bin in set' => [
+            <<<'JSON'
+            {
+                "bin": [
+                    "bin/app.php"
+                ]
+            }
+            JSON,
+            'bin/app.php',
+        ];
+
+        yield 'multiple bins' => [
+            <<<'JSON'
+            {
+                "bin": [
+                    "bin/app-first.php",
+                    "bin/app-second.php"
+                ]
+            }
+            JSON,
+            'bin/app-first.php',
+        ];
+    }
+
+    private static function createComposerJsonFromContents(string $contents): ComposerJson
+    {
+        return new ComposerJson(
+            '',
+            json_decode($contents, true),
+        );
     }
 
     private static function assertStateIs(

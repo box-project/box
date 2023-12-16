@@ -17,7 +17,9 @@ namespace KevinGH\Box\Composer\Artifact;
 use KevinGH\Box\Composer\Package\Extensions;
 use KevinGH\Box\Composer\Package\PackageInfo;
 use KevinGH\Box\Composer\Package\RequiredItem;
+use function array_key_exists;
 use function array_keys;
+use function current;
 
 /**
  * @private
@@ -66,5 +68,12 @@ final readonly class ComposerJson
     public function getVendorDir(): ?string
     {
         return $this->decodedContents['config']['vendor-dir'] ?? null;
+    }
+
+    public function getFirstBin(): ?string
+    {
+        $firstBin = current((array) ($this->decodedContents['bin'] ?? []));
+
+        return false === $firstBin ? null : $firstBin;
     }
 }

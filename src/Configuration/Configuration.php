@@ -848,7 +848,7 @@ final class Configuration
         if ($autodiscoverFiles || $forceFilesAutodiscovery) {
             [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
                 $basePath,
-                $composerArtifacts->composerJson?->decodedContents,
+                $composerArtifacts->composerJson,
                 $devPackages,
                 $composerArtifacts->getPaths(),
                 $excludedPaths,
@@ -1210,18 +1210,14 @@ final class Configuration
      */
     private static function retrieveAllDirectoriesToInclude(
         string $basePath,
-        ?array $decodedJsonContents,
+        ?ComposerJson $composerJson,
         array $devPackages,
         array $filesToAppend,
         array $excludedPaths,
     ): array {
         $toString = static fn (SplFileInfo|string $file): string => (string) $file;
 
-        if (null !== $decodedJsonContents && array_key_exists('vendor-dir', $decodedJsonContents)) {
-            $vendorDir = self::normalizePath($decodedJsonContents['vendor-dir'], $basePath);
-        } else {
-            $vendorDir = self::normalizePath('vendor', $basePath);
-        }
+        $vendorDir = ComposerConfiguration::retrieveVendorDir($composerJson);
 
         if (file_exists($vendorDir)) {
             // Note that some files may not exist. For example installed.json does not exist at all if no dependencies
@@ -1260,7 +1256,7 @@ final class Configuration
 
             $vendorPackages = array_diff($vendorPackages, $devPackages);
 
-            if (null === $decodedJsonContents || false === array_key_exists('autoload', $decodedJsonContents)) {
+            if (false === array_key_exists('autoload', $composerJson?->decodedContents ?? [])) {
                 $files = toArray(values(map(
                     $toString,
                     Finder::create()
@@ -1295,7 +1291,7 @@ final class Configuration
             $paths = [];
         }
 
-        $autoload = $decodedJsonContents['autoload'] ?? [];
+        $autoload = $composerJson->decodedContents['autoload'] ?? [];
 
         if (array_key_exists('psr-4', $autoload)) {
             foreach ($autoload['psr-4'] as $path) {
@@ -1742,20 +1738,15 @@ final class Configuration
     }
 
     private static function retrieveMainScriptPath(
-        stdClass $raw,
-        string $basePath,
-        ?array $decodedJsonContents,
+        stdClass            $raw,
+        string              $basePath,
+        ?ComposerJson       $composerJson,
         ConfigurationLogger $logger,
     ): ?string {
-        $firstBin = false;
+        $firstBin = $composerJson?->getFirstBin();
 
-        if (null !== $decodedJsonContents && array_key_exists('bin', $decodedJsonContents)) {
-            /** @var false|string $firstBin */
-            $firstBin = current((array) $decodedJsonContents['bin']);
-
-            if (false !== $firstBin) {
-                $firstBin = self::normalizePath($firstBin, $basePath);
-            }
+        if (null !== $firstBin) {
+            $firstBin = self::normalizePath(self::DEFAULT_MAIN_SCRIPT, $basePath);
         }
 
         if (isset($raw->{self::MAIN_KEY})) {
@@ -1774,7 +1765,7 @@ final class Configuration
                 }
             }
         } else {
-            $main = false !== $firstBin ? $firstBin : self::normalizePath(self::DEFAULT_MAIN_SCRIPT, $basePath);
+            $main = $firstBin ?? self::normalizePath(self::DEFAULT_MAIN_SCRIPT, $basePath);
         }
 
         if (is_bool($main)) {
