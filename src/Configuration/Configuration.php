@@ -20,6 +20,7 @@ use DateTimeZone;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
+use JsonException;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
@@ -37,7 +38,6 @@ use KevinGH\Box\PhpScoper\ConfigurationFactory as PhpScoperConfigurationFactory;
 use KevinGH\Box\PhpScoper\SerializableScoper;
 use Phar;
 use RuntimeException;
-use Seld\JsonLint\ParsingException;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Filesystem\Path;
@@ -80,6 +80,7 @@ use function preg_match;
 use function preg_replace;
 use function property_exists;
 use function realpath;
+use function Safe\json_decode;
 use function sprintf;
 use function str_starts_with;
 use function trigger_error;
@@ -1820,15 +1821,13 @@ final class Configuration
 
     private static function retrieveComposerArtifact(string $path): ?ComposerArtifact
     {
-        $json = new Json();
-
         if (false === file_exists($path) || false === is_file($path) || false === is_readable($path)) {
             return null;
         }
 
         try {
-            $contents = (array) $json->decodeFile($path, true);
-        } catch (ParsingException $exception) {
+            $contents = json_decode($path, true);
+        } catch (JsonException $exception) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
