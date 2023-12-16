@@ -26,6 +26,8 @@ use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
 use KevinGH\Box\Composer\Artifact\ComposerFile;
 use KevinGH\Box\Composer\Artifact\ComposerFiles;
+use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
+use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
@@ -263,8 +265,8 @@ final class Configuration
 
         $devPackages = ComposerConfiguration::retrieveDevPackages(
             $basePath,
-            $composerFiles->getComposerJson()->getDecodedContents(),
-            $composerFiles->getComposerLock()->getDecodedContents(),
+            new DecodedComposerJson($composerFiles->getComposerJson()->getDecodedContents()),
+            new DecodedComposerLock($composerFiles->getComposerLock()->getDecodedContents()),
             $excludeDevPackages,
         );
 

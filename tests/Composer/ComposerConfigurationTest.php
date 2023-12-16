@@ -15,6 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Fidry\FileSystem\FS;
+use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
+use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -24,6 +26,8 @@ use function json_decode;
  * @internal
  */
 #[CoversClass(ComposerConfiguration::class)]
+#[CoversClass(DecodedComposerJson::class)]
+#[CoversClass(DecodedComposerLock::class)]
 class ComposerConfigurationTest extends FileSystemTestCase
 {
     private const COMPOSER_LOCK_SAMPLE = <<<'JSON'
@@ -237,7 +241,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
-                [],
+                new DecodedComposerJson([]),
                 null,
                 $excludeDevPackages,
             ),
@@ -247,8 +251,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
     #[DataProvider('excludeDevFilesSettingProvider')]
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file(): void
     {
-        $decodedComposerJson = [];
-        $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
+        $composerJson = new DecodedComposerJson([]);
+        $composerLock = new DecodedComposerLock(json_decode(self::COMPOSER_LOCK_SAMPLE, true));
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
         FS::mkdir('vendor/doctrine/instantiator');
@@ -258,7 +262,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
             $this->tmp.'/vendor/doctrine/instantiator',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $composerJson, $composerLock, true);
 
         self::assertSame($expected, $actual);
 
@@ -266,8 +270,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
-                $decodedComposerJson,
-                $decodedComposerLock,
+                $composerJson,
+                $composerLock,
                 false,
             ),
         );
@@ -275,8 +279,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_2(): void
     {
-        $decodedComposerJson = ['config' => []];
-        $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
+        $composerJson = new DecodedComposerJson(['config' => []]);
+        $composerLock = new DecodedComposerLock(json_decode(self::COMPOSER_LOCK_SAMPLE, true));
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
         FS::mkdir('vendor/doctrine/instantiator');
@@ -286,7 +290,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
             $this->tmp.'/vendor/doctrine/instantiator',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $composerJson, $composerLock, true);
 
         self::assertSame($expected, $actual);
 
@@ -294,8 +298,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
-                $decodedComposerJson,
-                $decodedComposerLock,
+                $composerJson,
+                $composerLock,
                 false,
             ),
         );
@@ -303,8 +307,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_ignores_non_existent_dev_packages_found_in_the_lock_file(): void
     {
-        $decodedComposerJson = [];
-        $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
+        $composerJson = new DecodedComposerJson([]);
+        $composerLock = new DecodedComposerLock(json_decode(self::COMPOSER_LOCK_SAMPLE, true));
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
         // Doctrine Instantiator vendor does not exists
@@ -313,7 +317,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
             $this->tmp.'/vendor/bamarni/composer-bin-plugin',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $composerJson, $composerLock, true);
 
         self::assertSame($expected, $actual);
 
@@ -321,8 +325,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
-                $decodedComposerJson,
-                $decodedComposerLock,
+                $composerJson,
+                $composerLock,
                 false,
             ),
         );
@@ -330,12 +334,12 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_in_a_custom_vendor_directory(): void
     {
-        $decodedComposerJson = [
+        $composerJson = new DecodedComposerJson([
             'config' => [
                 'vendor-dir' => 'custom-vendor',
             ],
-        ];
-        $decodedComposerLock = json_decode(self::COMPOSER_LOCK_SAMPLE, true);
+        ]);
+        $composerLock = new DecodedComposerLock(json_decode(self::COMPOSER_LOCK_SAMPLE, true));
 
         FS::mkdir('custom-vendor/bamarni/composer-bin-plugin');
         FS::mkdir('vendor/doctrine/instantiator');  // Wrong directory
@@ -344,7 +348,12 @@ class ComposerConfigurationTest extends FileSystemTestCase
             $this->tmp.'/custom-vendor/bamarni/composer-bin-plugin',
         ];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
+        $actual = ComposerConfiguration::retrieveDevPackages(
+            $this->tmp,
+            $composerJson,
+            $composerLock,
+            true,
+        );
 
         self::assertSame($expected, $actual);
 
@@ -352,8 +361,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
-                $decodedComposerJson,
-                $decodedComposerLock,
+                $composerJson,
+                $composerLock,
                 false,
             ),
         );
@@ -361,9 +370,9 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_even_if_no_dev_package_is_registered(): void
     {
-        $decodedComposerJson = [];
+        $composerJson = new DecodedComposerJson([]);
 
-        $decodedComposerLock = json_decode(
+        $composerLock = new DecodedComposerLock(json_decode(
             <<<'JSON'
                 {
                     "_readme": [
@@ -463,14 +472,14 @@ class ComposerConfigurationTest extends FileSystemTestCase
                 }
                 JSON,
             true,
-        );
+        ));
 
         FS::mkdir('custom-vendor/bamarni/composer-bin-plugin');
         FS::mkdir('vendor/doctrine/instantiator');  // Wrong directory
 
         $expected = [];
 
-        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $decodedComposerJson, $decodedComposerLock, true);
+        $actual = ComposerConfiguration::retrieveDevPackages($this->tmp, $composerJson, $composerLock, true);
 
         self::assertSame($expected, $actual);
 
@@ -478,8 +487,8 @@ class ComposerConfigurationTest extends FileSystemTestCase
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
-                $decodedComposerJson,
-                $decodedComposerLock,
+                $composerJson,
+                $composerLock,
                 false,
             ),
         );
@@ -489,5 +498,42 @@ class ComposerConfigurationTest extends FileSystemTestCase
     {
         yield [true];
         yield [false];
+    }
+
+    #[DataProvider('vendorDirProvider')]
+    public function test_it_can_retrieve_the_vendor_directory_from_composer_json(
+        ?DecodedComposerJson $composerJson,
+        string $expected,
+    ): void {
+        $actual = ComposerConfiguration::retrieveVendorDir($composerJson);
+
+        self::assertSame($expected, $actual);
+    }
+
+    public static function vendorDirProvider(): iterable
+    {
+        yield 'no composer.json' => [
+            null,
+            'vendor',
+        ];
+
+        yield 'no custom vendor-dir' => [
+            new DecodedComposerJson([]),
+            'vendor',
+        ];
+
+        yield 'no custom vendor-dir in config' => [
+            new DecodedComposerJson(['config' => ['platform' => ['php' => '7.2']]]),
+            'vendor',
+        ];
+
+        yield 'custom vendor-dir' => [
+            new DecodedComposerJson([
+                'config' => [
+                    'vendor-dir' => 'custom-vendor',
+                ],
+            ]),
+            'custom-vendor',
+        ];
     }
 }
