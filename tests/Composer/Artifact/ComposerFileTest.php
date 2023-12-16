@@ -34,8 +34,8 @@ class ComposerFileTest extends TestCase
 
         self::assertInstanceOf(ComposerFile::class, $actual);
 
-        self::assertSame($expectedPath, $actual->getPath());
-        self::assertSame($expectedContents, $actual->getDecodedContents());
+        self::assertSame($expectedPath, $actual->path);
+        self::assertSame($expectedContents, $actual->decodedContents);
     }
 
     #[DataProvider('invalidInstantiatorsProvider')]
