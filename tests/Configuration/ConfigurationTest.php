@@ -3043,7 +3043,7 @@ class ConfigurationTest extends ConfigurationTestCase
               -basePath: "/path/to"
               -composerJson: KevinGH\Box\Composer\Artifact\ComposerFile {#100
                 -path: "composer.json"
-                -contents: array:1 [
+                -decodedContents: array:1 [
                   "config" => array:3 [
                     "bin-dir" => "bin"
                     "platform" => array:1 [
@@ -3055,7 +3055,7 @@ class ConfigurationTest extends ConfigurationTestCase
               }
               -composerLock: KevinGH\Box\Composer\Artifact\ComposerFile {#100
                 -path: "composer.lock"
-                -contents: []
+                -decodedContents: []
               }
               -files: array:6 [
                 0 => "bar.php"
