@@ -682,7 +682,7 @@ final class Compile implements CommandAware
         if ($config->excludeComposerFiles()) {
             $box->removeComposerArtefacts(
                 ComposerConfiguration::retrieveVendorDir(
-                    $config->getDecodedComposerJsonContents() ?? [],
+                    new DecodedComposerJson($config->getDecodedComposerJsonContents() ?? []),
                 ),
             );
         }

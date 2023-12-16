@@ -16,6 +16,7 @@ namespace KevinGH\Box\Composer\Artifact;
 
 use KevinGH\Box\Composer\Package\Extensions;
 use KevinGH\Box\Composer\Package\PackageInfo;
+use function array_column;
 use function array_map;
 
 /**
@@ -59,5 +60,13 @@ final readonly class DecodedComposerLock
             static fn (array $package) => new PackageInfo($package),
             $this->decodedContents['packages'] ?? [],
         );
+    }
+
+    /**
+     * @return string[] Names of the dev packages
+     */
+    public function getDevPackageNames(): array
+    {
+        return array_column($this->decodedContents['packages-dev'] ?? [], 'name');
     }
 }

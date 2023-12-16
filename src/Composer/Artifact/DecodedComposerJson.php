@@ -60,4 +60,9 @@ final readonly class DecodedComposerJson
             $this->decodedContents['conflict'] ?? [],
         );
     }
+
+    public function getVendorDir(): ?string
+    {
+        return $this->decodedContents['config']['vendor-dir'] ?? null;
+    }
 }
