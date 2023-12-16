@@ -265,8 +265,8 @@ final class Configuration
 
         $devPackages = ComposerConfiguration::retrieveDevPackages(
             $basePath,
-            new DecodedComposerJson($composerFiles->getComposerJson()?->decodedContents ?? []),
-            new DecodedComposerLock($composerFiles->getComposerLock()?->decodedContents ?? []),
+            $composerFiles->getComposerJson(),
+            $composerFiles->getComposerLock(),
             $excludeDevPackages,
         );
 
@@ -422,8 +422,8 @@ final class Configuration
         private readonly ?string $file,
         private readonly string $alias,
         private readonly string $basePath,
-        private readonly ?ComposerFile $composerJson,
-        private readonly ?ComposerFile $composerLock,
+        private readonly ?DecodedComposerJson $composerJson,
+        private readonly ?DecodedComposerLock $composerLock,
         private readonly array $files,
         private readonly array $binaryFiles,
         private readonly bool $autodiscoveredFiles,
@@ -495,12 +495,12 @@ final class Configuration
         return $this->basePath;
     }
 
-    public function getComposerJson(): ?ComposerFile
+    public function getComposerJson(): ?DecodedComposerJson
     {
         return $this->composerJson;
     }
 
-    public function getComposerLock(): ?ComposerFile
+    public function getComposerLock(): ?DecodedComposerLock
     {
         return $this->composerLock;
     }
@@ -1808,9 +1808,12 @@ final class Configuration
 
     private static function retrieveComposerFiles(string $basePath): ComposerFiles
     {
+        $composerJson = self::retrieveComposerFile(Path::canonicalize($basePath.'/composer.json'));
+        $composerLock = self::retrieveComposerFile(Path::canonicalize($basePath.'/composer.lock'));
+
         return new ComposerFiles(
-            self::retrieveComposerFile(Path::canonicalize($basePath.'/composer.json')),
-            self::retrieveComposerFile(Path::canonicalize($basePath.'/composer.lock')),
+            $composerJson?->toComposerJson(),
+            $composerLock?->toComposerLock(),
             self::retrieveComposerFile(Path::canonicalize($basePath.'/vendor/composer/installed.json')),
         );
     }

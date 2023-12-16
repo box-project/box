@@ -36,9 +36,22 @@ class AppRequirementsFactoryTest extends TestCase
         CompressionAlgorithm $compressionAlgorithm,
         array $expected,
     ): void {
+        $composerJson = new DecodedComposerJson(
+            '',
+            null === $composerJsonContents
+                ? []
+                : json_decode($composerJsonContents, true, flags: JSON_THROW_ON_ERROR),
+        );
+        $composerLock = new DecodedComposerLock(
+            '',
+            null === $composerLockContents
+                ? []
+                : json_decode($composerLockContents, true, flags: JSON_THROW_ON_ERROR),
+        );
+
         $actual = AppRequirementsFactory::create(
-            new DecodedComposerJson(null === $composerJsonContents ? [] : json_decode($composerJsonContents, true, flags: JSON_THROW_ON_ERROR)),
-            new DecodedComposerLock(null === $composerLockContents ? [] : json_decode($composerLockContents, true, flags: JSON_THROW_ON_ERROR)),
+            $composerJson,
+            $composerLock,
             $compressionAlgorithm,
         );
 

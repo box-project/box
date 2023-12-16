@@ -39,12 +39,14 @@ final readonly class AppRequirementFactoryBench
     {
         AppRequirementsFactory::create(
             new DecodedComposerJson(
+                '',
                 json_decode(
                     file_get_contents(self::FIXTURES.'/composer.json'),
                     true,
                 ),
             ),
             new DecodedComposerLock(
+                '',
                 json_decode(
                     file_get_contents(self::FIXTURES.'/composer.lock'),
                     true,

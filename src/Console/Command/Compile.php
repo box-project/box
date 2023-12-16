@@ -28,8 +28,6 @@ use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Composer\ComposerProcessFactory;
@@ -567,8 +565,8 @@ final class Compile implements CommandAware
         );
 
         $checkFiles = RequirementsDumper::dump(
-            new DecodedComposerJson($config->getComposerJson()?->decodedContents ?? []),
-            new DecodedComposerLock($config->getComposerLock()?->decodedContents ?? []),
+            $config->getComposerJson(),
+            $config->getComposerLock(),
             $config->getCompressionAlgorithm(),
         );
 
@@ -682,7 +680,7 @@ final class Compile implements CommandAware
         if ($config->excludeComposerFiles()) {
             $box->removeComposerArtefacts(
                 ComposerConfiguration::retrieveVendorDir(
-                    new DecodedComposerJson($config->getComposerJson()?->decodedContents ?? []),
+                    $config->getComposerJson(),
                 ),
             );
         }

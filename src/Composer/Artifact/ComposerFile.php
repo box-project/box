@@ -21,4 +21,20 @@ final readonly class ComposerFile
         public array $decodedContents,
     ) {
     }
+
+    public function toComposerJson(): DecodedComposerJson
+    {
+        return new DecodedComposerJson(
+            $this->path,
+            $this->decodedContents,
+        );
+    }
+
+    public function toComposerLock(): DecodedComposerLock
+    {
+        return new DecodedComposerLock(
+            $this->path,
+            $this->decodedContents,
+        );
+    }
 }

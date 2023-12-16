@@ -22,7 +22,8 @@ use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\NullCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Composer\Artifact\ComposerFile;
+use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
+use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -325,14 +326,14 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $expectedJson = null === $expectedJsonPath
             ? null
-            : new ComposerFile(
+            : new DecodedComposerJson(
                 $this->tmp.DIRECTORY_SEPARATOR.$expectedJsonPath,
                 $expectedJsonContents ?? [],
             );
 
         $expectedLock = null === $expectedLockPath
             ? null
-            : new ComposerFile(
+            : new DecodedComposerLock(
                 $this->tmp.DIRECTORY_SEPARATOR.$expectedLockPath,
                 $expectedLockContents ?? [],
             );

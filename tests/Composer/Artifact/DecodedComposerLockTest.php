@@ -36,7 +36,10 @@ class DecodedComposerLockTest extends TestCase
         array $expectedPlatformExtensions,
         array $expectedPackages,
     ): void {
-        $actual = new DecodedComposerLock(json_decode($composerJsonContents, true));
+        $actual = new DecodedComposerLock(
+            '',
+            json_decode($composerJsonContents, true),
+        );
 
         self::assertStateIs(
             $actual,

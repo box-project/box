@@ -27,8 +27,10 @@ final readonly class DecodedComposerLock
     /**
      * @param array $decodedContents Decoded JSON contents of the `composer.lock` file
      */
-    public function __construct(private array $decodedContents)
-    {
+    public function __construct(
+        public string $path,
+        public array $decodedContents,
+    ) {
     }
 
     public function isEmpty(): bool
