@@ -1830,7 +1830,7 @@ final class Configuration
         } catch (ParsingException $exception) {
             throw new InvalidArgumentException(
                 sprintf(
-                    'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
+                    'Expected the file "%s" to be a valid JSON file but an error has been found: %s',
                     $path,
                     $exception->getMessage(),
                 ),
