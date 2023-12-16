@@ -313,7 +313,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    #[DataProvider('jsonFilesProvider')]
+    #[DataProvider('composerFilesProvider')]
     public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
         callable $setup,
         ?string $expectedJsonPath,
@@ -323,23 +323,19 @@ class ConfigurationTest extends ConfigurationTestCase
     ): void {
         $setup();
 
-        if (null !== $expectedJsonPath) {
-            $expectedJsonPath = $this->tmp.DIRECTORY_SEPARATOR.$expectedJsonPath;
-        }
+        $expectedJson = null === $expectedJsonPath
+            ? null
+            : new ComposerFile(
+                $this->tmp.DIRECTORY_SEPARATOR.$expectedJsonPath,
+                $expectedJsonContents ?? [],
+            );
 
-        if (null !== $expectedLockPath) {
-            $expectedLockPath = $this->tmp.DIRECTORY_SEPARATOR.$expectedLockPath;
-        }
-
-        $expectedJson = new ComposerFile(
-            $expectedJsonPath,
-            $expectedJsonContents ?? [],
-        );
-
-        $expectedLock = new ComposerFile(
-            $expectedLockPath,
-            $expectedLockContents ?? [],
-        );
+        $expectedLock = null === $expectedLockPath
+            ? null
+            : new ComposerFile(
+                $this->tmp.DIRECTORY_SEPARATOR.$expectedLockPath,
+                $expectedLockContents ?? [],
+            );
 
         $this->reloadConfig();
 
@@ -2970,8 +2966,8 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getBinaryFiles());
         self::assertSame([], $this->config->getCompactors()->toArray());
         self::assertFalse($this->config->hasAutodiscoveredFiles());
-        self::assertNotNull($this->config->getComposerJson());
-        self::assertNotNull($this->config->getComposerLock());
+        self::assertNull($this->config->getComposerJson());
+        self::assertNull($this->config->getComposerLock());
         self::assertSame(CompressionAlgorithm::NONE, $this->config->getCompressionAlgorithm());
         self::assertSame($this->tmp.'/box.json', $this->config->getConfigurationFile());
         self::assertEquals(
@@ -3230,7 +3226,7 @@ class ConfigurationTest extends ConfigurationTestCase
         ];
     }
 
-    public static function jsonFilesProvider(): iterable
+    public static function composerFilesProvider(): iterable
     {
         yield [
             static function (): void {},

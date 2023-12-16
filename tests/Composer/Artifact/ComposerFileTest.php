@@ -59,12 +59,6 @@ class ComposerFileTest extends TestCase
         ];
 
         yield [
-            static fn (): ComposerFile => ComposerFile::createEmpty(),
-            null,
-            [],
-        ];
-
-        yield [
             static fn (): ComposerFile => new ComposerFile('path/to/foo', ['foo' => 'bar']),
             'path/to/foo',
             ['foo' => 'bar'],
