@@ -1188,12 +1188,12 @@ class CompileTest extends FileSystemTestCase
               -alias: "index.phar"
               -basePath: "/path/to"
               -composerJson: KevinGH\Box\Composer\Artifact\ComposerFile {#140
-                -path: null
-                -contents: []
+                +path: null
+                +decodedContents: []
               }
               -composerLock: KevinGH\Box\Composer\Artifact\ComposerFile {#140
-                -path: null
-                -contents: []
+                +path: null
+                +decodedContents: []
               }
               -files: []
               -binaryFiles: []
