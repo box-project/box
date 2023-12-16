@@ -226,7 +226,7 @@ final class Configuration
 
         $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
 
-        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles->getComposerJson()->getDecodedContents(), $logger);
+        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles->getComposerJson()->decodedContents, $logger);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath, $mainScriptPath, $logger);
@@ -255,8 +255,8 @@ final class Configuration
 
         $checkRequirements = self::retrieveCheckRequirements(
             $raw,
-            null !== $composerFiles->getComposerJson()->getPath(),
-            null !== $composerFiles->getComposerLock()->getPath(),
+            null !== $composerFiles->getComposerJson()->path,
+            null !== $composerFiles->getComposerLock()->path,
             false === $isStubGenerated && null === $stubPath,
             $logger,
         );
@@ -265,8 +265,8 @@ final class Configuration
 
         $devPackages = ComposerConfiguration::retrieveDevPackages(
             $basePath,
-            new DecodedComposerJson($composerFiles->getComposerJson()->getDecodedContents()),
-            new DecodedComposerLock($composerFiles->getComposerLock()->getDecodedContents()),
+            new DecodedComposerJson($composerFiles->getComposerJson()->decodedContents),
+            new DecodedComposerLock($composerFiles->getComposerLock()->decodedContents),
             $excludeDevPackages,
         );
 
@@ -848,7 +848,7 @@ final class Configuration
         if ($autodiscoverFiles || $forceFilesAutodiscovery) {
             [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
                 $basePath,
-                $composerFiles->getComposerJson()->getDecodedContents(),
+                $composerFiles->getComposerJson()->decodedContents,
                 $devPackages,
                 $composerFiles->getPaths(),
                 $excludedPaths,
@@ -952,8 +952,8 @@ final class Configuration
 
         $excludedFiles = array_flip($excludedFiles);
         $files = array_filter([
-            $composerFiles->getComposerJson()->getPath(),
-            $composerFiles->getComposerLock()->getPath(),
+            $composerFiles->getComposerJson()->path,
+            $composerFiles->getComposerLock()->path,
         ]);
 
         if (false === isset($raw->{$key})) {
@@ -1541,22 +1541,22 @@ final class Configuration
         self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, null);
 
         $canDumpAutoload = (
-            null !== $composerFiles->getComposerJson()->getPath()
+            null !== $composerFiles->getComposerJson()->path
             && (
                 // The composer.lock and installed.json are optional (e.g. if there is no dependencies installed)
                 // but when one is present, the other must be as well otherwise the dumped autoloader will be broken
                 (
-                    null === $composerFiles->getComposerLock()->getPath()
-                    && null === $composerFiles->getInstalledJson()->getPath()
+                    null === $composerFiles->getComposerLock()->path
+                    && null === $composerFiles->getInstalledJson()->path
                 )
                 || (
-                    null !== $composerFiles->getComposerLock()->getPath()
-                    && null !== $composerFiles->getInstalledJson()->getPath()
+                    null !== $composerFiles->getComposerLock()->path
+                    && null !== $composerFiles->getInstalledJson()->path
                 )
                 || (
-                    null === $composerFiles->getComposerLock()->getPath()
-                    && null !== $composerFiles->getInstalledJson()->getPath()
-                    && [] === $composerFiles->getInstalledJson()->getDecodedContents()
+                    null === $composerFiles->getComposerLock()->path
+                    && null !== $composerFiles->getInstalledJson()->path
+                    && [] === $composerFiles->getInstalledJson()->decodedContents
                 )
             )
         );
