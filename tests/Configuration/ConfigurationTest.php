@@ -18,6 +18,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
+use JsonException;
 use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\NullCompactor;
 use KevinGH\Box\Compactor\Php;
@@ -34,7 +35,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use RuntimeException;
-use Seld\JsonLint\ParsingException;
 use stdClass;
 use function abs;
 use function array_fill_keys;
@@ -356,17 +356,12 @@ class ConfigurationTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $composerJson = $this->tmp.'/composer.json';
 
-            self::assertSame(
-                <<<EOF
-                    Expected the file "{$composerJson}" to be a valid composer.json file but an error has been found: Parse error on line 1:
-
-                    ^
-                    Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-                    EOF,
+            self::assertStringStartsWith(
+                "Expected the file \"{$composerJson}\" to be a valid JSON file but an error has been found: ",
                 $exception->getMessage(),
             );
             self::assertSame(0, $exception->getCode());
-            self::assertInstanceOf(ParsingException::class, $exception->getPrevious());
+            self::assertInstanceOf(JsonException::class, $exception->getPrevious());
         }
     }
 
@@ -381,17 +376,12 @@ class ConfigurationTest extends ConfigurationTestCase
         } catch (InvalidArgumentException $exception) {
             $composerLock = $this->tmp.'/composer.lock';
 
-            self::assertSame(
-                <<<EOF
-                    Expected the file "{$composerLock}" to be a valid composer.json file but an error has been found: Parse error on line 1:
-
-                    ^
-                    Expected one of: 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['
-                    EOF,
+            self::assertStringStartsWith(
+                "Expected the file \"{$composerLock}\" to be a valid JSON file but an error has been found: ",
                 $exception->getMessage(),
             );
             self::assertSame(0, $exception->getCode());
-            self::assertInstanceOf(ParsingException::class, $exception->getPrevious());
+            self::assertInstanceOf(JsonException::class, $exception->getPrevious());
         }
     }
 
