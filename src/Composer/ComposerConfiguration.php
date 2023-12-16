@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use Symfony\Component\Filesystem\Path;
 use function array_filter;
 use function array_map;
@@ -37,8 +37,8 @@ final class ComposerConfiguration
      */
     public static function retrieveDevPackages(
         string $basePath,
-        ?DecodedComposerJson $composerJson,
-        ?DecodedComposerLock $composerLock,
+        ?ComposerJson $composerJson,
+        ?ComposerLock $composerLock,
         bool $excludeDevPackages,
     ): array {
         if (null === $composerJson
@@ -60,8 +60,8 @@ final class ComposerConfiguration
      */
     private static function getDevPackagePaths(
         string $basePath,
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
     ): array {
         $vendorDir = Path::makeAbsolute(
             self::retrieveVendorDir($composerJson),
@@ -83,7 +83,7 @@ final class ComposerConfiguration
         );
     }
 
-    public static function retrieveVendorDir(?DecodedComposerJson $composerJson): string
+    public static function retrieveVendorDir(?ComposerJson $composerJson): string
     {
         return $composerJson?->getVendorDir() ?? self::DEFAULT_VENDOR_DIR;
     }

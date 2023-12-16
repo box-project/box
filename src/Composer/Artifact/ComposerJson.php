@@ -22,7 +22,7 @@ use function array_keys;
 /**
  * @private
  */
-final readonly class DecodedComposerJson
+final readonly class ComposerJson
 {
     /**
      * @param array $decodedContents Decoded JSON contents of the `composer.json` file

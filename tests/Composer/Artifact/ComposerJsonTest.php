@@ -24,8 +24,8 @@ use function json_decode;
 /**
  * @internal
  */
-#[CoversClass(DecodedComposerJson::class)]
-class DecodedComposerJsonTest extends TestCase
+#[CoversClass(ComposerJson::class)]
+class ComposerJsonTest extends TestCase
 {
     #[DataProvider('composerJsonProvider')]
     public function test_it_can_interpret_a_decoded_composer_json_file(
@@ -35,7 +35,7 @@ class DecodedComposerJsonTest extends TestCase
         array $expectedRequiredItems,
         array $expectedConflictingExtensions,
     ): void {
-        $actual = new DecodedComposerJson(
+        $actual = new ComposerJson(
             '',
             json_decode($composerJsonContents, true),
         );
@@ -160,7 +160,7 @@ class DecodedComposerJsonTest extends TestCase
     }
 
     private static function assertStateIs(
-        DecodedComposerJson $composerJson,
+        ComposerJson $composerJson,
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
         array $expectedRequiredItems,

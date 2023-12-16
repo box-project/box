@@ -18,26 +18,29 @@ use function array_filter;
 use function array_map;
 use function array_values;
 
-final readonly class ComposerFiles
+/**
+ * @private
+ */
+final readonly class ComposerArtifacts
 {
     public function __construct(
-        private ?DecodedComposerJson $composerJson = null,
-        private ?DecodedComposerLock $composerLock = null,
-        private ?ComposerFile $installedJson = null,
+        public readonly ?ComposerJson $composerJson = null,
+        public readonly ?ComposerLock $composerLock = null,
+        public readonly ?ComposerArtifact $installedJson = null,
     ) {
     }
 
-    public function getComposerJson(): ?DecodedComposerJson
+    public function getComposerJson(): ?ComposerJson
     {
         return $this->composerJson;
     }
 
-    public function getComposerLock(): ?DecodedComposerLock
+    public function getComposerLock(): ?ComposerLock
     {
         return $this->composerLock;
     }
 
-    public function getInstalledJson(): ?ComposerFile
+    public function getInstalledJson(): ?ComposerArtifact
     {
         return $this->installedJson;
     }
@@ -50,7 +53,7 @@ final readonly class ComposerFiles
         return array_values(
             array_filter(
                 array_map(
-                    static fn (null|ComposerFile|DecodedComposerJson|DecodedComposerLock $file): ?string => $file?->path,
+                    static fn (null|ComposerArtifact|ComposerJson|ComposerLock $file): ?string => $file?->path,
                     [$this->composerJson, $this->composerLock, $this->installedJson],
                 ),
             ),

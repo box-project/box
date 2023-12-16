@@ -14,7 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Artifact;
 
-final readonly class ComposerFile
+/**
+ * @private
+ */
+final readonly class ComposerArtifact
 {
     public function __construct(
         public string $path,
@@ -22,17 +25,17 @@ final readonly class ComposerFile
     ) {
     }
 
-    public function toComposerJson(): DecodedComposerJson
+    public function toComposerJson(): ComposerJson
     {
-        return new DecodedComposerJson(
+        return new ComposerJson(
             $this->path,
             $this->decodedContents,
         );
     }
 
-    public function toComposerLock(): DecodedComposerLock
+    public function toComposerLock(): ComposerLock
     {
-        return new DecodedComposerLock(
+        return new ComposerLock(
             $this->path,
             $this->decodedContents,
         );

@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\Composer;
 
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -26,8 +26,8 @@ use function json_decode;
  * @internal
  */
 #[CoversClass(ComposerConfiguration::class)]
-#[CoversClass(DecodedComposerJson::class)]
-#[CoversClass(DecodedComposerLock::class)]
+#[CoversClass(ComposerJson::class)]
+#[CoversClass(ComposerLock::class)]
 class ComposerConfigurationTest extends FileSystemTestCase
 {
     private const COMPOSER_LOCK_SAMPLE = <<<'JSON'
@@ -241,7 +241,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
             [],
             ComposerConfiguration::retrieveDevPackages(
                 $this->tmp,
-                new DecodedComposerJson('', []),
+                new ComposerJson('', []),
                 null,
                 $excludeDevPackages,
             ),
@@ -251,7 +251,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
     #[DataProvider('excludeDevFilesSettingProvider')]
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file(): void
     {
-        $composerJson = new DecodedComposerJson('', []);
+        $composerJson = new ComposerJson('', []);
         $composerLock = self::createComposerLockSample();
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
@@ -279,7 +279,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_2(): void
     {
-        $composerJson = new DecodedComposerJson('', ['config' => []]);
+        $composerJson = new ComposerJson('', ['config' => []]);
         $composerLock = self::createComposerLockSample();
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
@@ -307,7 +307,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_ignores_non_existent_dev_packages_found_in_the_lock_file(): void
     {
-        $composerJson = new DecodedComposerJson('', []);
+        $composerJson = new ComposerJson('', []);
         $composerLock = self::createComposerLockSample();
 
         FS::mkdir('vendor/bamarni/composer-bin-plugin');
@@ -334,7 +334,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_in_a_custom_vendor_directory(): void
     {
-        $composerJson = new DecodedComposerJson(
+        $composerJson = new ComposerJson(
             '',
             [
                 'config' => [
@@ -373,9 +373,9 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     public function test_it_can_retrieve_the_dev_packages_found_in_the_lock_file_even_if_no_dev_package_is_registered(): void
     {
-        $composerJson = new DecodedComposerJson('', []);
+        $composerJson = new ComposerJson('', []);
 
-        $composerLock = new DecodedComposerLock(
+        $composerLock = new ComposerLock(
             '',
             json_decode(
                 <<<'JSON'
@@ -508,7 +508,7 @@ class ComposerConfigurationTest extends FileSystemTestCase
 
     #[DataProvider('vendorDirProvider')]
     public function test_it_can_retrieve_the_vendor_directory_from_composer_json(
-        ?DecodedComposerJson $composerJson,
+        ?ComposerJson $composerJson,
         string $expected,
     ): void {
         $actual = ComposerConfiguration::retrieveVendorDir($composerJson);
@@ -524,17 +524,17 @@ class ComposerConfigurationTest extends FileSystemTestCase
         ];
 
         yield 'no custom vendor-dir' => [
-            new DecodedComposerJson('', []),
+            new ComposerJson('', []),
             'vendor',
         ];
 
         yield 'no custom vendor-dir in config' => [
-            new DecodedComposerJson('', ['config' => ['platform' => ['php' => '7.2']]]),
+            new ComposerJson('', ['config' => ['platform' => ['php' => '7.2']]]),
             'vendor',
         ];
 
         yield 'custom vendor-dir' => [
-            new DecodedComposerJson(
+            new ComposerJson(
                 '',
                 [
                     'config' => [
@@ -546,9 +546,9 @@ class ComposerConfigurationTest extends FileSystemTestCase
         ];
     }
 
-    private static function createComposerLockSample(): DecodedComposerLock
+    private static function createComposerLockSample(): ComposerLock
     {
-        return new DecodedComposerLock(
+        return new ComposerLock(
             '',
             json_decode(self::COMPOSER_LOCK_SAMPLE, true),
         );
