@@ -160,8 +160,7 @@ class ComposerJsonTest extends TestCase
     public function test_it_can_give_the_first_bin_file(
         string $composerJsonContents,
         ?string $expected,
-    ): void
-    {
+    ): void {
         $composerJson = self::createComposerJsonFromContents($composerJsonContents);
 
         $actual = $composerJson->getFirstBin();
@@ -178,43 +177,164 @@ class ComposerJsonTest extends TestCase
 
         yield 'empty bin' => [
             <<<'JSON'
-            {
-                "bin": null
-            }
-            JSON,
+                {
+                    "bin": null
+                }
+                JSON,
             null,
         ];
 
         yield 'single bin' => [
             <<<'JSON'
-            {
-                "bin": "bin/app.php"
-            }
-            JSON,
+                {
+                    "bin": "bin/app.php"
+                }
+                JSON,
             'bin/app.php',
         ];
 
         yield 'single bin in set' => [
             <<<'JSON'
-            {
-                "bin": [
-                    "bin/app.php"
-                ]
-            }
-            JSON,
+                {
+                    "bin": [
+                        "bin/app.php"
+                    ]
+                }
+                JSON,
             'bin/app.php',
         ];
 
         yield 'multiple bins' => [
             <<<'JSON'
-            {
-                "bin": [
-                    "bin/app-first.php",
-                    "bin/app-second.php"
-                ]
-            }
-            JSON,
+                {
+                    "bin": [
+                        "bin/app-first.php",
+                        "bin/app-second.php"
+                    ]
+                }
+                JSON,
             'bin/app-first.php',
+        ];
+    }
+
+    #[DataProvider('autoloadProvider')]
+    public function test_it_can_give_the_autoload_file_paths(
+        string $composerJsonContents,
+        array $expected,
+    ): void {
+        $composerJson = self::createComposerJsonFromContents($composerJsonContents);
+
+        $actual = $composerJson->getAutoloadPaths();
+
+        self::assertSame($expected, $actual);
+    }
+
+    public static function autoloadProvider(): iterable
+    {
+        yield 'empty' => [
+            '{}',
+            [],
+        ];
+
+        yield 'empty autoload' => [
+            <<<'JSON'
+                {
+                    "autoload": {}
+                }
+                JSON,
+            [],
+        ];
+
+        yield 'PSR-4 autoload' => [
+            <<<'JSON'
+                {
+                    "autoload": {
+                        "psr-4": {
+                            "Monolog\\": "src/",
+                            "Vendor\\Namespace\\": ""
+                        }
+                    }
+                }
+                JSON,
+            [
+                'src/',
+                '',
+            ],
+        ];
+
+        yield 'PSR-4 autoload directories' => [
+            <<<'JSON'
+                {
+                     "autoload": {
+                        "psr-4": { "Monolog\\": ["src/", "lib/"] }
+                    }
+                }
+                JSON,
+            [
+                'src/',
+                'lib/',
+            ],
+        ];
+
+        yield 'PSR-0' => [
+            <<<'JSON'
+                {
+                     "autoload": {
+                        "psr-0": {
+                            "Monolog\\": "src/",
+                            "Vendor\\Namespace\\": "src/",
+                            "Vendor_Namespace_": "src/"
+                        }
+                    }
+                }
+                JSON,
+            [
+                'src/',
+                'src/',
+                'src/',
+            ],
+        ];
+
+        yield 'PSR-0 directories' => [
+            <<<'JSON'
+                {
+                     "autoload": {
+                        "psr-0": { "Monolog\\": ["src/", "lib/"] }
+                    }
+                }
+                JSON,
+            [
+                'src/',
+                'lib/',
+            ],
+        ];
+
+        yield 'PSR-0 global' => [
+            <<<'JSON'
+                {
+                     "autoload": {
+                        "psr-0": { "UniqueGlobalClass": "" }
+                    }
+                }
+                JSON,
+            [
+                '',
+            ],
+        ];
+
+        yield 'classmap' => [
+            <<<'JSON'
+                {
+                    "autoload": {
+                        "classmap": ["src/", "lib/", "Something.php"]
+                    }
+                }
+                JSON,
+            [
+                'src/',
+                'lib/',
+                'Something.php',
+            ],
         ];
     }
 

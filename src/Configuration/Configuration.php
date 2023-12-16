@@ -55,7 +55,6 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function array_walk;
-use function current;
 use function dirname;
 use function explode;
 use function file_exists;
@@ -226,7 +225,7 @@ final class Configuration
 
         $excludeComposerArtifacts = self::retrieveExcludeComposerArtifacts($raw, $logger);
 
-        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerArtifacts->composerJson?->decodedContents, $logger);
+        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerArtifacts->composerJson, $logger);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath, $mainScriptPath, $logger);
@@ -1217,7 +1216,10 @@ final class Configuration
     ): array {
         $toString = static fn (SplFileInfo|string $file): string => (string) $file;
 
-        $vendorDir = ComposerConfiguration::retrieveVendorDir($composerJson);
+        $vendorDir = self::normalizePath(
+            ComposerConfiguration::retrieveVendorDir($composerJson),
+            $basePath,
+        );
 
         if (file_exists($vendorDir)) {
             // Note that some files may not exist. For example installed.json does not exist at all if no dependencies
@@ -1256,7 +1258,7 @@ final class Configuration
 
             $vendorPackages = array_diff($vendorPackages, $devPackages);
 
-            if (false === array_key_exists('autoload', $composerJson?->decodedContents ?? [])) {
+            if (!($composerJson?->hasAutoload() ?? false)) {
                 $files = toArray(values(map(
                     $toString,
                     Finder::create()
@@ -1291,51 +1293,24 @@ final class Configuration
             $paths = [];
         }
 
-        $autoload = $composerJson->decodedContents['autoload'] ?? [];
-
-        if (array_key_exists('psr-4', $autoload)) {
-            foreach ($autoload['psr-4'] as $path) {
-                /** @var string|string[] $path */
-                $composerPaths = (array) $path;
-
-                foreach ($composerPaths as $composerPath) {
-                    $paths[] = '' !== trim($composerPath) ? $composerPath : $basePath;
-                }
-            }
-        }
-
-        if (array_key_exists('psr-0', $autoload)) {
-            foreach ($autoload['psr-0'] as $path) {
-                /** @var string|string[] $path */
-                $composerPaths = (array) $path;
-
-                foreach ($composerPaths as $composerPath) {
-                    $paths[] = '' !== trim($composerPath) ? $composerPath : $basePath;
-                }
-            }
-        }
-
-        if (array_key_exists('classmap', $autoload)) {
-            foreach ($autoload['classmap'] as $path) {
-                // @var string $path
-                $paths[] = $path;
-            }
-        }
+        $paths = array_merge(
+            $paths,
+            $composerJson?->getAutoloadPaths() ?? [],
+        );
 
         $normalizePath = static fn (string $path): string => Path::isAbsolute($path)
             ? Path::canonicalize($path)
             : self::normalizePath(trim($path, '/ '), $basePath);
 
-        if (array_key_exists('files', $autoload)) {
-            foreach ($autoload['files'] as $path) {
-                /** @var string $path */
-                $path = $normalizePath($path);
+        $composerFiles = $composerJson?->getAutoloadFiles() ?? [];
+        foreach ($composerFiles as $path) {
+            /** @var string $path */
+            $path = $normalizePath($path);
 
-                Assert::file($path);
-                Assert::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
+            Assert::file($path);
+            Assert::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
 
-                $filesToAppend[] = $path;
-            }
+            $filesToAppend[] = $path;
         }
 
         $files = $filesToAppend;
@@ -1738,15 +1713,15 @@ final class Configuration
     }
 
     private static function retrieveMainScriptPath(
-        stdClass            $raw,
-        string              $basePath,
-        ?ComposerJson       $composerJson,
+        stdClass $raw,
+        string $basePath,
+        ?ComposerJson $composerJson,
         ConfigurationLogger $logger,
     ): ?string {
         $firstBin = $composerJson?->getFirstBin();
 
         if (null !== $firstBin) {
-            $firstBin = self::normalizePath(self::DEFAULT_MAIN_SCRIPT, $basePath);
+            $firstBin = self::normalizePath($firstBin, $basePath);
         }
 
         if (isset($raw->{self::MAIN_KEY})) {

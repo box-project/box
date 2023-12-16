@@ -20,6 +20,7 @@ use KevinGH\Box\Composer\Package\RequiredItem;
 use function array_key_exists;
 use function array_keys;
 use function current;
+use function trim;
 
 /**
  * @private
@@ -75,5 +76,58 @@ final readonly class ComposerJson
         $firstBin = current((array) ($this->decodedContents['bin'] ?? []));
 
         return false === $firstBin ? null : $firstBin;
+    }
+
+    public function hasAutoload(): bool
+    {
+        return array_key_exists('autoload', $this->decodedContents);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAutoloadPaths(): array
+    {
+        $autoload = $this->decodedContents['autoload'] ?? [];
+        $paths = [];
+
+        if (array_key_exists('psr-4', $autoload)) {
+            foreach ($autoload['psr-4'] as $path) {
+                /** @var string|string[] $path */
+                $composerPaths = (array) $path;
+
+                foreach ($composerPaths as $composerPath) {
+                    $paths[] = trim($composerPath);
+                }
+            }
+        }
+
+        if (array_key_exists('psr-0', $autoload)) {
+            foreach ($autoload['psr-0'] as $path) {
+                /** @var string|string[] $path */
+                $composerPaths = (array) $path;
+
+                foreach ($composerPaths as $composerPath) {
+                    $paths[] = trim($composerPath);
+                }
+            }
+        }
+
+        if (array_key_exists('classmap', $autoload)) {
+            foreach ($autoload['classmap'] as $path) {
+                // @var string $path
+                $paths[] = $path;
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getAutoloadFiles(): array
+    {
+        return $this->decodedContents['autoload']['files'] ?? [];
     }
 }
