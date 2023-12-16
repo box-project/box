@@ -1816,35 +1816,36 @@ final class Configuration
 
     private static function retrieveComposerFiles(string $basePath): ComposerFiles
     {
-        $retrieveFileAndContents = static function (string $file): ?ComposerFile {
-            $json = new Json();
-
-            if (false === file_exists($file) || false === is_file($file) || false === is_readable($file)) {
-                return ComposerFile::createEmpty();
-            }
-
-            try {
-                $contents = (array) $json->decodeFile($file, true);
-            } catch (ParsingException $exception) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
-                        $file,
-                        $exception->getMessage(),
-                    ),
-                    0,
-                    $exception,
-                );
-            }
-
-            return new ComposerFile($file, $contents);
-        };
-
         return new ComposerFiles(
-            $retrieveFileAndContents(Path::canonicalize($basePath.'/composer.json')),
-            $retrieveFileAndContents(Path::canonicalize($basePath.'/composer.lock')),
-            $retrieveFileAndContents(Path::canonicalize($basePath.'/vendor/composer/installed.json')),
+            self::retrieveComposerFile(Path::canonicalize($basePath.'/composer.json')),
+            self::retrieveComposerFile(Path::canonicalize($basePath.'/composer.lock')),
+            self::retrieveComposerFile(Path::canonicalize($basePath.'/vendor/composer/installed.json')),
         );
+    }
+
+    private static function retrieveComposerFile(string $path): ComposerFile
+    {
+        $json = new Json();
+
+        if (false === file_exists($path) || false === is_file($path) || false === is_readable($path)) {
+            return ComposerFile::createEmpty();
+        }
+
+        try {
+            $contents = (array) $json->decodeFile($path, true);
+        } catch (ParsingException $exception) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
+                    $path,
+                    $exception->getMessage(),
+                ),
+                0,
+                $exception,
+            );
+        }
+
+        return new ComposerFile($path, $contents);
     }
 
     /**
