@@ -786,7 +786,7 @@ class BoxTest extends FileSystemTestCase
             self::assertFileExists('phar://test.phar/'.$file);
         }
 
-        $this->box->removeComposerArtefacts('vendor');
+        $this->box->removeComposerArtifacts('vendor');
 
         foreach ($files as $file => $contents) {
             self::assertFileDoesNotExist('phar://test.phar/'.$file);
@@ -819,7 +819,7 @@ class BoxTest extends FileSystemTestCase
             self::assertFileExists('phar://test.phar/'.$file);
         }
 
-        $this->box->removeComposerArtefacts('my-vendor');
+        $this->box->removeComposerArtifacts('my-vendor');
 
         foreach ($files as $file => $contents) {
             self::assertFileDoesNotExist('phar://test.phar/'.$file);
@@ -855,7 +855,7 @@ class BoxTest extends FileSystemTestCase
             self::assertFileExists('phar://test.phar/lib/'.$file);
         }
 
-        $this->box->removeComposerArtefacts('vendor');
+        $this->box->removeComposerArtifacts('vendor');
 
         foreach ($files as $file => $contents) {
             self::assertFileDoesNotExist('phar://test.phar/lib/'.$file);
@@ -867,7 +867,7 @@ class BoxTest extends FileSystemTestCase
         $this->box->startBuffering();
 
         try {
-            $this->box->removeComposerArtefacts('vendor');
+            $this->box->removeComposerArtifacts('vendor');
 
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {

@@ -22,21 +22,21 @@ use PHPUnit\Framework\TestCase;
 /**
  * @internal
  */
-#[CoversClass(ComposerFiles::class)]
-class ComposerFilesTest extends TestCase
+#[CoversClass(ComposerArtifacts::class)]
+class ComposerArtifactsTest extends TestCase
 {
     #[DataProvider('validInstantiatorsProvider')]
     public function test_it_can_be_created(
         Closure $create,
-        ?DecodedComposerJson $expectedComposerJson,
-        ?DecodedComposerLock $expectedComposerLock,
-        ?ComposerFile $expectedInstalledJson,
+        ?ComposerJson $expectedComposerJson,
+        ?ComposerLock $expectedComposerLock,
+        ?ComposerArtifact $expectedInstalledJson,
         array $expectedPaths,
     ): void {
-        /** @var ComposerFiles $actual */
+        /** @var ComposerArtifacts $actual */
         $actual = $create();
 
-        self::assertInstanceOf(ComposerFiles::class, $actual);
+        self::assertInstanceOf(ComposerArtifacts::class, $actual);
 
         self::assertEquals($expectedComposerJson, $actual->getComposerJson());
         self::assertEquals($expectedComposerLock, $actual->getComposerLock());
@@ -48,12 +48,12 @@ class ComposerFilesTest extends TestCase
     public static function validInstantiatorsProvider(): iterable
     {
         yield (static function (): array {
-            $json = new DecodedComposerJson('path/to/composer.json', ['name' => 'composer.json']);
-            $lock = new DecodedComposerLock('path/to/composer.lock', ['name' => 'composer.lock']);
-            $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
+            $json = new ComposerJson('path/to/composer.json', ['name' => 'composer.json']);
+            $lock = new ComposerLock('path/to/composer.lock', ['name' => 'composer.lock']);
+            $installed = new ComposerArtifact('path/to/installed.json', ['name' => 'installed.json']);
 
             return [
-                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
+                static fn (): ComposerArtifacts => new ComposerArtifacts($json, $lock, $installed),
                 $json,
                 $lock,
                 $installed,
@@ -66,12 +66,12 @@ class ComposerFilesTest extends TestCase
         })();
 
         yield (static function (): array {
-            $json = new DecodedComposerJson('path/to/composer.json', ['name' => 'composer.json']);
+            $json = new ComposerJson('path/to/composer.json', ['name' => 'composer.json']);
             $lock = null;
-            $installed = new ComposerFile('path/to/installed.json', ['name' => 'installed.json']);
+            $installed = new ComposerArtifact('path/to/installed.json', ['name' => 'installed.json']);
 
             return [
-                static fn (): ComposerFiles => new ComposerFiles($json, $lock, $installed),
+                static fn (): ComposerArtifacts => new ComposerArtifacts($json, $lock, $installed),
                 $json,
                 $lock,
                 $installed,
@@ -83,7 +83,7 @@ class ComposerFilesTest extends TestCase
         })();
 
         yield [
-            static fn () => new ComposerFiles(),
+            static fn () => new ComposerArtifacts(),
             null,
             null,
             null,

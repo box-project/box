@@ -159,11 +159,11 @@ final class Box implements Countable
     /**
      * @param non-empty-string $normalizedVendorDir Normalized path ("/" path separator and no trailing "/") to the Composer vendor directory
      */
-    public function removeComposerArtefacts(string $normalizedVendorDir): void
+    public function removeComposerArtifacts(string $normalizedVendorDir): void
     {
         Assert::false($this->buffering, 'The buffering must have ended before removing the Composer artefacts');
 
-        $composerFiles = [
+        $composerArtifacts = [
             'composer.json',
             'composer.lock',
             $normalizedVendorDir.'/composer/installed.json',
@@ -171,17 +171,17 @@ final class Box implements Countable
 
         $this->phar->startBuffering();
 
-        foreach ($composerFiles as $composerFile) {
-            $localComposerFile = ($this->mapFile)($composerFile);
+        foreach ($composerArtifacts as $composerArtifact) {
+            $localComposerArtifact = ($this->mapFile)($composerArtifact);
 
             $pharFilePath = sprintf(
                 'phar://%s/%s',
                 $this->phar->getPath(),
-                $localComposerFile,
+                $localComposerArtifact,
             );
 
             if (file_exists($pharFilePath)) {
-                $this->phar->delete($localComposerFile);
+                $this->phar->delete($localComposerArtifact);
             }
         }
 

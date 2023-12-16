@@ -22,8 +22,8 @@ use KevinGH\Box\Compactor\InvalidCompactor;
 use KevinGH\Box\Compactor\NullCompactor;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Json\JsonValidationException;
 use KevinGH\Box\MapFile;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -314,7 +314,7 @@ class ConfigurationTest extends ConfigurationTestCase
         self::assertSame([], $this->config->getWarnings());
     }
 
-    #[DataProvider('composerFilesProvider')]
+    #[DataProvider('composerArtifactsProvider')]
     public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
         callable $setup,
         ?string $expectedJsonPath,
@@ -326,14 +326,14 @@ class ConfigurationTest extends ConfigurationTestCase
 
         $expectedJson = null === $expectedJsonPath
             ? null
-            : new DecodedComposerJson(
+            : new ComposerJson(
                 $this->tmp.DIRECTORY_SEPARATOR.$expectedJsonPath,
                 $expectedJsonContents ?? [],
             );
 
         $expectedLock = null === $expectedLockPath
             ? null
-            : new DecodedComposerLock(
+            : new ComposerLock(
                 $this->tmp.DIRECTORY_SEPARATOR.$expectedLockPath,
                 $expectedLockContents ?? [],
             );
@@ -486,8 +486,8 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-composer-files' => null,
         ]);
 
-        self::assertTrue($this->config->excludeComposerFiles());
-        self::assertTrue($this->getNoFileConfig()->excludeComposerFiles());
+        self::assertTrue($this->config->excludeComposerArtifacts());
+        self::assertTrue($this->getNoFileConfig()->excludeComposerArtifacts());
 
         self::assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
@@ -499,8 +499,8 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-composer-files' => true,
         ]);
 
-        self::assertTrue($this->config->excludeComposerFiles());
-        self::assertTrue($this->getNoFileConfig()->excludeComposerFiles());
+        self::assertTrue($this->config->excludeComposerArtifacts());
+        self::assertTrue($this->getNoFileConfig()->excludeComposerArtifacts());
 
         self::assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
@@ -515,7 +515,7 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-composer-files' => true,
         ]);
 
-        self::assertTrue($this->config->excludeComposerFiles());
+        self::assertTrue($this->config->excludeComposerArtifacts());
 
         self::assertSame(
             ['The "exclude-composer-files" setting can be omitted since is set to its default value'],
@@ -527,7 +527,7 @@ class ConfigurationTest extends ConfigurationTestCase
             'exclude-composer-files' => false,
         ]);
 
-        self::assertFalse($this->config->excludeComposerFiles());
+        self::assertFalse($this->config->excludeComposerArtifacts());
 
         self::assertSame([], $this->config->getRecommendations());
         self::assertSame([], $this->config->getWarnings());
@@ -2961,7 +2961,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
         self::assertFalse($this->config->checkRequirements());
         self::assertFalse($this->config->dumpAutoload());
-        self::assertTrue($this->config->excludeComposerFiles());
+        self::assertTrue($this->config->excludeComposerArtifacts());
         self::assertMatchesRegularExpression('/^box-auto-generated-alias-[\da-zA-Z]{12}\.phar$/', $this->config->getAlias());
         self::assertSame($this->tmp, $this->config->getBasePath());
         self::assertSame([], $this->config->getBinaryFiles());
@@ -3044,7 +3044,7 @@ class ConfigurationTest extends ConfigurationTestCase
               -file: "box.json"
               -alias: "test.phar"
               -basePath: "/path/to"
-              -composerJson: KevinGH\Box\Composer\Artifact\ComposerFile {#100
+              -composerJson: KevinGH\Box\Composer\Artifact\ComposerArtifact {#100
                 +path: "composer.json"
                 +decodedContents: array:1 [
                   "config" => array:3 [
@@ -3056,7 +3056,7 @@ class ConfigurationTest extends ConfigurationTestCase
                   ]
                 ]
               }
-              -composerLock: KevinGH\Box\Composer\Artifact\ComposerFile {#100
+              -composerLock: KevinGH\Box\Composer\Artifact\ComposerArtifact {#100
                 +path: "composer.lock"
                 +decodedContents: []
               }
@@ -3074,7 +3074,7 @@ class ConfigurationTest extends ConfigurationTestCase
               ]
               -autodiscoveredFiles: true
               -dumpAutoload: true
-              -excludeComposerFiles: true
+              -excludeComposerArtifacts: true
               -excludeDevFiles: true
               -compactors: array:1 [
                 0 => "KevinGH\Box\Compactor\Php"
@@ -3227,7 +3227,7 @@ class ConfigurationTest extends ConfigurationTestCase
         ];
     }
 
-    public static function composerFilesProvider(): iterable
+    public static function composerArtifactsProvider(): iterable
     {
         yield [
             static function (): void {},

@@ -22,7 +22,7 @@ use function array_map;
 /**
  * @private
  */
-final readonly class DecodedComposerLock
+final readonly class ComposerLock
 {
     /**
      * @param array $decodedContents Decoded JSON contents of the `composer.lock` file

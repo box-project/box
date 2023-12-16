@@ -15,8 +15,8 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -41,16 +41,16 @@ final class RequirementsDumper
      * @return list<array{string, string}>
      */
     public static function dump(
-        ?DecodedComposerJson $composerJson,
-        ?DecodedComposerLock $composerLock,
+        ?ComposerJson $composerJson,
+        ?ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
         Assert::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
 
         $filesWithContents = [
             self::dumpRequirementsConfig(
-                $composerJson ?? new DecodedComposerJson('', []),
-                $composerLock ?? new DecodedComposerLock('', []),
+                $composerJson ?? new ComposerJson('', []),
+                $composerLock ?? new ComposerLock('', []),
                 $compressionAlgorithm,
             ),
         ];
@@ -71,8 +71,8 @@ final class RequirementsDumper
     }
 
     private static function dumpRequirementsConfig(
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
         $requirements = AppRequirementsFactory::create(

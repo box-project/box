@@ -1193,7 +1193,7 @@ class CompileTest extends FileSystemTestCase
               -binaryFiles: []
               -autodiscoveredFiles: true
               -dumpAutoload: false
-              -excludeComposerFiles: true
+              -excludeComposerArtifacts: true
               -excludeDevFiles: false
               -compactors: []
               -compressionAlgorithm: "NONE"

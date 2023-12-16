@@ -16,7 +16,7 @@ namespace KevinGH\Box\Configuration;
 
 use Closure;
 use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Composer\Artifact\ComposerFile;
+use KevinGH\Box\Composer\Artifact\ComposerArtifact;
 use KevinGH\Box\MapFile;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Path;
@@ -54,13 +54,13 @@ final readonly class ExportableConfiguration
             $configuration->getBasePath(),
             null === $composerJson
                 ? null
-                : new ComposerFile(
+                : new ComposerArtifact(
                     $normalizePath($composerJson->path),
                     $composerJson->decodedContents,
                 ),
             null === $composerLock
                 ? null
-                : new ComposerFile(
+                : new ComposerArtifact(
                     $normalizePath($composerLock->path),
                     $composerLock->decodedContents,
                 ),
@@ -68,7 +68,7 @@ final readonly class ExportableConfiguration
             $normalizePaths($configuration->getBinaryFiles()),
             $configuration->hasAutodiscoveredFiles(),
             $configuration->dumpAutoload(),
-            $configuration->excludeComposerFiles(),
+            $configuration->excludeComposerArtifacts(),
             $configuration->excludeDevFiles(),
             array_map('get_class', $configuration->getCompactors()->toArray()),
             $configuration->getCompressionAlgorithm()->name,
@@ -120,13 +120,13 @@ final readonly class ExportableConfiguration
         private ?string $file,
         private string $alias,
         private string $basePath,
-        private ?ComposerFile $composerJson,
-        private ?ComposerFile $composerLock,
+        private ?ComposerArtifact $composerJson,
+        private ?ComposerArtifact $composerLock,
         private array $files,
         private array $binaryFiles,
         private bool $autodiscoveredFiles,
         private bool $dumpAutoload,
-        private bool $excludeComposerFiles,
+        private bool $excludeComposerArtifacts,
         private bool $excludeDevFiles,
         private array|Compactors $compactors,
         private string $compressionAlgorithm,
