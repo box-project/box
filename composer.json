@@ -42,6 +42,7 @@
         "symfony/polyfill-mbstring": "^1.28",
         "symfony/process": "^6.4.0 || ^7.0.0",
         "symfony/var-dumper": "^6.4.0 || ^7.0.0",
+        "thecodingmachine/safe": "^2.5",
         "webmozart/assert": "^1.11"
     },
     "require-dev": {
