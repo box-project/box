@@ -351,7 +351,7 @@ jobs:
 
             -   name: Create Pull Request
                 if: env.requirement_checker_changed == 'true'
-                uses: peter-evans/create-pull-request@v5
+                uses: peter-evans/create-pull-request@v6
                 with:
                     token: ${{ secrets.GITHUB_TOKEN }}
                     branch-suffix: random
