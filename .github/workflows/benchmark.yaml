@@ -32,13 +32,13 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
             -   name: Install PHPBench
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
                 with:
                     working-directory: vendor-bin/phpbench
 
@@ -73,13 +73,13 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
             -   name: Install PHPBench
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
                 with:
                     working-directory: vendor-bin/phpbench
 
@@ -110,13 +110,13 @@ jobs:
 #                    coverage: none
 #
 #            -   name: Install Composer dependencies
-#                uses: ramsey/composer-install@v2
+#                uses: ramsey/composer-install@v3
 #
 #            -   name: Ensure that the make target is up to date
 #                run: make _vendor_install
 #
 #            -   name: Install PHPBench
-#                uses: ramsey/composer-install@v2
+#                uses: ramsey/composer-install@v3
 #                with:
 #                    working-directory: vendor-bin/phpbench
 #
