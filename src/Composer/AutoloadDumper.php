@@ -19,7 +19,6 @@ use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\NotInstantiable;
 use UnexpectedValueException;
-use function array_column;
 use function array_map;
 use function explode;
 use function implode;
@@ -79,8 +78,7 @@ final class AutoloadDumper
     private static function getExcludedComposerAutoloadFileHashes(
         string $vendorDir,
         array $excludedComposerAutoloadFiles,
-    ): array
-    {
+    ): array {
         $fileHashGenerator = new ComposerFileHasher(
             '',
             $excludedComposerAutoloadFiles,

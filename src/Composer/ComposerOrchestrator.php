@@ -111,13 +111,9 @@ final class ComposerOrchestrator
     }
 
     /**
-     * @param SymbolsRegistry $symbolsRegistry
-     * @param string $prefix
-     * @param bool $excludeDevFiles
      * @param string[] $excludedComposerAutoloadFiles Relative paths of the files that were not scoped hence which need
      *                                                to be configured as loaded to Composer as otherwise they would be
      *                                                autoloaded twice.
-     * @return void
      */
     public function dumpAutoload(
         SymbolsRegistry $symbolsRegistry,
@@ -132,7 +128,7 @@ final class ComposerOrchestrator
         }
 
         $vendorDir = $this->getVendorDir();
-        $autoloadFile = $vendorDir .'/autoload.php';
+        $autoloadFile = $vendorDir.'/autoload.php';
 
         $autoloadContents = AutoloadDumper::generateAutoloadStatements(
             $symbolsRegistry,
