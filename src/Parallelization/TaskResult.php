@@ -46,7 +46,7 @@ final readonly class TaskResult
      * @param LocalPharFile[] $localPharFiles
      */
     public function __construct(
-        public array           $localPharFiles,
+        public array $localPharFiles,
         public SymbolsRegistry $symbolsRegistry,
     ) {
     }
