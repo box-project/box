@@ -416,7 +416,10 @@ vendor-bin/php-cs-fixer/composer.lock: vendor-bin/php-cs-fixer/composer.json
 	@echo "$$ composer bin php-cs-fixer update --lock && touch -c $(@)"
 
 .PHONY: phpbench_install
-phpbench_install: $(PHPBENCH_BIN)
+phpbench_install: $(PHPBENCH_BIN) \
+			$(PHPBENCH_WITH_COMPACTORS_VENDOR_DIR) \
+			$(PHPBENCH_WITHOUT_COMPACTORS_VENDOR_DIR) \
+			$(PHPBENCH_REQUIREMENT_CHECKER_VENDOR_DIR)
 
 $(PHPBENCH_BIN): vendor-bin/phpbench/vendor
 	touch -c $@

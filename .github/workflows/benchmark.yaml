@@ -27,7 +27,7 @@ jobs:
                 with:
                     php-version: '8.2'
                     ini-values: phar.readonly=0, opcache.enable_cli=1
-                    extensions: opcache, :xdebug
+                    extensions: iconv, mbstring, opcache, :xdebug
                     tools: composer
                     coverage: none
 
@@ -37,13 +37,8 @@ jobs:
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
-            -   name: Install PHPBench
-                uses: ramsey/composer-install@v3
-                with:
-                    working-directory: vendor-bin/phpbench
-
-            -   name: Ensure that the PHPBench make target is up to date
-                run: make phpbench_install
+            -   name: Install PHPBench Composer dependencies
+                uses: ./.github/actions/install-bench
 
             -   name: Run PHPBench
                 run: make phpbench_main
@@ -78,13 +73,8 @@ jobs:
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
-            -   name: Install PHPBench
-                uses: ramsey/composer-install@v3
-                with:
-                    working-directory: vendor-bin/phpbench
-
-            -   name: Ensure that the PHPBench make target is up to date
-                run: make phpbench_install
+            -   name: Install PHPBench Composer dependencies
+                uses: ./.github/actions/install-bench
 
             -   name: Run PHPBench
                 run: make phpbench
