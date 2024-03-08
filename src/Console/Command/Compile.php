@@ -28,8 +28,6 @@ use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Box;
 use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Composer\ComposerOrchestrator;
 use KevinGH\Box\Composer\ComposerProcessFactory;
@@ -279,7 +277,7 @@ final class Compile implements CommandAware
 
         self::commit($box, $composerOrchestrator, $config, $logger);
 
-        self::checkComposerFiles($box, $config, $logger);
+        self::checkComposerArtifacts($box, $config, $logger);
 
         if ($debug) {
             $box->extractTo(self::DEBUG_DIR, true);
@@ -567,8 +565,8 @@ final class Compile implements CommandAware
         );
 
         $checkFiles = RequirementsDumper::dump(
-            new DecodedComposerJson($config->getDecodedComposerJsonContents() ?? []),
-            new DecodedComposerLock($config->getDecodedComposerLockContents() ?? []),
+            $config->getComposerJson(),
+            $config->getComposerLock(),
             $config->getCompressionAlgorithm(),
         );
 
@@ -673,18 +671,18 @@ final class Compile implements CommandAware
         );
     }
 
-    private static function checkComposerFiles(Box $box, Configuration $config, CompilerLogger $logger): void
+    private static function checkComposerArtifacts(Box $box, Configuration $config, CompilerLogger $logger): void
     {
-        $message = $config->excludeComposerFiles()
+        $message = $config->excludeComposerArtifacts()
             ? 'Removing the Composer dump artefacts'
             : 'Keep the Composer dump artefacts';
 
         $logger->log(CompilerLogger::QUESTION_MARK_PREFIX, $message);
 
-        if ($config->excludeComposerFiles()) {
-            $box->removeComposerArtefacts(
+        if ($config->excludeComposerArtifacts()) {
+            $box->removeComposerArtifacts(
                 ComposerConfiguration::retrieveVendorDir(
-                    $config->getDecodedComposerJsonContents() ?? [],
+                    $config->getComposerJson(),
                 ),
             );
         }

@@ -14,10 +14,10 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use Symfony\Component\Filesystem\Path;
-use function array_column;
 use function array_filter;
-use function array_key_exists;
 use function array_map;
 use function realpath;
 use const DIRECTORY_SEPARATOR;
@@ -27,6 +27,8 @@ use const DIRECTORY_SEPARATOR;
  */
 final class ComposerConfiguration
 {
+    private const DEFAULT_VENDOR_DIR = 'vendor';
+
     /**
      * Attempts to locate the `composer.json` and `composer.lock` files in the provided base-path in order to collect
      * all the dev packages.
@@ -35,12 +37,12 @@ final class ComposerConfiguration
      */
     public static function retrieveDevPackages(
         string $basePath,
-        ?array $composerJsonDecodedContents,
-        ?array $composerLockDecodedContents,
+        ?ComposerJson $composerJson,
+        ?ComposerLock $composerLock,
         bool $excludeDevPackages,
     ): array {
-        if (null === $composerJsonDecodedContents
-            || null === $composerLockDecodedContents
+        if (null === $composerJson
+            || null === $composerLock
             || false === $excludeDevPackages
         ) {
             return [];
@@ -48,8 +50,8 @@ final class ComposerConfiguration
 
         return self::getDevPackagePaths(
             $basePath,
-            $composerJsonDecodedContents,
-            $composerLockDecodedContents,
+            $composerJson,
+            $composerLock,
         );
     }
 
@@ -58,50 +60,31 @@ final class ComposerConfiguration
      */
     private static function getDevPackagePaths(
         string $basePath,
-        array $composerJsonDecodedContents,
-        array $composerLockDecodedContents,
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
     ): array {
         $vendorDir = Path::makeAbsolute(
-            self::retrieveVendorDir($composerJsonDecodedContents),
+            self::retrieveVendorDir($composerJson),
             $basePath,
         );
+        $packageNames = $composerLock->getDevPackageNames();
 
-        $packageNames = self::retrieveDevPackageNames($composerLockDecodedContents);
+        $mapPackageNameToRealPath = static function (string $packageName) use ($vendorDir): ?string {
+            $realPath = realpath($vendorDir.DIRECTORY_SEPARATOR.$packageName);
+
+            return false !== $realPath ? $realPath : null;
+        };
 
         return array_filter(
             array_map(
-                static function (string $packageName) use ($vendorDir): ?string {
-                    $realPath = realpath($vendorDir.DIRECTORY_SEPARATOR.$packageName);
-
-                    return false !== $realPath ? $realPath : null;
-                },
+                $mapPackageNameToRealPath,
                 $packageNames,
             ),
         );
     }
 
-    public static function retrieveVendorDir(array $composerJsonDecodedContents): string
+    public static function retrieveVendorDir(?ComposerJson $composerJson): string
     {
-        if (false === array_key_exists('config', $composerJsonDecodedContents)) {
-            return 'vendor';
-        }
-
-        if (false === array_key_exists('vendor-dir', $composerJsonDecodedContents['config'])) {
-            return 'vendor';
-        }
-
-        return $composerJsonDecodedContents['config']['vendor-dir'];
-    }
-
-    /**
-     * @return string[] Names of the dev packages
-     */
-    private static function retrieveDevPackageNames(array $composerLockDecodedContents): array
-    {
-        if (false === array_key_exists('packages-dev', $composerLockDecodedContents)) {
-            return [];
-        }
-
-        return array_column($composerLockDecodedContents['packages-dev'], 'name');
+        return $composerJson?->getVendorDir() ?? self::DEFAULT_VENDOR_DIR;
     }
 }

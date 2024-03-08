@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Composer\Package\Extension;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 
@@ -29,8 +29,8 @@ final class AppRequirementsFactory
     private const SELF_PACKAGE = null;
 
     public static function create(
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): Requirements {
         $requirementsBuilder = new RequirementsBuilder();
@@ -45,8 +45,8 @@ final class AppRequirementsFactory
 
     private static function retrievePhpVersionRequirements(
         RequirementsBuilder $requirementsBuilder,
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
     ): void {
         // If the application has a constraint on the PHP version, it is the authority.
         $composerLock->hasRequiredPhpVersion() || $composerJson->hasRequiredPhpVersion()
@@ -56,8 +56,8 @@ final class AppRequirementsFactory
 
     private static function retrievePHPRequirementFromPlatform(
         RequirementsBuilder $requirementsBuilder,
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
     ): void {
         $requiredPhpVersion = $composerLock->getRequiredPhpVersion() ?? $composerJson->getRequiredPhpVersion();
 
@@ -70,7 +70,7 @@ final class AppRequirementsFactory
 
     private static function retrievePHPRequirementFromPackages(
         RequirementsBuilder $requirementsBuilder,
-        DecodedComposerLock $composerLock,
+        ComposerLock $composerLock,
     ): void {
         foreach ($composerLock->getPackages() as $packageInfo) {
             if ($packageInfo->hasRequiredPhpVersion()) {
@@ -103,7 +103,7 @@ final class AppRequirementsFactory
     }
 
     private static function collectComposerJsonExtensionRequirements(
-        DecodedComposerJson $composerJson,
+        ComposerJson $composerJson,
         RequirementsBuilder $requirementsBuilder,
     ): void {
         foreach ($composerJson->getRequiredItems() as $packageInfo) {
@@ -132,7 +132,7 @@ final class AppRequirementsFactory
     }
 
     private static function collectComposerLockExtensionRequirements(
-        DecodedComposerLock $composerLock,
+        ComposerLock $composerLock,
         RequirementsBuilder $requirementsBuilder,
     ): void {
         foreach ($composerLock->getPlatformExtensions() as $extension) {
