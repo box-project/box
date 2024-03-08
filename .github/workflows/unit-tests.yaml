@@ -75,7 +75,7 @@ jobs:
                 run: composer config platform.php --unset
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
                 with:
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
@@ -126,13 +126,13 @@ jobs:
                     echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$INFECTION_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
             -   name: Install Infection
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
 
             -   name: Ensure that the Infection make target is up to date
                 run: make infection_install
