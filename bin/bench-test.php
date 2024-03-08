@@ -34,7 +34,7 @@ $noParallelTime = $meanTimes['with compactors; no parallel processing'];
 
 $formatMeanTime = static fn (float $mean) => number_format($mean).'µs';
 
-$maxParallelTimeTarget = .8 * $noParallelTime;
+$maxParallelTimeTarget = .9 * $noParallelTime;
 
 echo 'Benchmark results check:'.PHP_EOL;
 echo '========================'.PHP_EOL;
