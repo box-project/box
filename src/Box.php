@@ -129,15 +129,18 @@ final class Box implements Countable
 
         if ([] === $this->bufferedFiles) {
             $this->bufferedFiles = [
-                '.box_empty' => 'A PHAR cannot be empty so Box adds this file to ensure the PHAR is created still.',
+                new LocalPharFile(
+                    '.box_empty',
+                    'A PHAR cannot be empty so Box adds this file to ensure the PHAR is created still.',
+                ),
             ];
         }
 
         try {
             foreach ($this->bufferedFiles as $file) {
                 FS::dumpFile(
-                    $file->path,
-                    $file->contents,
+                    $file->getPath(),
+                    $file->getContents(),
                 );
             }
 
@@ -310,7 +313,7 @@ final class Box implements Countable
         }
 
         foreach ($this->processContents($files) as $file) {
-            $this->bufferedFiles[$file->path] = $file;
+            $this->bufferedFiles[$file->getPath()] = $file;
         }
     }
 

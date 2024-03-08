@@ -17,8 +17,8 @@ namespace KevinGH\Box\Filesystem;
 final readonly class LocalPharFile implements File
 {
     public function __construct(
-        public string $path,
-        public string $contents,
+        private string $path,
+        private string $contents,
     ) {
     }
 
