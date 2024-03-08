@@ -20,6 +20,7 @@ use Amp\Sync\Channel;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\Compactor\Compactors;
+use KevinGH\Box\Filesystem\LocalPharFile;
 use KevinGH\Box\MapFile;
 use function array_map;
 
@@ -53,21 +54,21 @@ final readonly class ProcessFileTask implements Task
 
             $processedContents = $compactors->compact($local, $contents);
 
-            return [$local, $processedContents, $compactors->getScoperSymbolsRegistry()];
+            return [new LocalPharFile($local, $processedContents), $compactors->getScoperSymbolsRegistry()];
         };
 
         $tuples = array_map($processFile, $this->filePaths);
 
-        $filesWithContents = [];
+        $localPharFiles = [];
         $symbolRegistries = [];
 
-        foreach ($tuples as [$local, $processedContents, $symbolRegistry]) {
-            $filesWithContents[] = [$local, $processedContents];
+        foreach ($tuples as [$localPharFile, $symbolRegistry]) {
+            $localPharFiles[] = $localPharFile;
             $symbolRegistries[] = $symbolRegistry;
         }
 
         return new TaskResult(
-            $filesWithContents,
+            $localPharFiles,
             SymbolsRegistry::createFromRegistries(array_filter($symbolRegistries)),
         );
     }

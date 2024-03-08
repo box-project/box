@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Parallelization;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use KevinGH\Box\Filesystem\LocalPharFile;
 use PhpParser\Node\Name\FullyQualified;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -64,25 +65,25 @@ final class TaskResultTest extends TestCase
             [
                 new TaskResult(
                     [
-                        ['fileA', 'contentA'],
-                        ['fileB', 'contentB'],
+                        new LocalPharFile('fileA', 'contentA'),
+                        new LocalPharFile('fileB', 'contentB'),
                     ],
                     $symbolsRegistry1,
                 ),
                 new TaskResult(
                     [
-                        ['fileC', 'contentC'],
-                        ['fileD', 'contentD'],
+                        new LocalPharFile('fileC', 'contentC'),
+                        new LocalPharFile('fileD', 'contentD'),
                     ],
                     $symbolsRegistry2,
                 ),
             ],
             new TaskResult(
                 [
-                    ['fileA', 'contentA'],
-                    ['fileB', 'contentB'],
-                    ['fileC', 'contentC'],
-                    ['fileD', 'contentD'],
+                    new LocalPharFile('fileA', 'contentA'),
+                    new LocalPharFile('fileB', 'contentB'),
+                    new LocalPharFile('fileC', 'contentC'),
+                    new LocalPharFile('fileD', 'contentD'),
                 ],
                 $expectedSymbolsRegistry,
             ),
