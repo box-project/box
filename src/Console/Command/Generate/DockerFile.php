@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace KevinGH\Box\Console\Command\Generate;
 
 use Fidry\Console\Command\CommandAware;
 use Fidry\Console\Command\CommandAwareness;
@@ -20,7 +20,10 @@ use Fidry\Console\Command\Configuration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
 use Fidry\FileSystem\FS;
+use KevinGH\Box\Console\Command\Compile;
+use KevinGH\Box\Console\Command\ConfigOption;
 use KevinGH\Box\DockerFileGenerator;
+use KevinGH\Box\Phar\PharInfo;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
@@ -35,7 +38,7 @@ use function sprintf;
 /**
  * @private
  */
-final class GenerateDockerFile implements CommandAware
+final class DockerFile implements CommandAware
 {
     use CommandAwareness;
 
@@ -44,10 +47,14 @@ final class GenerateDockerFile implements CommandAware
     private const PHAR_ARG = 'phar';
     private const DOCKER_FILE_NAME = 'Dockerfile';
 
+    public function __construct(private readonly string $commandName = self::NAME)
+    {
+    }
+
     public function getConfiguration(): Configuration
     {
         return new Configuration(
-            'docker',
+            $this->commandName,
             '🐳  Generates a Dockerfile for the given PHAR',
             '',
             [
@@ -83,7 +90,7 @@ final class GenerateDockerFile implements CommandAware
         );
         $io->newLine();
 
-        $requirementsFilePhar = 'phar://'.$pharFilePath.'/.box/.requirements.php';
+        $requirementsFilePhar = 'phar://'.$pharFilePath.'/'.PharInfo::BOX_REQUIREMENTS;
 
         return $this->generateFile(
             $pharFilePath,

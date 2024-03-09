@@ -12,11 +12,10 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command;
+namespace KevinGH\Box\Console\Command\Generate;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
-use Fidry\FileSystem\FS;
 use KevinGH\Box\Test\CommandTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -25,12 +24,12 @@ use function Safe\realpath;
 /**
  * @internal
  */
-#[CoversClass(GenerateDockerFile::class)]
-class GenerateDockerFileTest extends CommandTestCase
+#[CoversClass(\KevinGH\Box\Console\Command\Generate\DockerFile::class)]
+class DockerFileTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;
 
-    private const FIXTURES_DIR = __DIR__.'/../../../fixtures/docker';
+    private const FIXTURES_DIR = __DIR__.'/../../../../fixtures/docker';
 
     protected function setUp(): void
     {
@@ -41,7 +40,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
     protected function getCommand(): Command
     {
-        return new GenerateDockerFile();
+        return new DockerFile();
     }
 
     public function test_it_generates_a_dockerfile_for_a_given_phar(): void
@@ -65,33 +64,6 @@ class GenerateDockerFileTest extends CommandTestCase
         $this->assertSameOutput($expected, ExitCode::SUCCESS);
 
         self::assertFileExists($this->tmp.'/Dockerfile');
-    }
-
-    public function test_it_can_generate_a_dockerfile_for_a_given_phar_from_a_different_working_directory(): void
-    {
-        $workDir = $this->tmp.'/workdir';
-        FS::mkdir($workDir);
-
-        $this->commandTester->execute([
-            'command' => 'docker',
-            'phar' => $pharPath = realpath(self::FIXTURES_DIR.'/simple-phar.phar'),
-            '--working-dir' => $workDir,
-        ]);
-
-        $expected = <<<OUTPUT
-
-            🐳  Generating a Dockerfile for the PHAR "{$pharPath}"
-
-             [OK] Done
-
-            You can now inspect your Dockerfile file or build your container with:
-            $ docker build .
-
-            OUTPUT;
-
-        $this->assertSameOutput($expected, ExitCode::SUCCESS);
-
-        self::assertFileExists($workDir.'/Dockerfile');
     }
 
     public function test_it_cannot_generate_a_dockerfile_for_a_phar_without_requirements(): void

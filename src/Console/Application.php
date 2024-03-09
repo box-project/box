@@ -15,13 +15,15 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use Fidry\Console\Application\Application as FidryApplication;
+use KevinGH\Box\Console\Command\Check\Requirements as CheckRequirements;
 use KevinGH\Box\Console\Command\Check\Signature as CheckSignature;
 use KevinGH\Box\Console\Command\Compile;
 use KevinGH\Box\Console\Command\Composer\ComposerCheckVersion;
 use KevinGH\Box\Console\Command\Composer\ComposerVendorDir;
 use KevinGH\Box\Console\Command\Diff;
 use KevinGH\Box\Console\Command\Extract;
-use KevinGH\Box\Console\Command\GenerateDockerFile;
+use KevinGH\Box\Console\Command\Generate\DockerFile as GenerateDockerFile;
+use KevinGH\Box\Console\Command\Generate\Requirements as GenerateRequirements;
 use KevinGH\Box\Console\Command\Info;
 use KevinGH\Box\Console\Command\Info\Signature as InfoSignature;
 use KevinGH\Box\Console\Command\Namespace_;
@@ -99,11 +101,14 @@ final class Application implements FidryApplication
             new Info('info:general'),
             new InfoSignature(),
             new CheckSignature(),
+            new CheckRequirements(),
             new Process(),
             new Extract(),
             new Validate(),
             new Verify(),
             new GenerateDockerFile(),
+            new GenerateDockerFile('generate:docker'),
+            new GenerateRequirements(),
             new Namespace_(),
         ];
     }

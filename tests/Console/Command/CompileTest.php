@@ -25,6 +25,7 @@ use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\Application;
+use KevinGH\Box\Console\Command\Generate\DockerFile;
 use KevinGH\Box\Console\DisplayNormalizer as BoxDisplayNormalizer;
 use KevinGH\Box\Console\MessageRenderer;
 use KevinGH\Box\Test\FileSystemTestCase;
@@ -159,7 +160,7 @@ class CompileTest extends FileSystemTestCase
 
         $application = new SymfonyApplication();
         $application->add($command);
-        $application->add(new SymfonyCommand(new GenerateDockerFile()));
+        $application->add(new SymfonyCommand(new DockerFile()));
 
         $this->commandTester = new CommandTester(
             $application->get(
