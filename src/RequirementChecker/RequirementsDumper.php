@@ -15,13 +15,12 @@ declare(strict_types=1);
 namespace KevinGH\Box\RequirementChecker;
 
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
-use function array_map;
 use function str_replace;
 use function var_export;
 
@@ -42,16 +41,16 @@ final class RequirementsDumper
      * @return list<array{string, string}>
      */
     public static function dump(
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+        ?ComposerJson $composerJson,
+        ?ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
         Assert::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
 
         $filesWithContents = [
             self::dumpRequirementsConfig(
-                $composerJson,
-                $composerLock,
+                $composerJson ?? new ComposerJson('', []),
+                $composerLock ?? new ComposerLock('', []),
                 $compressionAlgorithm,
             ),
         ];
@@ -72,24 +71,21 @@ final class RequirementsDumper
     }
 
     private static function dumpRequirementsConfig(
-        DecodedComposerJson $composerJson,
-        DecodedComposerLock $composerLock,
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        $requirements = array_map(
-            static fn (Requirement $requirement) => $requirement->toArray(),
-            AppRequirementsFactory::create(
-                $composerJson,
-                $composerLock,
-                $compressionAlgorithm,
-            ),
+        $requirements = AppRequirementsFactory::create(
+            $composerJson,
+            $composerLock,
+            $compressionAlgorithm,
         );
 
         return [
             '.requirements.php',
             str_replace(
                 '\'__CONFIG__\'',
-                var_export($requirements, true),
+                var_export($requirements->toArray(), true),
                 self::REQUIREMENTS_CONFIG_TEMPLATE,
             ),
         ];

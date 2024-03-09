@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer\Artifact;
 
+use KevinGH\Box\Composer\Package\ExtensionsAssertion;
 use KevinGH\Box\Composer\Package\PackageInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -23,8 +24,8 @@ use function json_decode;
 /**
  * @internal
  */
-#[CoversClass(DecodedComposerLock::class)]
-class DecodedComposerLockTest extends TestCase
+#[CoversClass(ComposerLock::class)]
+class ComposerLockTest extends TestCase
 {
     #[DataProvider('composerLockProvider')]
     public function test_it_can_interpret_a_decoded_composer_json_file(
@@ -35,7 +36,10 @@ class DecodedComposerLockTest extends TestCase
         array $expectedPlatformExtensions,
         array $expectedPackages,
     ): void {
-        $actual = new DecodedComposerLock(json_decode($composerJsonContents, true));
+        $actual = new ComposerLock(
+            '',
+            json_decode($composerJsonContents, true),
+        );
 
         self::assertStateIs(
             $actual,
@@ -177,7 +181,7 @@ class DecodedComposerLockTest extends TestCase
     }
 
     private static function assertStateIs(
-        DecodedComposerLock $composerLock,
+        ComposerLock $composerLock,
         bool $expectedIsEmpty,
         ?string $expectedRequiredPhpVersion,
         bool $expectedHasRequiredPhpVersion,
@@ -187,7 +191,7 @@ class DecodedComposerLockTest extends TestCase
         self::assertSame($expectedIsEmpty, $composerLock->isEmpty());
         self::assertSame($expectedRequiredPhpVersion, $composerLock->getRequiredPhpVersion());
         self::assertSame($expectedHasRequiredPhpVersion, $composerLock->hasRequiredPhpVersion());
-        self::assertSame($expectedPlatformExtensions, $composerLock->getPlatformExtensions());
+        ExtensionsAssertion::assertEqual($expectedPlatformExtensions, $composerLock->getPlatformExtensions());
         self::assertEquals($expectedPackages, $composerLock->getPackages());
     }
 }

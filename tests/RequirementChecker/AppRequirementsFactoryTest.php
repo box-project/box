@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -36,13 +36,29 @@ class AppRequirementsFactoryTest extends TestCase
         CompressionAlgorithm $compressionAlgorithm,
         array $expected,
     ): void {
+        $composerJson = new ComposerJson(
+            '',
+            null === $composerJsonContents
+                ? []
+                : json_decode($composerJsonContents, true, flags: JSON_THROW_ON_ERROR),
+        );
+        $composerLock = new ComposerLock(
+            '',
+            null === $composerLockContents
+                ? []
+                : json_decode($composerLockContents, true, flags: JSON_THROW_ON_ERROR),
+        );
+
         $actual = AppRequirementsFactory::create(
-            new DecodedComposerJson(null === $composerJsonContents ? [] : json_decode($composerJsonContents, true, flags: JSON_THROW_ON_ERROR)),
-            new DecodedComposerLock(null === $composerLockContents ? [] : json_decode($composerLockContents, true, flags: JSON_THROW_ON_ERROR)),
+            $composerJson,
+            $composerLock,
             $compressionAlgorithm,
         );
 
-        self::assertEquals($expected, $actual);
+        self::assertEquals(
+            (new Requirements($expected))->toArray(),
+            $actual->toArray(),
+        );
     }
 
     public static function lockContentsProvider(): iterable
@@ -200,8 +216,8 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::GZ,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forRequiredExtension('zlib', null),
                 Requirement::forRequiredExtension('phar', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -219,8 +235,8 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::GZ,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forRequiredExtension('zlib', null),
                 Requirement::forRequiredExtension('phar', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -246,8 +262,8 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::GZ,
             [
                 Requirement::forPHP('^7.1', null),
-                Requirement::forRequiredExtension('zlib', null),
                 Requirement::forRequiredExtension('phar', null),
+                Requirement::forRequiredExtension('zlib', null),
             ],
         ];
 
@@ -430,8 +446,8 @@ class AppRequirementsFactoryTest extends TestCase
                 Requirement::forPHP('>=5.3', 'beberlei/assert'),
                 Requirement::forPHP('^5.3.2 || ^7.0', 'composer/ca-bundle'),
                 Requirement::forRequiredExtension('mbstring', 'beberlei/assert'),
-                Requirement::forRequiredExtension('openssl', 'composer/ca-bundle'),
                 Requirement::forRequiredExtension('openssl', 'acme/foo'),
+                Requirement::forRequiredExtension('openssl', 'composer/ca-bundle'),
                 Requirement::forRequiredExtension('pcre', 'composer/ca-bundle'),
             ],
         ];
@@ -607,10 +623,10 @@ class AppRequirementsFactoryTest extends TestCase
             [
                 Requirement::forPHP('>=5.4', null),
                 Requirement::forConflictingExtension('http', 'beberlei/assert'),
-                Requirement::forConflictingExtension('psr', 'beberlei/assert'),
-                Requirement::forConflictingExtension('psr', null),
-                Requirement::forConflictingExtension('zlib', 'composer/ca-bundle'),
                 Requirement::forConflictingExtension('phar', null),
+                Requirement::forConflictingExtension('psr', null),
+                Requirement::forConflictingExtension('psr', 'beberlei/assert'),
+                Requirement::forConflictingExtension('zlib', 'composer/ca-bundle'),
             ],
         ];
 
@@ -666,10 +682,14 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('>=5.3', null),
+                Requirement::forRequiredExtension('mbstring', null),
                 Requirement::forRequiredExtension('mbstring', 'beberlei/assert'),
-                Requirement::forRequiredExtension('openssl', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('openssl', null),
                 Requirement::forRequiredExtension('openssl', 'acme/foo'),
+                Requirement::forRequiredExtension('openssl', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('pcre', null),
                 Requirement::forRequiredExtension('pcre', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('pdo_sqlite3', null),
             ],
         ];
 
@@ -804,12 +824,12 @@ class AppRequirementsFactoryTest extends TestCase
             CompressionAlgorithm::NONE,
             [
                 Requirement::forPHP('^7.3', null),
-                Requirement::forRequiredExtension('mbstring', null),
-                Requirement::forRequiredExtension('mbstring', 'beberlei/assert'),
-                Requirement::forRequiredExtension('mbstring', 'composer/ca-bundle'),
                 Requirement::forRequiredExtension('json', null),
                 Requirement::forRequiredExtension('json', 'beberlei/assert'),
                 Requirement::forRequiredExtension('json', 'composer/ca-bundle'),
+                Requirement::forRequiredExtension('mbstring', null),
+                Requirement::forRequiredExtension('mbstring', 'beberlei/assert'),
+                Requirement::forRequiredExtension('mbstring', 'composer/ca-bundle'),
             ],
         ];
 

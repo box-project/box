@@ -29,7 +29,7 @@ final class RequiredItemTest extends TestCase
         array $rawPackageInfo,
         string $expectedName,
         array $expectedRequiredExtensions,
-        ?string $expectedPolyfilledExtension,
+        ?Extension $expectedPolyfilledExtension,
     ): void {
         $requiredItem = new RequiredItem($rawPackageInfo);
 
@@ -68,14 +68,14 @@ final class RequiredItemTest extends TestCase
             ['symfony/polyfill-mbstring' => '^7.1'],
             'symfony/polyfill-mbstring',
             [],
-            'mbstring',
+            new Extension('mbstring'),
         ];
 
         yield 'phpseclib/mcrypt_compat' => [
             ['phpseclib/mcrypt_compat' => '*'],
             'phpseclib/mcrypt_compat',
             [],
-            'mcrypt',
+            new Extension('mcrypt'),
         ];
     }
 
@@ -83,10 +83,10 @@ final class RequiredItemTest extends TestCase
         RequiredItem $actual,
         string $expectedName,
         array $expectedRequiredExtensions,
-        ?string $expectedPolyfilledExtension,
+        ?Extension $expectedPolyfilledExtension,
     ): void {
         self::assertSame($expectedName, $actual->getName());
-        self::assertSame($expectedRequiredExtensions, $actual->getRequiredExtensions());
-        self::assertSame($expectedPolyfilledExtension, $actual->getPolyfilledExtension());
+        ExtensionsAssertion::assertEqual($expectedRequiredExtensions, $actual->getRequiredExtensions());
+        self::assertEquals($expectedPolyfilledExtension, $actual->getPolyfilledExtension());
     }
 }

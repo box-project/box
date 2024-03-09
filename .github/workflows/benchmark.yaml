@@ -26,29 +26,24 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
-                    ini-values: phar.readonly=0
-                    extensions: opcache
+                    ini-values: phar.readonly=0, opcache.enable_cli=1
+                    extensions: iconv, mbstring, opcache, :xdebug
                     tools: composer
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
-            -   name: Install PHPBench
-                uses: ramsey/composer-install@v2
-                with:
-                    working-directory: vendor-bin/phpbench
-
-            -   name: Ensure that the PHPBench make target is up to date
-                run: make phpbench_install
+            -   name: Install PHPBench Composer dependencies
+                uses: ./.github/actions/install-bench
 
             -   name: Run PHPBench
                 run: make phpbench_main
 
-            -   uses: actions/upload-artifact@v3
+            -   uses: actions/upload-artifact@v4
                 name: Upload the Benchmark results
                 with:
                     name: bench-main-result
@@ -67,24 +62,19 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
-                    ini-values: phar.readonly=0
-                    extensions: opcache
+                    ini-values: phar.readonly=0, opcache.enable_cli=1
+                    extensions: opcache, :xdebug
                     tools: composer
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
-            -   name: Install PHPBench
-                uses: ramsey/composer-install@v2
-                with:
-                    working-directory: vendor-bin/phpbench
-
-            -   name: Ensure that the PHPBench make target is up to date
-                run: make phpbench_install
+            -   name: Install PHPBench Composer dependencies
+                uses: ./.github/actions/install-bench
 
             -   name: Run PHPBench
                 run: make phpbench
@@ -110,13 +100,13 @@ jobs:
 #                    coverage: none
 #
 #            -   name: Install Composer dependencies
-#                uses: ramsey/composer-install@v2
+#                uses: ramsey/composer-install@v3
 #
 #            -   name: Ensure that the make target is up to date
 #                run: make _vendor_install
 #
 #            -   name: Install PHPBench
-#                uses: ramsey/composer-install@v2
+#                uses: ramsey/composer-install@v3
 #                with:
 #                    working-directory: vendor-bin/phpbench
 #
