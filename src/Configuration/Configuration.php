@@ -20,12 +20,15 @@ use DateTimeZone;
 use Fidry\FileSystem\FS;
 use Humbug\PhpScoper\Configuration\Configuration as PhpScoperConfiguration;
 use InvalidArgumentException;
+use JsonException;
 use KevinGH\Box\Compactor\Compactor;
 use KevinGH\Box\Compactor\Compactors;
 use KevinGH\Box\Compactor\Php as PhpCompactor;
 use KevinGH\Box\Compactor\PhpScoper as PhpScoperCompactor;
-use KevinGH\Box\Composer\Artifact\ComposerFile;
-use KevinGH\Box\Composer\Artifact\ComposerFiles;
+use KevinGH\Box\Composer\Artifact\ComposerArtifact;
+use KevinGH\Box\Composer\Artifact\ComposerArtifacts;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Composer\ComposerConfiguration;
 use KevinGH\Box\Json\Json;
 use KevinGH\Box\MapFile;
@@ -35,7 +38,6 @@ use KevinGH\Box\PhpScoper\ConfigurationFactory as PhpScoperConfigurationFactory;
 use KevinGH\Box\PhpScoper\SerializableScoper;
 use Phar;
 use RuntimeException;
-use Seld\JsonLint\ParsingException;
 use SplFileInfo;
 use stdClass;
 use Symfony\Component\Filesystem\Path;
@@ -53,7 +55,6 @@ use function array_merge;
 use function array_unique;
 use function array_values;
 use function array_walk;
-use function current;
 use function dirname;
 use function explode;
 use function file_exists;
@@ -78,6 +79,7 @@ use function preg_match;
 use function preg_replace;
 use function property_exists;
 use function realpath;
+use function Safe\json_decode;
 use function sprintf;
 use function str_starts_with;
 use function trigger_error;
@@ -218,13 +220,13 @@ final class Configuration
 
         $basePath = self::retrieveBasePath($file, $raw, $logger);
 
-        $composerFiles = self::retrieveComposerFiles($basePath);
+        $composerArtifacts = self::retrieveComposerArtifacts($basePath);
 
-        $dumpAutoload = self::retrieveDumpAutoload($raw, $composerFiles, $logger);
+        $dumpAutoload = self::retrieveDumpAutoload($raw, $composerArtifacts, $logger);
 
-        $excludeComposerFiles = self::retrieveExcludeComposerFiles($raw, $logger);
+        $excludeComposerArtifacts = self::retrieveExcludeComposerArtifacts($raw, $logger);
 
-        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerFiles->getComposerJson()->getDecodedContents(), $logger);
+        $mainScriptPath = self::retrieveMainScriptPath($raw, $basePath, $composerArtifacts->composerJson, $logger);
         $mainScriptContents = self::retrieveMainScriptContents($mainScriptPath);
 
         [$tmpOutputPath, $outputPath] = self::retrieveOutputPath($raw, $basePath, $mainScriptPath, $logger);
@@ -253,8 +255,8 @@ final class Configuration
 
         $checkRequirements = self::retrieveCheckRequirements(
             $raw,
-            null !== $composerFiles->getComposerJson()->getPath(),
-            null !== $composerFiles->getComposerLock()->getPath(),
+            null !== $composerArtifacts->composerJson?->path,
+            null !== $composerArtifacts->composerLock?->path,
             false === $isStubGenerated && null === $stubPath,
             $logger,
         );
@@ -263,8 +265,8 @@ final class Configuration
 
         $devPackages = ComposerConfiguration::retrieveDevPackages(
             $basePath,
-            $composerFiles->getComposerJson()->getDecodedContents(),
-            $composerFiles->getComposerLock()->getDecodedContents(),
+            $composerArtifacts->composerJson,
+            $composerArtifacts->composerLock,
             $excludeDevPackages,
         );
 
@@ -308,7 +310,7 @@ final class Configuration
             $excludedPaths,
             $alwaysExcludedPaths,
             $devPackages,
-            $composerFiles,
+            $composerArtifacts,
             $autodiscoverFiles,
             $forceFilesAutodiscovery,
             $logger,
@@ -346,13 +348,13 @@ final class Configuration
             $file,
             $alias,
             $basePath,
-            $composerFiles->getComposerJson(),
-            $composerFiles->getComposerLock(),
+            $composerArtifacts->composerJson,
+            $composerArtifacts->composerLock,
             $filesAggregate,
             $binaryFilesAggregate,
             $autodiscoverFiles || $forceFilesAutodiscovery,
             $dumpAutoload,
-            $excludeComposerFiles,
+            $excludeComposerArtifacts,
             $excludeDevPackages,
             $compactors,
             $compressionAlgorithm,
@@ -382,37 +384,37 @@ final class Configuration
     }
 
     /**
-     * @param string                 $basePath              Utility to private the base path used and be able to retrieve a
-     *                                                      path relative to it (the base path)
-     * @param array                  $composerJson          The first element is the path to the `composer.json` file as a
-     *                                                      string and the second element its decoded contents as an
-     *                                                      associative array.
-     * @param array                  $composerLock          The first element is the path to the `composer.lock` file as a
-     *                                                      string and the second element its decoded contents as an
-     *                                                      associative array.
-     * @param SplFileInfo[]          $files                 List of files
-     * @param SplFileInfo[]          $binaryFiles           List of binary files
-     * @param bool                   $dumpAutoload          Whether the Composer autoloader should be dumped
-     * @param bool                   $excludeComposerFiles  Whether the Composer files composer.json, composer.lock and
-     *                                                      installed.json should be removed from the PHAR
-     * @param CompressionAlgorithm   $compressionAlgorithm  Compression algorithm constant value. See the \Phar class constants
-     * @param null|int               $fileMode              File mode in octal form
-     * @param string                 $mainScriptPath        The main script file path
-     * @param string                 $mainScriptContents    The processed content of the main script file
-     * @param MapFile                $fileMapper            Utility to map the files from outside and inside the PHAR
-     * @param mixed                  $metadata              The PHAR Metadata
-     * @param bool                   $promptForPrivateKey   If the user should be prompted for the private key passphrase
-     * @param array                  $processedReplacements The processed list of replacement placeholders and their values
-     * @param null|non-empty-string  $shebang               The shebang line
-     * @param SigningAlgorithm       $signingAlgorithm      The PHAR siging algorithm. See \Phar constants
-     * @param null|string            $stubBannerContents    The stub banner comment
-     * @param null|string            $stubBannerPath        The path to the stub banner comment file
-     * @param null|string            $stubPath              The PHAR stub file path
-     * @param bool                   $isInterceptFileFuncs  Whether Phar::interceptFileFuncs() should be used
-     * @param bool                   $isStubGenerated       Whether if the PHAR stub should be generated
-     * @param null|DateTimeImmutable $timestamp             Timestamp at which the PHAR will be set to.
-     * @param bool                   $checkRequirements     Whether the PHAR will check the application requirements before
-     *                                                      running
+     * @param string                 $basePath                 Utility to private the base path used and be able to retrieve a
+     *                                                         path relative to it (the base path)
+     * @param array                  $composerJson             The first element is the path to the `composer.json` file as a
+     *                                                         string and the second element its decoded contents as an
+     *                                                         associative array.
+     * @param array                  $composerLock             The first element is the path to the `composer.lock` file as a
+     *                                                         string and the second element its decoded contents as an
+     *                                                         associative array.
+     * @param SplFileInfo[]          $files                    List of files
+     * @param SplFileInfo[]          $binaryFiles              List of binary files
+     * @param bool                   $dumpAutoload             Whether the Composer autoloader should be dumped
+     * @param bool                   $excludeComposerArtifacts Whether the Composer files composer.json, composer.lock and
+     *                                                         installed.json should be removed from the PHAR
+     * @param CompressionAlgorithm   $compressionAlgorithm     Compression algorithm constant value. See the \Phar class constants
+     * @param null|int               $fileMode                 File mode in octal form
+     * @param string                 $mainScriptPath           The main script file path
+     * @param string                 $mainScriptContents       The processed content of the main script file
+     * @param MapFile                $fileMapper               Utility to map the files from outside and inside the PHAR
+     * @param mixed                  $metadata                 The PHAR Metadata
+     * @param bool                   $promptForPrivateKey      If the user should be prompted for the private key passphrase
+     * @param array                  $processedReplacements    The processed list of replacement placeholders and their values
+     * @param null|non-empty-string  $shebang                  The shebang line
+     * @param SigningAlgorithm       $signingAlgorithm         The PHAR siging algorithm. See \Phar constants
+     * @param null|string            $stubBannerContents       The stub banner comment
+     * @param null|string            $stubBannerPath           The path to the stub banner comment file
+     * @param null|string            $stubPath                 The PHAR stub file path
+     * @param bool                   $isInterceptFileFuncs     Whether Phar::interceptFileFuncs() should be used
+     * @param bool                   $isStubGenerated          Whether if the PHAR stub should be generated
+     * @param null|DateTimeImmutable $timestamp                Timestamp at which the PHAR will be set to.
+     * @param bool                   $checkRequirements        Whether the PHAR will check the application requirements before
+     *                                                         running
      * @param string[]               $warnings
      * @param string[]               $recommendations
      */
@@ -420,13 +422,13 @@ final class Configuration
         private readonly ?string $file,
         private readonly string $alias,
         private readonly string $basePath,
-        private readonly ComposerFile $composerJson,
-        private readonly ComposerFile $composerLock,
+        private readonly ?ComposerJson $composerJson,
+        private readonly ?ComposerLock $composerLock,
         private readonly array $files,
         private readonly array $binaryFiles,
         private readonly bool $autodiscoveredFiles,
         private readonly bool $dumpAutoload,
-        private readonly bool $excludeComposerFiles,
+        private readonly bool $excludeComposerArtifacts,
         private readonly bool $excludeDevFiles,
         private readonly array|Compactors $compactors,
         private readonly CompressionAlgorithm $compressionAlgorithm,
@@ -493,24 +495,14 @@ final class Configuration
         return $this->basePath;
     }
 
-    public function getComposerJson(): ?string
+    public function getComposerJson(): ?ComposerJson
     {
-        return $this->composerJson->getPath();
+        return $this->composerJson;
     }
 
-    public function getDecodedComposerJsonContents(): ?array
+    public function getComposerLock(): ?ComposerLock
     {
-        return null === $this->composerJson->getPath() ? null : $this->composerJson->getDecodedContents();
-    }
-
-    public function getComposerLock(): ?string
-    {
-        return $this->composerLock->getPath();
-    }
-
-    public function getDecodedComposerLockContents(): ?array
-    {
-        return null === $this->composerLock->getPath() ? null : $this->composerLock->getDecodedContents();
+        return $this->composerLock;
     }
 
     /**
@@ -539,9 +531,9 @@ final class Configuration
         return $this->dumpAutoload;
     }
 
-    public function excludeComposerFiles(): bool
+    public function excludeComposerArtifacts(): bool
     {
-        return $this->excludeComposerFiles;
+        return $this->excludeComposerArtifacts;
     }
 
     public function excludeDevFiles(): bool
@@ -846,19 +838,19 @@ final class Configuration
         array $excludedPaths,
         array $alwaysExcludedPaths,
         array $devPackages,
-        ComposerFiles $composerFiles,
+        ComposerArtifacts $composerArtifacts,
         bool $autodiscoverFiles,
         bool $forceFilesAutodiscovery,
         ConfigurationLogger $logger,
     ): array {
-        $files = [self::retrieveFiles($raw, self::FILES_KEY, $basePath, $composerFiles, $alwaysExcludedPaths, $logger)];
+        $files = [self::retrieveFiles($raw, self::FILES_KEY, $basePath, $composerArtifacts, $alwaysExcludedPaths, $logger)];
 
         if ($autodiscoverFiles || $forceFilesAutodiscovery) {
             [$filesToAppend, $directories] = self::retrieveAllDirectoriesToInclude(
                 $basePath,
-                $composerFiles->getComposerJson()->getDecodedContents(),
+                $composerArtifacts->composerJson,
                 $devPackages,
-                $composerFiles->getPaths(),
+                $composerArtifacts->getPaths(),
                 $excludedPaths,
             );
 
@@ -898,7 +890,7 @@ final class Configuration
                 $files[] = $filesFromFinder;
             }
 
-            $files[] = self::wrapInSplFileInfo($composerFiles->getPaths());
+            $files[] = self::wrapInSplFileInfo($composerArtifacts->getPaths());
         }
 
         return self::retrieveFilesAggregate(...$files);
@@ -920,7 +912,7 @@ final class Configuration
         array $devPackages,
         ConfigurationLogger $logger,
     ): array {
-        $binaryFiles = self::retrieveFiles($raw, self::FILES_BIN_KEY, $basePath, ComposerFiles::createEmpty(), $alwaysExcludedPaths, $logger);
+        $binaryFiles = self::retrieveFiles($raw, self::FILES_BIN_KEY, $basePath, new ComposerArtifacts(), $alwaysExcludedPaths, $logger);
 
         $binaryDirectories = self::retrieveDirectories(
             $raw,
@@ -952,7 +944,7 @@ final class Configuration
         stdClass $raw,
         string $key,
         string $basePath,
-        ComposerFiles $composerFiles,
+        ComposerArtifacts $composerArtifacts,
         array $excludedFiles,
         ConfigurationLogger $logger,
     ): array {
@@ -960,8 +952,8 @@ final class Configuration
 
         $excludedFiles = array_flip($excludedFiles);
         $files = array_filter([
-            $composerFiles->getComposerJson()->getPath(),
-            $composerFiles->getComposerLock()->getPath(),
+            $composerArtifacts->composerJson?->path,
+            $composerArtifacts->composerLock?->path,
         ]);
 
         if (false === isset($raw->{$key})) {
@@ -1218,30 +1210,29 @@ final class Configuration
      */
     private static function retrieveAllDirectoriesToInclude(
         string $basePath,
-        ?array $decodedJsonContents,
+        ?ComposerJson $composerJson,
         array $devPackages,
         array $filesToAppend,
         array $excludedPaths,
     ): array {
         $toString = static fn (SplFileInfo|string $file): string => (string) $file;
 
-        if (null !== $decodedJsonContents && array_key_exists('vendor-dir', $decodedJsonContents)) {
-            $vendorDir = self::normalizePath($decodedJsonContents['vendor-dir'], $basePath);
-        } else {
-            $vendorDir = self::normalizePath('vendor', $basePath);
-        }
+        $vendorDir = self::normalizePath(
+            ComposerConfiguration::retrieveVendorDir($composerJson),
+            $basePath,
+        );
 
         if (file_exists($vendorDir)) {
             // Note that some files may not exist. For example installed.json does not exist at all if no dependencies
             // are included in composer.json.
-            $requiredComposerFiles = [
+            $requiredComposerArtifacts = [
                 'installed.json',
                 'installed.php',
                 'InstalledVersions.php',
             ];
 
-            foreach ($requiredComposerFiles as $requiredComposerFile) {
-                $normalizePath = self::normalizePath($vendorDir.'/composer/'.$requiredComposerFile, $basePath);
+            foreach ($requiredComposerArtifacts as $requiredComposerArtifact) {
+                $normalizePath = self::normalizePath($vendorDir.'/composer/'.$requiredComposerArtifact, $basePath);
 
                 if (file_exists($normalizePath)) {
                     $filesToAppend[] = $normalizePath;
@@ -1268,7 +1259,7 @@ final class Configuration
 
             $vendorPackages = array_diff($vendorPackages, $devPackages);
 
-            if (null === $decodedJsonContents || false === array_key_exists('autoload', $decodedJsonContents)) {
+            if (!($composerJson?->hasAutoload() ?? false)) {
                 $files = toArray(values(map(
                     $toString,
                     Finder::create()
@@ -1303,51 +1294,24 @@ final class Configuration
             $paths = [];
         }
 
-        $autoload = $decodedJsonContents['autoload'] ?? [];
-
-        if (array_key_exists('psr-4', $autoload)) {
-            foreach ($autoload['psr-4'] as $path) {
-                /** @var string|string[] $path */
-                $composerPaths = (array) $path;
-
-                foreach ($composerPaths as $composerPath) {
-                    $paths[] = '' !== trim($composerPath) ? $composerPath : $basePath;
-                }
-            }
-        }
-
-        if (array_key_exists('psr-0', $autoload)) {
-            foreach ($autoload['psr-0'] as $path) {
-                /** @var string|string[] $path */
-                $composerPaths = (array) $path;
-
-                foreach ($composerPaths as $composerPath) {
-                    $paths[] = '' !== trim($composerPath) ? $composerPath : $basePath;
-                }
-            }
-        }
-
-        if (array_key_exists('classmap', $autoload)) {
-            foreach ($autoload['classmap'] as $path) {
-                // @var string $path
-                $paths[] = $path;
-            }
-        }
+        $paths = array_merge(
+            $paths,
+            $composerJson?->getAutoloadPaths() ?? [],
+        );
 
         $normalizePath = static fn (string $path): string => Path::isAbsolute($path)
             ? Path::canonicalize($path)
             : self::normalizePath(trim($path, '/ '), $basePath);
 
-        if (array_key_exists('files', $autoload)) {
-            foreach ($autoload['files'] as $path) {
-                /** @var string $path */
-                $path = $normalizePath($path);
+        $composerFiles = $composerJson?->getAutoloadFiles() ?? [];
+        foreach ($composerFiles as $path) {
+            /** @var string $path */
+            $path = $normalizePath($path);
 
-                Assert::file($path);
-                Assert::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
+            Assert::file($path);
+            Assert::false(is_link($path), 'Cannot add the link "'.$path.'": links are not supported.');
 
-                $filesToAppend[] = $path;
-            }
+            $filesToAppend[] = $path;
         }
 
         $files = $filesToAppend;
@@ -1544,27 +1508,27 @@ final class Configuration
         );
     }
 
-    private static function retrieveDumpAutoload(stdClass $raw, ComposerFiles $composerFiles, ConfigurationLogger $logger): bool
+    private static function retrieveDumpAutoload(stdClass $raw, ComposerArtifacts $composerArtifacts, ConfigurationLogger $logger): bool
     {
         self::checkIfDefaultValue($logger, $raw, self::DUMP_AUTOLOAD_KEY, null);
 
         $canDumpAutoload = (
-            null !== $composerFiles->getComposerJson()->getPath()
+            null !== $composerArtifacts->composerJson?->path
             && (
                 // The composer.lock and installed.json are optional (e.g. if there is no dependencies installed)
                 // but when one is present, the other must be as well otherwise the dumped autoloader will be broken
                 (
-                    null === $composerFiles->getComposerLock()->getPath()
-                    && null === $composerFiles->getInstalledJson()->getPath()
+                    null === $composerArtifacts->composerLock?->path
+                    && null === $composerArtifacts->installedJson?->path
                 )
                 || (
-                    null !== $composerFiles->getComposerLock()->getPath()
-                    && null !== $composerFiles->getInstalledJson()->getPath()
+                    null !== $composerArtifacts->composerLock?->path
+                    && null !== $composerArtifacts->installedJson?->path
                 )
                 || (
-                    null === $composerFiles->getComposerLock()->getPath()
-                    && null !== $composerFiles->getInstalledJson()->getPath()
-                    && [] === $composerFiles->getInstalledJson()->getDecodedContents()
+                    null === $composerArtifacts->composerLock?->path
+                    && null !== $composerArtifacts->installedJson?->path
+                    && [] === $composerArtifacts->installedJson?->decodedContents
                 )
             )
         );
@@ -1616,7 +1580,7 @@ final class Configuration
         return $excludeDevFiles;
     }
 
-    private static function retrieveExcludeComposerFiles(stdClass $raw, ConfigurationLogger $logger): bool
+    private static function retrieveExcludeComposerArtifacts(stdClass $raw, ConfigurationLogger $logger): bool
     {
         self::checkIfDefaultValue($logger, $raw, self::EXCLUDE_COMPOSER_FILES_KEY, true);
 
@@ -1752,18 +1716,13 @@ final class Configuration
     private static function retrieveMainScriptPath(
         stdClass $raw,
         string $basePath,
-        ?array $decodedJsonContents,
+        ?ComposerJson $composerJson,
         ConfigurationLogger $logger,
     ): ?string {
-        $firstBin = false;
+        $firstBin = $composerJson?->getFirstBin();
 
-        if (null !== $decodedJsonContents && array_key_exists('bin', $decodedJsonContents)) {
-            /** @var false|string $firstBin */
-            $firstBin = current((array) $decodedJsonContents['bin']);
-
-            if (false !== $firstBin) {
-                $firstBin = self::normalizePath($firstBin, $basePath);
-            }
+        if (null !== $firstBin) {
+            $firstBin = self::normalizePath($firstBin, $basePath);
         }
 
         if (isset($raw->{self::MAIN_KEY})) {
@@ -1782,7 +1741,7 @@ final class Configuration
                 }
             }
         } else {
-            $main = false !== $firstBin ? $firstBin : self::normalizePath(self::DEFAULT_MAIN_SCRIPT, $basePath);
+            $main = $firstBin ?? self::normalizePath(self::DEFAULT_MAIN_SCRIPT, $basePath);
         }
 
         if (is_bool($main)) {
@@ -1814,37 +1773,42 @@ final class Configuration
         return preg_replace('/^#!.*\s*/', '', $contents);
     }
 
-    private static function retrieveComposerFiles(string $basePath): ComposerFiles
+    private static function retrieveComposerArtifacts(string $basePath): ComposerArtifacts
     {
-        $retrieveFileAndContents = static function (string $file): ?ComposerFile {
-            $json = new Json();
+        $composerJson = self::retrieveComposerArtifact(Path::canonicalize($basePath.'/composer.json'));
+        $composerLock = self::retrieveComposerArtifact(Path::canonicalize($basePath.'/composer.lock'));
 
-            if (false === file_exists($file) || false === is_file($file) || false === is_readable($file)) {
-                return ComposerFile::createEmpty();
-            }
-
-            try {
-                $contents = (array) $json->decodeFile($file, true);
-            } catch (ParsingException $exception) {
-                throw new InvalidArgumentException(
-                    sprintf(
-                        'Expected the file "%s" to be a valid composer.json file but an error has been found: %s',
-                        $file,
-                        $exception->getMessage(),
-                    ),
-                    0,
-                    $exception,
-                );
-            }
-
-            return new ComposerFile($file, $contents);
-        };
-
-        return new ComposerFiles(
-            $retrieveFileAndContents(Path::canonicalize($basePath.'/composer.json')),
-            $retrieveFileAndContents(Path::canonicalize($basePath.'/composer.lock')),
-            $retrieveFileAndContents(Path::canonicalize($basePath.'/vendor/composer/installed.json')),
+        return new ComposerArtifacts(
+            $composerJson?->toComposerJson(),
+            $composerLock?->toComposerLock(),
+            self::retrieveComposerArtifact(Path::canonicalize($basePath.'/vendor/composer/installed.json')),
         );
+    }
+
+    private static function retrieveComposerArtifact(string $path): ?ComposerArtifact
+    {
+        if (false === file_exists($path) || false === is_file($path) || false === is_readable($path)) {
+            return null;
+        }
+
+        try {
+            $contents = json_decode(
+                FS::getFileContents($path),
+                true,
+            );
+        } catch (JsonException $exception) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Expected the file "%s" to be a valid JSON file but an error has been found: %s',
+                    $path,
+                    $exception->getMessage(),
+                ),
+                0,
+                $exception,
+            );
+        }
+
+        return new ComposerArtifact($path, $contents);
     }
 
     /**

@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -36,9 +36,22 @@ class AppRequirementsFactoryTest extends TestCase
         CompressionAlgorithm $compressionAlgorithm,
         array $expected,
     ): void {
+        $composerJson = new ComposerJson(
+            '',
+            null === $composerJsonContents
+                ? []
+                : json_decode($composerJsonContents, true, flags: JSON_THROW_ON_ERROR),
+        );
+        $composerLock = new ComposerLock(
+            '',
+            null === $composerLockContents
+                ? []
+                : json_decode($composerLockContents, true, flags: JSON_THROW_ON_ERROR),
+        );
+
         $actual = AppRequirementsFactory::create(
-            new DecodedComposerJson(null === $composerJsonContents ? [] : json_decode($composerJsonContents, true, flags: JSON_THROW_ON_ERROR)),
-            new DecodedComposerLock(null === $composerLockContents ? [] : json_decode($composerLockContents, true, flags: JSON_THROW_ON_ERROR)),
+            $composerJson,
+            $composerLock,
             $compressionAlgorithm,
         );
 

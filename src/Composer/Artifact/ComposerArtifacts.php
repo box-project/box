@@ -18,35 +18,29 @@ use function array_filter;
 use function array_map;
 use function array_values;
 
-final readonly class ComposerFiles
+/**
+ * @private
+ */
+final readonly class ComposerArtifacts
 {
-    public static function createEmpty(): self
-    {
-        return new self(
-            ComposerFile::createEmpty(),
-            ComposerFile::createEmpty(),
-            ComposerFile::createEmpty(),
-        );
-    }
-
     public function __construct(
-        private ComposerFile $composerJson,
-        private ComposerFile $composerLock,
-        private ComposerFile $installedJson,
+        public readonly ?ComposerJson $composerJson = null,
+        public readonly ?ComposerLock $composerLock = null,
+        public readonly ?ComposerArtifact $installedJson = null,
     ) {
     }
 
-    public function getComposerJson(): ComposerFile
+    public function getComposerJson(): ?ComposerJson
     {
         return $this->composerJson;
     }
 
-    public function getComposerLock(): ComposerFile
+    public function getComposerLock(): ?ComposerLock
     {
         return $this->composerLock;
     }
 
-    public function getInstalledJson(): ComposerFile
+    public function getInstalledJson(): ?ComposerArtifact
     {
         return $this->installedJson;
     }
@@ -59,7 +53,7 @@ final readonly class ComposerFiles
         return array_values(
             array_filter(
                 array_map(
-                    static fn (ComposerFile $file): ?string => $file->getPath(),
+                    static fn (null|ComposerArtifact|ComposerJson|ComposerLock $file): ?string => $file?->path,
                     [$this->composerJson, $this->composerLock, $this->installedJson],
                 ),
             ),

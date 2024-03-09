@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Console\DisplayNormalizer;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -41,14 +41,14 @@ class RequirementsDumperTest extends TestCase
 
     #[DataProvider('jsonAndLockContentsProvider')]
     public function test_it_dumps_the_requirement_checker_files(
-        DecodedComposerJson $decodedComposerJsonContents,
-        DecodedComposerLock $decodedComposerLockContents,
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
         string $expectedRequirement,
     ): void {
         $checkFiles = $this->dumper->dump(
-            $decodedComposerJsonContents,
-            $decodedComposerLockContents,
+            $composerJson,
+            $composerLock,
             $compressionAlgorithm,
         );
 
@@ -111,8 +111,8 @@ class RequirementsDumperTest extends TestCase
     public static function jsonAndLockContentsProvider(): iterable
     {
         yield [
-            new DecodedComposerJson([]),
-            new DecodedComposerLock([]),
+            new ComposerJson('', []),
+            new ComposerLock('', []),
             CompressionAlgorithm::NONE,
             <<<'PHP'
                 <?php
@@ -123,18 +123,21 @@ class RequirementsDumperTest extends TestCase
         ];
 
         yield [
-            new DecodedComposerJson([]),
-            new DecodedComposerLock([
-                'packages' => [
-                    [
-                        'name' => 'acme/foo',
-                        'require' => [
-                            'php' => '^7.4',
-                            'ext-json' => '*',
+            new ComposerJson('', []),
+            new ComposerLock(
+                '',
+                [
+                    'packages' => [
+                        [
+                            'name' => 'acme/foo',
+                            'require' => [
+                                'php' => '^7.4',
+                                'ext-json' => '*',
+                            ],
                         ],
                     ],
                 ],
-            ]),
+            ),
             CompressionAlgorithm::GZ,
             <<<'PHP'
                 <?php

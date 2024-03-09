@@ -315,7 +315,7 @@ class ValidateTest extends CommandTestCase
              // Loading the configuration file "box.json".
 
             The configuration file failed validation: Parse error on line 1:
-            {
+            ...
             ^
             Expected one of: 'STRING', '}'
 
@@ -346,7 +346,7 @@ class ValidateTest extends CommandTestCase
         } catch (RuntimeException $exception) {
             $expected = <<<'OUTPUT'
                 The configuration file failed validation: Parse error on line 1:
-                {
+                ...
                 ^
                 Expected one of: 'STRING', '}'
                 OUTPUT;

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Parallelization;
 
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
+use KevinGH\Box\Filesystem\LocalPharFile;
 use function array_merge;
 
 /**
@@ -31,7 +32,7 @@ final readonly class TaskResult
         $symbolsRegistries = [];
 
         foreach ($results as $result) {
-            $filesWithContents[] = $result->filesWithContents;
+            $filesWithContents[] = $result->localPharFiles;
             $symbolsRegistries[] = $result->symbolsRegistry;
         }
 
@@ -42,10 +43,10 @@ final readonly class TaskResult
     }
 
     /**
-     * @param list<array{string, string}> $filesWithContents
+     * @param LocalPharFile[] $localPharFiles
      */
     public function __construct(
-        public array $filesWithContents,
+        public array $localPharFiles,
         public SymbolsRegistry $symbolsRegistry,
     ) {
     }
