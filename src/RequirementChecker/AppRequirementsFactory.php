@@ -29,11 +29,39 @@ class AppRequirementsFactory
 {
     private const SELF_PACKAGE = null;
 
+    public function createUnfiltered(
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
+        CompressionAlgorithm $compressionAlgorithm,
+    ): Requirements {
+        return $this
+            ->createBuilder(
+                $composerJson,
+                $composerLock,
+                $compressionAlgorithm,
+            )
+            ->getAll();
+    }
+
     public function create(
         ComposerJson $composerJson,
         ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): Requirements {
+        return $this
+            ->createBuilder(
+                $composerJson,
+                $composerLock,
+                $compressionAlgorithm,
+            )
+            ->build();
+    }
+
+    private function createBuilder(
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
+        CompressionAlgorithm $compressionAlgorithm,
+    ): RequirementsBuilder {
         $requirementsBuilder = new RequirementsBuilder();
 
         self::retrievePhpVersionRequirements($requirementsBuilder, $composerJson, $composerLock);
@@ -41,7 +69,7 @@ class AppRequirementsFactory
         self::collectComposerLockExtensionRequirements($composerLock, $requirementsBuilder);
         self::collectComposerJsonExtensionRequirements($composerJson, $requirementsBuilder);
 
-        return $requirementsBuilder->build();
+        return $requirementsBuilder;
     }
 
     private static function retrievePhpVersionRequirements(

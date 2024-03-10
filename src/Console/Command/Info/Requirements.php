@@ -18,18 +18,19 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Command\ChangeWorkingDirOption;
 use KevinGH\Box\Console\Command\ConfigOption;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
 use KevinGH\Box\RequirementChecker\Requirement;
+use KevinGH\Box\RequirementChecker\Requirements as RequirementsCollection;
 use KevinGH\Box\RequirementChecker\RequirementType;
 use stdClass;
 use Symfony\Component\Console\Input\InputOption;
+use function array_filter;
 use function array_map;
 use function implode;
+use function iter\filter;
 use function iter\toArray;
 use function sprintf;
 
@@ -84,80 +85,175 @@ final readonly class Requirements implements Command
             return ExitCode::FAILURE;
         }
 
-        $requirements = $this->factory->create(
+        $requirements = $this->factory->createUnfiltered(
             $composerJson,
             $composerLock,
             $config->getCompressionAlgorithm(),
         );
 
-        [$required, $conflicting] = self::retrieveRequirements($requirements);
+        [
+            $phpRequirements,
+            $requiredExtensions,
+            $providedExtensions,
+            $conflictingExtensions,
+        ] = self::filterRequirements($requirements);
 
-        self::renderRequiredSection($required, $io);
-        self::renderConflictingSection($conflicting, $io);
+        $optimizedRequiredRequirements = toArray(
+            filter(
+                static fn (Requirement $requirement) => $requirement->type === RequirementType::EXTENSION,
+                $this->factory
+                    ->create(
+                        $composerJson,
+                        $composerLock,
+                        $config->getCompressionAlgorithm(),
+                    ),
+            ),
+        );
+
+        self::renderRequiredPHPVersionsSection($phpRequirements, $io);
+        self::renderRequiredExtensionsSection($requiredExtensions, $io);
+        self::renderProvidedExtensionsSection($providedExtensions, $io);
+        self::renderOptimizedRequiredExtensionsSection($optimizedRequiredRequirements, $io);
+        self::renderConflictingExtensionsSection($conflictingExtensions, $io);
 
         return ExitCode::SUCCESS;
     }
 
-    /**
-     * @return array{Requirement[], Requirement[]}
-     */
-    private static function retrieveRequirements(\KevinGH\Box\RequirementChecker\Requirements $requirements): array
+    private static function filterRequirements(RequirementsCollection $requirements): array
     {
-        [$required, $conflicting] = array_reduce(
-            toArray($requirements),
-            static function ($carry, Requirement $requirement): array {
-                $hash = implode(
-                    ':',
-                    [
-                        $requirement->type->value,
-                        $requirement->condition,
-                        $requirement->source,
-                    ],
-                );
+        $phpRequirements = [];
+        $requiredExtensions = [];
+        $providedExtensions = [];
+        $conflictingExtensions = [];
 
-                if (RequirementType::EXTENSION_CONFLICT === $requirement->type) {
-                    $carry[1][$hash] = $requirement;
-                } else {
-                    $carry[0][$hash] = $requirement;
-                }
+        foreach ($requirements as $requirement) {
+            /** @var Requirement $requirement */
+            switch ($requirement->type) {
+                case RequirementType::PHP:
+                    $phpRequirements[] = $requirement;
+                    break;
 
-                return $carry;
-            },
-            [[], []],
-        );
+                case RequirementType::EXTENSION:
+                    $requiredExtensions[] = $requirement;
+                    break;
+
+                case RequirementType::PROVIDED_EXTENSION:
+                    $providedExtensions[] = $requirement;
+                    break;
+
+                case RequirementType::EXTENSION_CONFLICT:
+                    $conflictingExtensions[] = $requirement;
+                    break;
+            }
+        }
 
         return [
-            array_values($required),
-            array_values($conflicting),
+            $phpRequirements,
+            $requiredExtensions,
+            $providedExtensions,
+            $conflictingExtensions,
         ];
     }
 
     /**
      * @param Requirement[] $required
      */
-    private static function renderRequiredSection(
+    private static function renderRequiredPHPVersionsSection(
         array $required,
         IO $io,
     ): void {
         if (0 === count($required)) {
+            $io->writeln('<comment>No PHP requirement found.</comment>');
+
             return;
         }
 
-        $io->writeln('  <comment>Required:</comment>');
+        $io->writeln('<comment>Required PHP versions:</comment>');
         $io->writeln(
             array_map(
-                static fn (Requirement $requirement) => match ($requirement->type) {
-                    RequirementType::PHP => sprintf(
-                        '  - PHP %s (%s)',
-                        $requirement->condition,
-                        $requirement->source ?? 'root',
-                    ),
-                    RequirementType::EXTENSION => sprintf(
-                        '  - ext-%s (%s)',
-                        $requirement->condition,
-                        $requirement->source ?? 'root',
-                    ),
-                },
+                static fn (Requirement $requirement) => sprintf(
+                    '  - %s (%s)',
+                    $requirement->condition,
+                    $requirement->source ?? 'root',
+                ),
+                $required,
+            ),
+        );
+    }
+
+    /**
+     * @param Requirement[] $required
+     */
+    private static function renderRequiredExtensionsSection(
+        array $required,
+        IO $io,
+    ): void {
+        if (0 === count($required)) {
+            $io->writeln('<comment>No required extension found.</comment>');
+
+            return;
+        }
+
+        $io->writeln('<comment>Required extensions:</comment>');
+        $io->writeln(
+            array_map(
+                static fn (Requirement $requirement) => sprintf(
+                    '  - ext-%s (%s)',
+                    $requirement->condition,
+                    $requirement->source ?? 'root',
+                ),
+                $required,
+            ),
+        );
+    }
+
+    /**
+     * @param Requirement[] $provided
+     */
+    private static function renderProvidedExtensionsSection(
+        array $provided,
+        IO    $io,
+    ): void {
+        if (0 === count($provided)) {
+            $io->writeln('<comment>No provided extension found.</comment>');
+
+            return;
+        }
+
+        $io->writeln('<comment>Provided extensions:</comment>');
+        $io->writeln(
+            array_map(
+                static fn (Requirement $requirement) => sprintf(
+                    '  - ext-%s (%s)',
+                    $requirement->condition,
+                    $requirement->source ?? 'root',
+                ),
+                $provided,
+            ),
+        );
+    }
+
+    /**
+     * @param Requirement[] $required
+     */
+    private static function renderOptimizedRequiredExtensionsSection(
+        array $required,
+        IO $io,
+    ): void {
+        if (0 === count($required)) {
+            $io->writeln('<comment>No required extension found.</comment>');
+
+            return;
+        }
+
+        $io->writeln('<comment>Final required extensions:</comment> (accounts for the provided extensions)');
+        $io->writeln(
+            array_map(
+                static fn (Requirement $requirement) => sprintf(
+                    '  - ext-%s (%s)',
+                    $requirement->condition,
+                    $requirement->source ?? 'root',
+                ),
                 $required,
             ),
         );
@@ -166,15 +262,17 @@ final readonly class Requirements implements Command
     /**
      * @param Requirement[] $conflicting
      */
-    private static function renderConflictingSection(
+    private static function renderConflictingExtensionsSection(
         array $conflicting,
         IO $io,
     ): void {
         if (0 === count($conflicting)) {
+            $io->writeln('<comment>No conflicting package found.</comment>');
+
             return;
         }
 
-        $io->writeln('  <comment>Conflict:</comment>');
+        $io->writeln('<comment>Conflicting extensions:</comment>');
         $io->writeln(
             array_map(
                 static fn (Requirement $requirement) => sprintf(
