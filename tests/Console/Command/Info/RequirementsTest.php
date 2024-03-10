@@ -14,28 +14,16 @@ declare(strict_types=1);
 
 namespace Console\Command\Info;
 
-use Fidry\Console\Command\Command;
-use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;
-use InvalidArgumentException;
-use KevinGH\Box\Console\Command\Info;
 use KevinGH\Box\Console\Command\Info\Requirements as RequirementsCommand;
-use KevinGH\Box\Console\PharInfoRenderer;
-use KevinGH\Box\Phar\Throwable\InvalidPhar;
-use KevinGH\Box\Platform;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
 use KevinGH\Box\RequirementChecker\Requirements;
-use KevinGH\Box\Test\CommandTestCase;
-use Phar;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
-use Symfony\Component\Console\Output\OutputInterface;
-use function extension_loaded;
-use function implode;
 
 /**
  * @internal
@@ -47,7 +35,7 @@ class RequirementsTest extends TestCase
 
     private const FIXTURES = __DIR__.'/../../../../fixtures/requirement-checker';
 
-    private ObjectProphecy|AppRequirementsFactory $factoryProphecy;
+    private AppRequirementsFactory|ObjectProphecy $factoryProphecy;
     private CommandTester $commandTester;
 
     protected function setUp(): void
@@ -62,7 +50,7 @@ class RequirementsTest extends TestCase
     #[DataProvider('requirementsProvider')]
     public function test_it_provides_info_about_the_app_requirements(
         Requirements $requirements,
-        string              $expected,
+        string $expected,
     ): void {
         $this->factoryProphecy
             ->create(Argument::cetera())
@@ -83,8 +71,7 @@ class RequirementsTest extends TestCase
             '',
         ];
 
-        yield 'a real case' => [
-            ,
+        yield 'a real case' => [,
             '',
         ];
 

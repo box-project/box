@@ -18,40 +18,22 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
-use Fidry\FileSystem\FS;
-use Humbug\PhpScoper\Symbol\SymbolsRegistry;
-use KevinGH\Box\Compactor\Compactor;
-use KevinGH\Box\Compactor\Compactors;
-use KevinGH\Box\Compactor\PhpScoper;
-use KevinGH\Box\Compactor\Placeholder;
 use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
 use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Command\ChangeWorkingDirOption;
 use KevinGH\Box\Console\Command\ConfigOption;
-use KevinGH\Box\Console\Php\PhpSettingsChecker;
-use KevinGH\Box\Constants;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
 use KevinGH\Box\RequirementChecker\Requirement;
 use KevinGH\Box\RequirementChecker\RequirementType;
 use stdClass;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Filesystem\Path;
-use Symfony\Component\VarDumper\Cloner\VarCloner;
-use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function array_map;
-use function array_shift;
-use function array_unshift;
-use function explode;
-use function getcwd;
 use function implode;
 use function iter\toArray;
-use function putenv;
 use function sprintf;
 
-final class Requirements implements Command
+final readonly class Requirements implements Command
 {
     private const NO_CONFIG_OPTION = 'no-config';
 

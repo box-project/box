@@ -37,23 +37,19 @@ final readonly class AppRequirementFactoryBench
     #[BeforeMethods('setUp')]
     public function bench(): void
     {
-        AppRequirementsFactory::create(
-            new ComposerJson(
-                '',
-                json_decode(
-                    file_get_contents(self::FIXTURES.'/composer.json'),
-                    true,
-                ),
+        (new AppRequirementsFactory())->create(new ComposerJson(
+            '',
+            json_decode(
+                file_get_contents(self::FIXTURES.'/composer.json'),
+                true,
             ),
-            new ComposerLock(
-                '',
-                json_decode(
-                    file_get_contents(self::FIXTURES.'/composer.lock'),
-                    true,
-                ),
+        ), new ComposerLock(
+            '',
+            json_decode(
+                file_get_contents(self::FIXTURES.'/composer.lock'),
+                true,
             ),
-            CompressionAlgorithm::BZ2,
-        );
+        ), CompressionAlgorithm::BZ2);
     }
 
     private static function assertVendorsAreInstalled(): void

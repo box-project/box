@@ -75,11 +75,7 @@ final class RequirementsDumper
         ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        $requirements = AppRequirementsFactory::create(
-            $composerJson,
-            $composerLock,
-            $compressionAlgorithm,
-        );
+        $requirements = (new AppRequirementsFactory())->create($composerJson, $composerLock, $compressionAlgorithm);
 
         return [
             '.requirements.php',
