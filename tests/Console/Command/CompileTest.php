@@ -27,6 +27,8 @@ use KevinGH\Box\Compactor\Php;
 use KevinGH\Box\Console\Application;
 use KevinGH\Box\Console\DisplayNormalizer as BoxDisplayNormalizer;
 use KevinGH\Box\Console\MessageRenderer;
+use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
+use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use KevinGH\Box\Test\FileSystemTestCase;
 use KevinGH\Box\Test\RequiresPharReadonlyOff;
 use KevinGH\Box\VarDumperNormalizer;
@@ -181,6 +183,9 @@ class CompileTest extends FileSystemTestCase
     {
         return new Compile(
             (new Application())->getHeader(),
+            new RequirementsDumper(
+                new AppRequirementsFactory(),
+            ),
         );
     }
 

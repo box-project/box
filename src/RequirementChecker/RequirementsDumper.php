@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use Fidry\FileSystem\FS;
 use KevinGH\Box\Composer\Artifact\ComposerJson;
 use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -27,7 +26,7 @@ use function var_export;
 /**
  * @private
  */
-final class RequirementsDumper
+final readonly class RequirementsDumper
 {
     private const REQUIREMENTS_CONFIG_TEMPLATE = <<<'PHP'
         <?php
@@ -37,18 +36,26 @@ final class RequirementsDumper
 
     private const REQUIREMENT_CHECKER_PATH = __DIR__.'/../../res/requirement-checker';
 
+    public function __construct(
+        private AppRequirementsFactory $requirementsFactory,
+    ) {
+    }
+
     /**
      * @return list<array{string, string}>
      */
-    public static function dump(
+    public function dump(
         ?ComposerJson $composerJson,
         ?ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        Assert::directory(self::REQUIREMENT_CHECKER_PATH, 'Expected the requirement checker to have been dumped');
+        Assert::directory(
+            self::REQUIREMENT_CHECKER_PATH,
+            'Expected the requirement checker to have been dumped',
+        );
 
         $filesWithContents = [
-            self::dumpRequirementsConfig(
+            $this->dumpRequirementsConfig(
                 $composerJson ?? new ComposerJson('', []),
                 $composerLock ?? new ComposerLock('', []),
                 $compressionAlgorithm,
@@ -63,19 +70,23 @@ final class RequirementsDumper
         foreach ($requirementCheckerFiles as $file) {
             $filesWithContents[] = [
                 $file->getRelativePathname(),
-                FS::getFileContents($file->getPathname()),
+                $file->getContents(),
             ];
         }
 
         return $filesWithContents;
     }
 
-    private static function dumpRequirementsConfig(
+    private function dumpRequirementsConfig(
         ComposerJson $composerJson,
         ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,
     ): array {
-        $requirements = (new AppRequirementsFactory())->create($composerJson, $composerLock, $compressionAlgorithm);
+        $requirements = $this->requirementsFactory->create(
+            $composerJson,
+            $composerLock,
+            $compressionAlgorithm,
+        );
 
         return [
             '.requirements.php',

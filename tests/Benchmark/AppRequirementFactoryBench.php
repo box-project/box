@@ -28,28 +28,40 @@ final readonly class AppRequirementFactoryBench
 {
     private const FIXTURES = __DIR__.'/../../fixtures/bench/requirement-checker';
 
+    private AppRequirementsFactory $factory;
+    private ComposerJson $composerJson;
+    private ComposerLock $composerLock;
+
     public function setUp(): void
     {
         self::assertVendorsAreInstalled();
+
+        $this->factory = new AppRequirementsFactory();
+        $this->composerJson = new ComposerJson(
+            '',
+            json_decode(
+                file_get_contents(self::FIXTURES.'/composer.json'),
+                true,
+            ),
+        );
+        $this->composerLock = new ComposerLock(
+            '',
+            json_decode(
+                file_get_contents(self::FIXTURES.'/composer.lock'),
+                true,
+            ),
+        );
     }
 
     #[Iterations(1000)]
     #[BeforeMethods('setUp')]
     public function bench(): void
     {
-        (new AppRequirementsFactory())->create(new ComposerJson(
-            '',
-            json_decode(
-                file_get_contents(self::FIXTURES.'/composer.json'),
-                true,
-            ),
-        ), new ComposerLock(
-            '',
-            json_decode(
-                file_get_contents(self::FIXTURES.'/composer.lock'),
-                true,
-            ),
-        ), CompressionAlgorithm::BZ2);
+        $this->factory->create(
+            $this->composerJson,
+            $this->composerLock,
+            CompressionAlgorithm::BZ2,
+        );
     }
 
     private static function assertVendorsAreInstalled(): void

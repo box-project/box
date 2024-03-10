@@ -30,6 +30,7 @@ use KevinGH\Box\Console\Command\Process;
 use KevinGH\Box\Console\Command\Validate;
 use KevinGH\Box\Console\Command\Verify;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
+use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use function KevinGH\Box\get_box_version;
 use function sprintf;
 use function trim;
@@ -95,7 +96,12 @@ final class Application implements FidryApplication
         return [
             new ComposerCheckVersion(),
             new ComposerVendorDir(),
-            new Compile($this->getHeader()),
+            new Compile(
+                $this->getHeader(),
+                new RequirementsDumper(
+                    new AppRequirementsFactory(),
+                ),
+            ),
             new Diff(),
             new Info(),
             new Info('info:general'),
