@@ -28,7 +28,7 @@ final class AppRequirementsFactory
 {
     private const SELF_PACKAGE = null;
 
-    public static function create(
+    public function create(
         ComposerJson $composerJson,
         ComposerLock $composerLock,
         CompressionAlgorithm $compressionAlgorithm,

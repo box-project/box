@@ -49,7 +49,7 @@ class AppRequirementsFactoryTest extends TestCase
                 : json_decode($composerLockContents, true, flags: JSON_THROW_ON_ERROR),
         );
 
-        $actual = AppRequirementsFactory::create(
+        $actual = (new AppRequirementsFactory())->create(
             $composerJson,
             $composerLock,
             $compressionAlgorithm,

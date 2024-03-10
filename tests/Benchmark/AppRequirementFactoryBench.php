@@ -28,6 +28,7 @@ final readonly class AppRequirementFactoryBench
 {
     private const FIXTURES = __DIR__.'/../../fixtures/bench/requirement-checker';
 
+    private AppRequirementsFactory $factory;
     private ComposerJson $composerJson;
     private ComposerLock $composerLock;
 
@@ -35,6 +36,7 @@ final readonly class AppRequirementFactoryBench
     {
         self::assertVendorsAreInstalled();
 
+        $this->factory = new AppRequirementsFactory();
         $this->composerJson = new ComposerJson(
             '',
             json_decode(
@@ -55,7 +57,7 @@ final readonly class AppRequirementFactoryBench
     #[BeforeMethods('setUp')]
     public function bench(): void
     {
-        AppRequirementsFactory::create(
+        $this->factory->create(
             $this->composerJson,
             $this->composerLock,
             CompressionAlgorithm::BZ2,
