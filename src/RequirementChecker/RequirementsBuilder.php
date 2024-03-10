@@ -16,6 +16,7 @@ namespace KevinGH\Box\RequirementChecker;
 
 use KevinGH\Box\Composer\Package\Extension;
 use function array_diff_key;
+use function array_map;
 use function array_unique;
 use function natsort;
 use function strnatcmp;
@@ -53,9 +54,7 @@ final class RequirementsBuilder
         $requirements = $this->predefinedRequirements;
 
         foreach ($this->getSortedRequiredExtensions() as $extensionName => $sources) {
-            $sortedDistinctSources = self::createSortedDistinctList($sources);
-
-            foreach ($sortedDistinctSources as $source) {
+            foreach ($sources as $source) {
                 $requirements[] = Requirement::forRequiredExtension(
                     $extensionName,
                     $source,
@@ -64,9 +63,7 @@ final class RequirementsBuilder
         }
 
         foreach ($this->getSortedConflictedExtensions() as $extensionName => $sources) {
-            $sortedDistinctSources = self::createSortedDistinctList($sources);
-
-            foreach ($sortedDistinctSources as $source) {
+            foreach ($sources as $source) {
                 $requirements[] = Requirement::forConflictingExtension(
                     $extensionName,
                     $source,
@@ -82,14 +79,15 @@ final class RequirementsBuilder
      */
     private function getSortedRequiredExtensions(): array
     {
-        $extensions = array_diff_key(
-            $this->requiredExtensions,
-            $this->providedExtensions,
+        return array_map(
+            self::createSortedDistinctList(...),
+            self::sortByExtensionName(
+                array_diff_key(
+                    $this->requiredExtensions,
+                    $this->providedExtensions,
+                ),
+            ),
         );
-
-        uksort($extensions, strnatcmp(...));
-
-        return $extensions;
     }
 
     /**
@@ -97,8 +95,20 @@ final class RequirementsBuilder
      */
     private function getSortedConflictedExtensions(): array
     {
-        $extensions = $this->conflictingExtensions;
+        return array_map(
+            self::createSortedDistinctList(...),
+            self::sortByExtensionName($this->conflictingExtensions),
+        );
+    }
 
+    /**
+     * @template T
+     *
+     * @param  array<string, T> $extensions
+     * @return array<string, T>
+     */
+    private static function sortByExtensionName(array $extensions): array
+    {
         uksort($extensions, strnatcmp(...));
 
         return $extensions;
