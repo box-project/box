@@ -86,6 +86,26 @@ final readonly class Requirement
         );
     }
 
+    public static function forProvidedExtension(string $extension, ?string $packageName): self
+    {
+        return new self(
+            RequirementType::PROVIDED_EXTENSION,
+            $extension,
+            $packageName,
+            null === $packageName
+                ? sprintf(
+                    'This application provides the extension "%s".',
+                    $extension,
+                )
+                : sprintf(
+                    'The package "%s" provides the extension "%s".',
+                    $packageName,
+                    $extension,
+                ),
+            '',
+        );
+    }
+
     public static function forConflictingExtension(string $extension, ?string $packageName): self
     {
         return new self(

@@ -49,6 +49,40 @@ final class RequirementsBuilder
         $this->conflictingExtensions[$extension->name][] = $source;
     }
 
+    public function getAll(): Requirements
+    {
+        $requirements = $this->predefinedRequirements;
+
+        foreach ($this->getUnfilteredSortedRequiredExtensions() as $extensionName => $sources) {
+            foreach ($sources as $source) {
+                $requirements[] = Requirement::forRequiredExtension(
+                    $extensionName,
+                    $source,
+                );
+            }
+        }
+
+        foreach ($this->getSortedProvidedExtensions() as $extensionName => $sources) {
+            foreach ($sources as $source) {
+                $requirements[] = Requirement::forProvidedExtension(
+                    $extensionName,
+                    $source,
+                );
+            }
+        }
+
+        foreach ($this->getSortedConflictedExtensions() as $extensionName => $sources) {
+            foreach ($sources as $source) {
+                $requirements[] = Requirement::forConflictingExtension(
+                    $extensionName,
+                    $source,
+                );
+            }
+        }
+
+        return new Requirements($requirements);
+    }
+
     public function build(): Requirements
     {
         $requirements = $this->predefinedRequirements;
@@ -72,6 +106,31 @@ final class RequirementsBuilder
         }
 
         return new Requirements($requirements);
+    }
+
+    /**
+     * @return array<string, list<string>>
+     */
+    private function getUnfilteredSortedRequiredExtensions(): array
+    {
+        return array_map(
+            self::createSortedDistinctList(...),
+            self::sortByExtensionName(
+                $this->requiredExtensions,
+            ),
+        );
+    }
+    /**
+     * @return array<string, list<string>>
+     */
+    private function getSortedProvidedExtensions(): array
+    {
+        return array_map(
+            self::createSortedDistinctList(...),
+            self::sortByExtensionName(
+                $this->providedExtensions,
+            ),
+        );
     }
 
     /**
