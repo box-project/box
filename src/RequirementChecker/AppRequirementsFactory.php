@@ -39,7 +39,7 @@ final class AppRequirementsFactory
                 $composerLock,
                 $compressionAlgorithm,
             )
-            ->getAll();
+            ->all();
     }
 
     public function create(
