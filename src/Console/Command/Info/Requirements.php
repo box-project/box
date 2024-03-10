@@ -46,14 +46,14 @@ final readonly class Requirements implements Command
     {
         return new ConsoleConfiguration(
             'info:requirements',
-            'Lists the application requirements found;',
-            'The <info>%command.name%</info> command will list the requirements required to run the built PHAR.',
+            'Lists the application requirements found.',
+            'The <info>%command.name%</info> command will list the PHP versions and extensions required to run the built PHAR.',
             options: [
                 new InputOption(
                     self::NO_CONFIG_OPTION,
                     null,
                     InputOption::VALUE_NONE,
-                    'Ignore the config file even when one is specified with the --config option',
+                    'Ignore the config file even when one is specified with the `--config` option.',
                 ),
                 ConfigOption::getOptionInput(),
                 ChangeWorkingDirOption::getOptionInput(),
@@ -69,9 +69,24 @@ final readonly class Requirements implements Command
             ? Configuration::create(null, new stdClass())
             : ConfigOption::getConfig($io, true);
 
+        $composerJson = $config->getComposerJson();
+        $composerLock = $config->getComposerLock();
+
+        if (null === $composerJson) {
+            $io->error('Could not find a composer.json file.');
+
+            return ExitCode::FAILURE;
+        }
+
+        if (null === $composerLock) {
+            $io->error('Could not find a composer.lock file.');
+
+            return ExitCode::FAILURE;
+        }
+
         $requirements = $this->factory->create(
-            new DecodedComposerJson($config->getDecodedComposerJsonContents() ?? []),
-            new DecodedComposerLock($config->getDecodedComposerLockContents() ?? []),
+            $composerJson,
+            $composerLock,
             $config->getCompressionAlgorithm(),
         );
 
