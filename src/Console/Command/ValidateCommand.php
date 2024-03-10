@@ -34,7 +34,7 @@ use function sprintf;
 /**
  * @private
  */
-final class Validate implements Command
+final class ValidateCommand implements Command
 {
     private const FILE_ARGUMENT = 'file';
     private const IGNORE_MESSAGES_OPTION = 'ignore-recommendations-and-warnings';

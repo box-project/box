@@ -76,7 +76,7 @@ use const PHP_EOL;
 /**
  * @private
  */
-final class Compile implements CommandAware
+final class CompileCommand implements CommandAware
 {
     use CommandAwareness;
 
@@ -997,6 +997,6 @@ final class Compile implements CommandAware
 
     private function getDockerCommand(): Command
     {
-        return $this->getCommandRegistry()->findCommand(GenerateDockerFile::NAME);
+        return $this->getCommandRegistry()->findCommand(GenerateDockerFileCommand::NAME);
     }
 }

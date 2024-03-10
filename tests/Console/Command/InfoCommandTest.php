@@ -31,9 +31,9 @@ use function implode;
 /**
  * @internal
  */
-#[CoversClass(Info::class)]
+#[CoversClass(InfoCommand::class)]
 #[CoversClass(PharInfoRenderer::class)]
-class InfoTest extends CommandTestCase
+class InfoCommandTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../fixtures/info';
 
@@ -48,7 +48,7 @@ class InfoTest extends CommandTestCase
 
     protected function getCommand(): Command
     {
-        return new Info();
+        return new InfoCommand();
     }
 
     #[DataProvider('inputProvider')]

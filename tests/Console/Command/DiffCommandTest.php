@@ -31,8 +31,8 @@ use function Safe\realpath;
 /**
  * @internal
  */
-#[CoversClass(Diff::class)]
-class DiffTest extends CommandTestCase
+#[CoversClass(DiffCommand::class)]
+class DiffCommandTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;
 
@@ -47,7 +47,7 @@ class DiffTest extends CommandTestCase
 
     protected function getCommand(): Command
     {
-        return new Diff();
+        return new DiffCommand();
     }
 
     #[DataProvider('diffPharsProvider')]

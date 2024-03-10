@@ -44,7 +44,7 @@ use function putenv;
 use function sprintf;
 
 // TODO: replace the PHP-Scoper compactor in order to warn the user about scoping errors
-final class Process implements Command
+final class ProcessCommand implements Command
 {
     private const FILE_ARGUMENT = 'file';
 

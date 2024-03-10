@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Phar\Differ;
 
-use KevinGH\Box\Console\Command\Extract;
+use KevinGH\Box\Console\Command\ExtractCommand;
 use KevinGH\Box\Phar\DiffMode;
 
 final class DifferFactory
@@ -26,7 +26,7 @@ final class DifferFactory
         return match ($mode) {
             DiffMode::FILE_NAME => new FilenameDiffer(),
             DiffMode::GIT => new GitDiffer(),
-            DiffMode::GNU => new ProcessCommandBasedDiffer('diff --exclude='.Extract::PHAR_META_PATH),
+            DiffMode::GNU => new ProcessCommandBasedDiffer('diff --exclude='.ExtractCommand::PHAR_META_PATH),
             DiffMode::CHECKSUM => new ChecksumDiffer($checksumAlgorithm),
         };
     }

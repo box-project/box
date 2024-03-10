@@ -40,7 +40,7 @@ use function str_starts_with;
 /**
  * @private
  */
-final class Diff implements Command
+final class DiffCommand implements Command
 {
     private const FIRST_PHAR_ARG = 'pharA';
     private const SECOND_PHAR_ARG = 'pharB';

@@ -29,7 +29,7 @@ use function sprintf;
 /**
  * @private
  */
-final class Verify implements Command
+final class VerifyCommand implements Command
 {
     private const PHAR_ARG = 'phar';
 
