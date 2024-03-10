@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command\Check;
+namespace KevinGH\Box\Console\Command\Info;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
@@ -26,55 +26,32 @@ use Symfony\Component\Filesystem\Path;
 /**
  * @internal
  */
-#[CoversClass(Signature::class)]
-class SignatureTest extends CommandTestCase
+#[CoversClass(InfoSignatureCommand::class)]
+class SignatureCommandTest extends CommandTestCase
 {
     private const FIXTURES = __DIR__.'/../../../../fixtures/phar';
 
     protected function getCommand(): Command
     {
-        return new Signature();
+        return new InfoSignatureCommand();
     }
 
-    public function test_it_checks_the_phar_signature(): void
+    public function test_it_provides_the_phar_signature(): void
     {
         $pharPath = self::FIXTURES.'/simple-phar.phar';
-        $pharHash = '55AE0CCD6D3A74BE41E19CD070A655A73FEAEF8342084A0801954943FBF219ED';
 
         $this->commandTester->execute([
-            'command' => 'check:signature',
+            'command' => 'info:signature',
             'phar' => $pharPath,
-            'hash' => $pharHash,
-        ]);
-
-        OutputAssertions::assertSameOutput(
-            '',
-            ExitCode::SUCCESS,
-            $this->commandTester,
-        );
-    }
-
-    public function test_it_fails_if_the_phar_has_a_different_hash_than_the_expected_one_the_phar_signature(): void
-    {
-        $pharPath = self::FIXTURES.'/simple-phar.phar';
-        $pharHash = 'ARandomHash;CannotMatchTheRealOne';
-
-        $this->commandTester->execute([
-            'command' => 'check:signature',
-            'phar' => $pharPath,
-            'hash' => $pharHash,
         ]);
 
         OutputAssertions::assertSameOutput(
             <<<'EOF'
-
-                 [ERROR] Found the hash "55AE0CCD6D3A74BE41E19CD070A655A73FEAEF8342084A0801954943FBF219ED".
-
+                55AE0CCD6D3A74BE41E19CD070A655A73FEAEF8342084A0801954943FBF219ED
 
                 EOF,
-            ExitCode::FAILURE,
+            ExitCode::SUCCESS,
             $this->commandTester,
-            DisplayNormalizer::removeBlockLineReturn(...),
         );
     }
 
@@ -86,9 +63,8 @@ class SignatureTest extends CommandTestCase
 
         $this->commandTester->execute(
             [
-                'command' => 'check:signature',
+                'command' => 'info:signature',
                 'phar' => $file,
-                'hash' => '...',
             ],
         );
     }
@@ -100,9 +76,8 @@ class SignatureTest extends CommandTestCase
 
         $this->commandTester->execute(
             [
-                'command' => 'check:signature',
+                'command' => 'info:signature',
                 'phar' => $file,
-                'hash' => '...',
             ],
         );
 
@@ -127,9 +102,8 @@ class SignatureTest extends CommandTestCase
 
         $this->commandTester->execute(
             [
-                'command' => 'check:signature',
+                'command' => 'info:signature',
                 'phar' => $file,
-                'hash' => '...',
             ],
         );
     }

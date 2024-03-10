@@ -33,15 +33,15 @@ use function Safe\file_get_contents;
 /**
  * @internal
  */
-#[CoversClass(Extract::class)]
+#[CoversClass(ExtractCommand::class)]
 #[RunTestsInSeparateProcesses]
-class ExtractTest extends CommandTestCase
+class ExtractCommandTest extends CommandTestCase
 {
     private const FIXTURES_DIR = __DIR__.'/../../../fixtures/extract';
 
     protected function getCommand(): Command
     {
-        return new Extract();
+        return new ExtractCommand();
     }
 
     #[DataProvider('pharProvider')]

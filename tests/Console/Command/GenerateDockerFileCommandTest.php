@@ -25,8 +25,8 @@ use function Safe\realpath;
 /**
  * @internal
  */
-#[CoversClass(GenerateDockerFile::class)]
-class GenerateDockerFileTest extends CommandTestCase
+#[CoversClass(GenerateDockerFileCommand::class)]
+class GenerateDockerFileCommandTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;
 
@@ -41,7 +41,7 @@ class GenerateDockerFileTest extends CommandTestCase
 
     protected function getCommand(): Command
     {
-        return new GenerateDockerFile();
+        return new GenerateDockerFileCommand();
     }
 
     public function test_it_generates_a_dockerfile_for_a_given_phar(): void

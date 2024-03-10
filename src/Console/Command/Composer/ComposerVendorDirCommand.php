@@ -22,7 +22,7 @@ use KevinGH\Box\Composer\ComposerOrchestrator;
 /**
  * @private
  */
-final class ComposerVendorDir extends ComposerCommand
+final class ComposerVendorDirCommand extends ComposerCommand
 {
     public function getConfiguration(): Configuration
     {

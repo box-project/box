@@ -75,10 +75,10 @@ use const PHP_VERSION;
 /**
  * @internal
  */
-#[CoversClass(Compile::class)]
+#[CoversClass(CompileCommand::class)]
 #[CoversClass(MessageRenderer::class)]
 #[RunTestsInSeparateProcesses]
-class CompileTest extends FileSystemTestCase
+class CompileCommandTest extends FileSystemTestCase
 {
     use RequiresPharReadonlyOff;
 
@@ -161,7 +161,7 @@ class CompileTest extends FileSystemTestCase
 
         $application = new SymfonyApplication();
         $application->add($command);
-        $application->add(new SymfonyCommand(new GenerateDockerFile()));
+        $application->add(new SymfonyCommand(new GenerateDockerFileCommand()));
 
         $this->commandTester = new CommandTester(
             $application->get(
@@ -181,7 +181,7 @@ class CompileTest extends FileSystemTestCase
 
     protected function getCommand(): Command
     {
-        return new Compile(
+        return new CompileCommand(
             (new Application())->getHeader(),
             new RequirementsDumper(
                 new AppRequirementsFactory(),
