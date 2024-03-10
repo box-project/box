@@ -560,8 +560,7 @@ final class Compile implements CommandAware
         Box $box,
         RequirementsDumper $requirementsDumper,
         CompilerLogger $logger,
-    ): bool
-    {
+    ): bool {
         if (false === $config->checkRequirements()) {
             $logger->log(
                 CompilerLogger::QUESTION_MARK_PREFIX,

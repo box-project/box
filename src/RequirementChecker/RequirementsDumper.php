@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\RequirementChecker;
 
-use Fidry\FileSystem\FS;
 use KevinGH\Box\Composer\Artifact\ComposerJson;
 use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
@@ -27,7 +26,7 @@ use function var_export;
 /**
  * @private
  */
-final class RequirementsDumper
+final readonly class RequirementsDumper
 {
     private const REQUIREMENTS_CONFIG_TEMPLATE = <<<'PHP'
         <?php
