@@ -39,7 +39,7 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v2
+                uses: ramsey/composer-install@v3
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
@@ -72,7 +72,7 @@ jobs:
                         --output bin/box.phar.asc \
                         bin/box.phar
 
-            -   uses: actions/upload-artifact@v3
+            -   uses: actions/upload-artifact@v4
                 name: Upload the PHAR artifact
                 with:
                     name: box-phar
@@ -89,7 +89,7 @@ jobs:
         permissions:
             contents: write
         steps:
-            -   uses: actions/download-artifact@v3
+            -   uses: actions/download-artifact@v4
                 with:
                     name: box-phar
                     path: .
@@ -134,7 +134,7 @@ jobs:
                 with:
                     php-version: '8.2'
 
-            -   uses: actions/download-artifact@v3
+            -   uses: actions/download-artifact@v4
                 with:
                     name: box-phar
                     path: .

@@ -14,8 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Benchmark;
 
-use KevinGH\Box\Composer\Artifact\DecodedComposerJson;
-use KevinGH\Box\Composer\Artifact\DecodedComposerLock;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Phar\CompressionAlgorithm;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
 use PhpBench\Attributes\BeforeMethods;
@@ -38,13 +38,15 @@ final readonly class AppRequirementFactoryBench
     public function bench(): void
     {
         AppRequirementsFactory::create(
-            new DecodedComposerJson(
+            new ComposerJson(
+                '',
                 json_decode(
                     file_get_contents(self::FIXTURES.'/composer.json'),
                     true,
                 ),
             ),
-            new DecodedComposerLock(
+            new ComposerLock(
+                '',
                 json_decode(
                     file_get_contents(self::FIXTURES.'/composer.lock'),
                     true,

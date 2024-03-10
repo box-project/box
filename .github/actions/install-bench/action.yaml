@@ -1,0 +1,32 @@
+name: Install PHPBench dependnecies
+
+description: >
+    Install the PHPBench dependencies including the dependencies for the tested fixtures.
+
+runs:
+    using: composite
+    steps:
+        -   name: Install PHPBench
+            uses: ramsey/composer-install@v3
+            with:
+                working-directory: vendor-bin/phpbench
+
+        -   name: Install PHPBench fixture dependencies (with compactors)
+            uses: ramsey/composer-install@v3
+            with:
+                working-directory: fixtures/bench/with-compactors
+
+        -   name: Install PHPBench fixture dependencies (without compactors)
+            uses: ramsey/composer-install@v3
+            with:
+                working-directory: fixtures/bench/without-compactors
+
+        -   name: Install PHPBench fixture dependencies (requirement-checker)
+            uses: ramsey/composer-install@v3
+            with:
+                composer-options: '--ignore-platform-reqs'
+                working-directory: fixtures/bench/requirement-checker
+
+        -   name: Ensure that the PHPBench make target is up to date
+            shell: sh
+            run: make phpbench_install
