@@ -274,6 +274,7 @@ final class RequirementsBuilderTest extends TestCase
         array $predefinedRequirements,
         array $requiredExtensionSourcePairs,
         array $conflictingExtensionSourcePairs,
+        array $providedExtensionSourcePairs,
         Requirements $expectedBuiltRequirements,
         Requirements $expectedAllRequirements,
     ): void {
@@ -287,6 +288,10 @@ final class RequirementsBuilderTest extends TestCase
 
         foreach ($conflictingExtensionSourcePairs as [$conflictingExtension, $source]) {
             $this->builder->addConflictingExtension($conflictingExtension, $source);
+        }
+
+        foreach ($providedExtensionSourcePairs as [$conflictingExtension, $source]) {
+            $this->builder->addProvidedExtension($conflictingExtension, $source);
         }
 
         $this->assertBuiltRequirementsEquals($expectedBuiltRequirements);
@@ -305,6 +310,7 @@ final class RequirementsBuilderTest extends TestCase
                 $predefinedRequirementNull,
                 $predefinedRequirementA,
             ],
+            [],
             [],
             [],
             new Requirements([
@@ -327,6 +333,7 @@ final class RequirementsBuilderTest extends TestCase
                 [new Extension('noop'), 'A'],
             ],
             [],
+            [],
             new Requirements([
                 Requirement::forRequiredExtension('noop', null),
                 Requirement::forRequiredExtension('noop', 'A'),
@@ -346,6 +353,7 @@ final class RequirementsBuilderTest extends TestCase
                 [new Extension('a-ext'), null],
             ],
             [],
+            [],
             new Requirements([
                 Requirement::forRequiredExtension('a-ext', null),
                 Requirement::forRequiredExtension('z-ext', null),
@@ -364,6 +372,7 @@ final class RequirementsBuilderTest extends TestCase
                 [new Extension('noop'), null],
                 [new Extension('noop'), 'A'],
             ],
+            [],
             new Requirements([
                 Requirement::forConflictingExtension('noop', null),
                 Requirement::forConflictingExtension('noop', 'A'),
@@ -383,6 +392,7 @@ final class RequirementsBuilderTest extends TestCase
                 [new Extension('z-ext'), null],
                 [new Extension('a-ext'), null],
             ],
+            [],
             new Requirements([
                 Requirement::forConflictingExtension('a-ext', null),
                 Requirement::forConflictingExtension('z-ext', null),
@@ -390,6 +400,38 @@ final class RequirementsBuilderTest extends TestCase
             new Requirements([
                 Requirement::forConflictingExtension('a-ext', null),
                 Requirement::forConflictingExtension('z-ext', null),
+            ]),
+        ];
+
+        yield 'provided extension sources' => [
+            [],
+            [],
+            [],
+            [
+                [new Extension('noop'), 'Z'],
+                [new Extension('noop'), null],
+                [new Extension('noop'), 'A'],
+            ],
+            new Requirements([]),
+            new Requirements([
+                Requirement::forProvidedExtension('noop', null),
+                Requirement::forProvidedExtension('noop', 'A'),
+                Requirement::forProvidedExtension('noop', 'Z'),
+            ]),
+        ];
+
+        yield 'provided extensions' => [
+            [],
+            [],
+            [],
+            [
+                [new Extension('z-ext'), null],
+                [new Extension('a-ext'), null],
+            ],
+            new Requirements([]),
+            new Requirements([
+                Requirement::forProvidedExtension('a-ext', null),
+                Requirement::forProvidedExtension('z-ext', null),
             ]),
         ];
     }
