@@ -25,12 +25,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @internal
  */
-#[CoversClass(Process::class)]
-class ProcessTest extends CommandTestCase
+#[CoversClass(ProcessCommand::class)]
+class ProcessCommandTest extends CommandTestCase
 {
     protected function getCommand(): Command
     {
-        return new Process();
+        return new ProcessCommand();
     }
 
     public function test_it_processes_a_file_and_displays_the_processed_contents_with_no_config(): void

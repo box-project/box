@@ -95,6 +95,42 @@ final class RequirementTest extends TestCase
         self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
     }
 
+    public function test_it_can_be_created_for_a_provided_extension_constraint(): void
+    {
+        $requirement = Requirement::forProvidedExtension('mbstring', null);
+
+        $expected = [
+            'type' => 'provided-extension',
+            'condition' => 'mbstring',
+            'source' => null,
+            'message' => 'This application provides the extension "mbstring".',
+            'helpMessage' => 'This application does not require the extension "mbstring", it is provided by the application itself.',
+        ];
+
+        $actual = $requirement->toArray();
+
+        self::assertSame($expected, $actual);
+        self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
+    }
+
+    public function test_it_can_be_created_for_a_provided_extension_constraint_for_a_package(): void
+    {
+        $requirement = Requirement::forProvidedExtension('mbstring', 'box/test');
+
+        $expected = [
+            'type' => 'provided-extension',
+            'condition' => 'mbstring',
+            'source' => 'box/test',
+            'message' => 'The package "box/test" provides the extension "mbstring".',
+            'helpMessage' => 'This application does not require the extension "box/test", it is provided by the package "mbstring".',
+        ];
+
+        $actual = $requirement->toArray();
+
+        self::assertSame($expected, $actual);
+        self::assertItCanBeCreatedFromItsArrayForm($requirement, $actual);
+    }
+
     public function test_it_can_be_created_for_a_conflicting_extension_constraint(): void
     {
         $requirement = Requirement::forConflictingExtension('mbstring', null);

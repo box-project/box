@@ -15,20 +15,20 @@ declare(strict_types=1);
 namespace KevinGH\Box\Console;
 
 use Fidry\Console\Application\Application as FidryApplication;
-use KevinGH\Box\Console\Command\Check\Signature as CheckSignature;
-use KevinGH\Box\Console\Command\Compile;
-use KevinGH\Box\Console\Command\Composer\ComposerCheckVersion;
-use KevinGH\Box\Console\Command\Composer\ComposerVendorDir;
-use KevinGH\Box\Console\Command\Diff;
-use KevinGH\Box\Console\Command\Extract;
-use KevinGH\Box\Console\Command\GenerateDockerFile;
-use KevinGH\Box\Console\Command\Info;
+use KevinGH\Box\Console\Command\Check\CheckSignatureCommand as CheckSignature;
+use KevinGH\Box\Console\Command\CompileCommand;
+use KevinGH\Box\Console\Command\Composer\ComposerCheckVersionCommand;
+use KevinGH\Box\Console\Command\Composer\ComposerVendorDirCommand;
+use KevinGH\Box\Console\Command\DiffCommand;
+use KevinGH\Box\Console\Command\ExtractCommand;
+use KevinGH\Box\Console\Command\GenerateDockerFileCommand;
+use KevinGH\Box\Console\Command\Info\InfoSignatureCommand as InfoSignature;
 use KevinGH\Box\Console\Command\Info\Requirements as InfoRequirements;
-use KevinGH\Box\Console\Command\Info\Signature as InfoSignature;
-use KevinGH\Box\Console\Command\Namespace_;
-use KevinGH\Box\Console\Command\Process;
-use KevinGH\Box\Console\Command\Validate;
-use KevinGH\Box\Console\Command\Verify;
+use KevinGH\Box\Console\Command\InfoCommand;
+use KevinGH\Box\Console\Command\NamespaceCommand;
+use KevinGH\Box\Console\Command\ProcessCommand;
+use KevinGH\Box\Console\Command\ValidateCommand;
+use KevinGH\Box\Console\Command\VerifyCommand;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
 use KevinGH\Box\RequirementChecker\RequirementsDumper;
 use function KevinGH\Box\get_box_version;
@@ -94,28 +94,28 @@ final class Application implements FidryApplication
     public function getCommands(): array
     {
         return [
-            new ComposerCheckVersion(),
-            new ComposerVendorDir(),
-            new Compile(
+            new ComposerCheckVersionCommand(),
+            new ComposerVendorDirCommand(),
+            new CompileCommand(
                 $this->getHeader(),
                 new RequirementsDumper(
                     new AppRequirementsFactory(),
                 ),
             ),
-            new Diff(),
-            new Info(),
-            new Info('info:general'),
+            new DiffCommand(),
+            new InfoCommand(),
+            new InfoCommand('info:general'),
             new InfoSignature(),
             new InfoRequirements(
                 new AppRequirementsFactory(),
             ),
             new CheckSignature(),
-            new Process(),
-            new Extract(),
-            new Validate(),
-            new Verify(),
-            new GenerateDockerFile(),
-            new Namespace_(),
+            new ProcessCommand(),
+            new ExtractCommand(),
+            new ValidateCommand(),
+            new VerifyCommand(),
+            new GenerateDockerFileCommand(),
+            new NamespaceCommand(),
         ];
     }
 

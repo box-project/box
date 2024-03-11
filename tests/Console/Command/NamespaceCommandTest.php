@@ -23,12 +23,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 /**
  * @internal
  */
-#[CoversClass(Namespace_::class)]
-class Namespace_Test extends CommandTestCase
+#[CoversClass(NamespaceCommand::class)]
+class NamespaceCommandTest extends CommandTestCase
 {
     protected function getCommand(): Command
     {
-        return new Namespace_();
+        return new NamespaceCommand();
     }
 
     public function test_it_show_the_ng(): void

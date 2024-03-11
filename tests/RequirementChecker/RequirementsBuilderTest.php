@@ -25,13 +25,19 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(RequirementsBuilder::class)]
 final class RequirementsBuilderTest extends TestCase
 {
+    private RequirementsBuilder $builder;
+
+    protected function setUp(): void
+    {
+        $this->builder = new RequirementsBuilder();
+    }
+
     public function test_it_can_build_requirements_from_an_empty_list(): void
     {
-        $requirements = (new RequirementsBuilder())->build();
-
         $expected = new Requirements([]);
 
-        self::assertEquals($expected, $requirements);
+        $this->assertBuiltRequirementsEquals($expected);
+        $this->assertAllRequirementsEquals($expected);
     }
 
     public function test_it_can_build_requirements_from_predefined_requirements(): void
@@ -42,39 +48,36 @@ final class RequirementsBuilderTest extends TestCase
             Requirement::forConflictingExtension('http', null),
         ];
 
-        $builder = new RequirementsBuilder();
-
         foreach ($predefinedRequirements as $predefinedRequirement) {
-            $builder->addRequirement($predefinedRequirement);
+            $this->builder->addRequirement($predefinedRequirement);
         }
 
         $expected = new Requirements($predefinedRequirements);
-        $actual = $builder->build();
 
-        self::assertEquals($expected, $actual);
+        $this->assertBuiltRequirementsEquals($expected);
+        $this->assertAllRequirementsEquals($expected);
     }
 
     public function test_it_can_build_requirements_from_required_extensions(): void
     {
-        $builder = new RequirementsBuilder();
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('http'),
             'package1',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('http'),
             'package2',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('phar'),
             'package1',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('openssl'),
             'package3',
         );
         // Duplicate
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('openssl'),
             'package3',
         );
@@ -86,51 +89,51 @@ final class RequirementsBuilderTest extends TestCase
             Requirement::forRequiredExtension('phar', 'package1'),
         ]);
 
-        $actual = $builder->build();
-
-        self::assertEquals($expected, $actual);
+        $this->assertBuiltRequirementsEquals($expected);
+        $this->assertAllRequirementsEquals($expected);
     }
 
     public function test_it_can_build_requirements_from_provided_extensions(): void
     {
-        $builder = new RequirementsBuilder();
-        $builder->addProvidedExtension(
+        $this->builder->addProvidedExtension(
             new Extension('http'),
             'package1',
         );
-        $builder->addProvidedExtension(
+        $this->builder->addProvidedExtension(
             new Extension('http'),
             'package2',
         );
 
-        $expected = new Requirements([]);
+        $expectedBuiltRequirements = new Requirements([]);
+        $expectedAllRequirements = new Requirements([
+            Requirement::forProvidedExtension('http', 'package1'),
+            Requirement::forProvidedExtension('http', 'package2'),
+        ]);
 
-        $actual = $builder->build();
-
-        self::assertEquals($expected, $actual);
+        $this->assertBuiltRequirementsEquals($expectedBuiltRequirements);
+        $this->assertAllRequirementsEquals($expectedAllRequirements);
     }
 
     public function test_it_can_build_requirements_from_conflicting_extensions(): void
     {
-        $builder = new RequirementsBuilder();
-        $builder->addConflictingExtension(
+        $this->builder->addConflictingExtension(
             new Extension('http'),
             'package1',
         );
-        $builder->addConflictingExtension(
+        $this->builder->addConflictingExtension(
             new Extension('http'),
             'package2',
         );
-        $builder->addConflictingExtension(
+        $this->builder->addConflictingExtension(
             new Extension('phar'),
             'package1',
         );
-        $builder->addConflictingExtension(
+        $this->builder->addConflictingExtension(
             new Extension('openssl'),
             'package3',
         );
         // Duplicate
-        $builder->addConflictingExtension(
+        $this->builder->addConflictingExtension(
             new Extension('openssl'),
             'package3',
         );
@@ -142,88 +145,96 @@ final class RequirementsBuilderTest extends TestCase
             Requirement::forConflictingExtension('phar', 'package1'),
         ]);
 
-        $actual = $builder->build();
-
-        self::assertEquals($expected, $actual);
+        $this->assertBuiltRequirementsEquals($expected);
+        $this->assertAllRequirementsEquals($expected);
     }
 
     public function test_it_removes_extension_requirements_if_they_are_provided(): void
     {
-        $builder = new RequirementsBuilder();
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('http'),
             'package1',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('http'),
             'package2',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('phar'),
             'package1',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('openssl'),
             'package3',
         );
-        $builder->addProvidedExtension(
+        $this->builder->addProvidedExtension(
             new Extension('http'),
             'package3',
         );
 
-        $expected = new Requirements([
+        $expectedBuiltRequirements = new Requirements([
             Requirement::forRequiredExtension('openssl', 'package3'),
             Requirement::forRequiredExtension('phar', 'package1'),
         ]);
+        $expectedAllRequirements = new Requirements([
+            Requirement::forRequiredExtension('http', 'package1'),
+            Requirement::forRequiredExtension('http', 'package2'),
+            Requirement::forRequiredExtension('openssl', 'package3'),
+            Requirement::forRequiredExtension('phar', 'package1'),
+            Requirement::forProvidedExtension('http', 'package3'),
+        ]);
 
-        $actual = $builder->build();
-
-        self::assertEquals($expected, $actual);
+        $this->assertBuiltRequirementsEquals($expectedBuiltRequirements);
+        $this->assertAllRequirementsEquals($expectedAllRequirements);
     }
 
     public function test_it_does_not_remove_extension_conflicts_if_they_are_provided(): void
     {
-        $builder = new RequirementsBuilder();
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('http'),
             'package1',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('http'),
             'package2',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('phar'),
             'package1',
         );
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('openssl'),
             'package3',
         );
-        $builder->addProvidedExtension(
+        $this->builder->addProvidedExtension(
             new Extension('http'),
             'package3',
         );
 
-        $expected = new Requirements([
+        $expectedBuiltRequirements = new Requirements([
             Requirement::forRequiredExtension('openssl', 'package3'),
             Requirement::forRequiredExtension('phar', 'package1'),
         ]);
+        $expectedAllRequirements = new Requirements([
+            Requirement::forRequiredExtension('http', 'package1'),
+            Requirement::forRequiredExtension('http', 'package2'),
+            Requirement::forRequiredExtension('openssl', 'package3'),
+            Requirement::forRequiredExtension('phar', 'package1'),
+            Requirement::forProvidedExtension('http', 'package3'),
+        ]);
 
-        $actual = $builder->build();
-
-        self::assertEquals($expected, $actual);
+        $this->assertBuiltRequirementsEquals($expectedBuiltRequirements);
+        $this->assertAllRequirementsEquals($expectedAllRequirements);
     }
 
     public function test_it_can_have_an_extension_that_is_required_and_conflicting_at_the_same_time(): void
     {
         // This scenario does not really make sense but ensuring this does not happen is Composer's job not Box.
-        $builder = new RequirementsBuilder();
-        $builder->addRequiredExtension(
+        $this->builder->addRequiredExtension(
             new Extension('http'),
             'package1',
         );
-        $builder->addConflictingExtension(
+        $this->builder->addConflictingExtension(
             new Extension('http'),
             'package2',
         );
@@ -233,9 +244,11 @@ final class RequirementsBuilderTest extends TestCase
             Requirement::forConflictingExtension('http', 'package2'),
         ]);
 
-        $actual = $builder->build();
+        $builtRequirements = $this->builder->build();
+        $allRequirements = $this->builder->all();
 
-        self::assertEquals($expected, $actual);
+        self::assertEquals($expected, $builtRequirements);
+        self::assertEquals($expected, $allRequirements);
     }
 
     // TODO: this could be solved
@@ -243,16 +256,15 @@ final class RequirementsBuilderTest extends TestCase
     {
         $predefinedRequirement = Requirement::forRequiredExtension('http', null);
 
-        $builder = new RequirementsBuilder();
-        $builder->addRequirement($predefinedRequirement);
-        $builder->addProvidedExtension(
+        $this->builder->addRequirement($predefinedRequirement);
+        $this->builder->addProvidedExtension(
             new Extension('http'),
             'package3',
         );
 
         $expected = new Requirements([$predefinedRequirement]);
 
-        $actual = $builder->build();
+        $actual = $this->builder->build();
 
         self::assertEquals($expected, $actual);
     }
@@ -262,25 +274,28 @@ final class RequirementsBuilderTest extends TestCase
         array $predefinedRequirements,
         array $requiredExtensionSourcePairs,
         array $conflictingExtensionSourcePairs,
-        Requirements $expected,
+        array $providedExtensionSourcePairs,
+        Requirements $expectedBuiltRequirements,
+        Requirements $expectedAllRequirements,
     ): void {
-        $builder = new RequirementsBuilder();
-
         foreach ($predefinedRequirements as $predefinedRequirement) {
-            $builder->addRequirement($predefinedRequirement);
+            $this->builder->addRequirement($predefinedRequirement);
         }
 
         foreach ($requiredExtensionSourcePairs as [$requiredExtension, $source]) {
-            $builder->addRequiredExtension($requiredExtension, $source);
+            $this->builder->addRequiredExtension($requiredExtension, $source);
         }
 
         foreach ($conflictingExtensionSourcePairs as [$conflictingExtension, $source]) {
-            $builder->addConflictingExtension($conflictingExtension, $source);
+            $this->builder->addConflictingExtension($conflictingExtension, $source);
         }
 
-        $actual = $builder->build();
+        foreach ($providedExtensionSourcePairs as [$conflictingExtension, $source]) {
+            $this->builder->addProvidedExtension($conflictingExtension, $source);
+        }
 
-        self::assertEquals($expected, $actual);
+        $this->assertBuiltRequirementsEquals($expectedBuiltRequirements);
+        $this->assertAllRequirementsEquals($expectedAllRequirements);
     }
 
     public static function requirementsProvider(): iterable
@@ -297,6 +312,12 @@ final class RequirementsBuilderTest extends TestCase
             ],
             [],
             [],
+            [],
+            new Requirements([
+                $predefinedRequirementZ,
+                $predefinedRequirementNull,
+                $predefinedRequirementA,
+            ]),
             new Requirements([
                 $predefinedRequirementZ,
                 $predefinedRequirementNull,
@@ -312,6 +333,12 @@ final class RequirementsBuilderTest extends TestCase
                 [new Extension('noop'), 'A'],
             ],
             [],
+            [],
+            new Requirements([
+                Requirement::forRequiredExtension('noop', null),
+                Requirement::forRequiredExtension('noop', 'A'),
+                Requirement::forRequiredExtension('noop', 'Z'),
+            ]),
             new Requirements([
                 Requirement::forRequiredExtension('noop', null),
                 Requirement::forRequiredExtension('noop', 'A'),
@@ -326,6 +353,11 @@ final class RequirementsBuilderTest extends TestCase
                 [new Extension('a-ext'), null],
             ],
             [],
+            [],
+            new Requirements([
+                Requirement::forRequiredExtension('a-ext', null),
+                Requirement::forRequiredExtension('z-ext', null),
+            ]),
             new Requirements([
                 Requirement::forRequiredExtension('a-ext', null),
                 Requirement::forRequiredExtension('z-ext', null),
@@ -340,6 +372,12 @@ final class RequirementsBuilderTest extends TestCase
                 [new Extension('noop'), null],
                 [new Extension('noop'), 'A'],
             ],
+            [],
+            new Requirements([
+                Requirement::forConflictingExtension('noop', null),
+                Requirement::forConflictingExtension('noop', 'A'),
+                Requirement::forConflictingExtension('noop', 'Z'),
+            ]),
             new Requirements([
                 Requirement::forConflictingExtension('noop', null),
                 Requirement::forConflictingExtension('noop', 'A'),
@@ -354,10 +392,61 @@ final class RequirementsBuilderTest extends TestCase
                 [new Extension('z-ext'), null],
                 [new Extension('a-ext'), null],
             ],
+            [],
+            new Requirements([
+                Requirement::forConflictingExtension('a-ext', null),
+                Requirement::forConflictingExtension('z-ext', null),
+            ]),
             new Requirements([
                 Requirement::forConflictingExtension('a-ext', null),
                 Requirement::forConflictingExtension('z-ext', null),
             ]),
         ];
+
+        yield 'provided extension sources' => [
+            [],
+            [],
+            [],
+            [
+                [new Extension('noop'), 'Z'],
+                [new Extension('noop'), null],
+                [new Extension('noop'), 'A'],
+            ],
+            new Requirements([]),
+            new Requirements([
+                Requirement::forProvidedExtension('noop', null),
+                Requirement::forProvidedExtension('noop', 'A'),
+                Requirement::forProvidedExtension('noop', 'Z'),
+            ]),
+        ];
+
+        yield 'provided extensions' => [
+            [],
+            [],
+            [],
+            [
+                [new Extension('z-ext'), null],
+                [new Extension('a-ext'), null],
+            ],
+            new Requirements([]),
+            new Requirements([
+                Requirement::forProvidedExtension('a-ext', null),
+                Requirement::forProvidedExtension('z-ext', null),
+            ]),
+        ];
+    }
+
+    private function assertBuiltRequirementsEquals(Requirements $expected): void
+    {
+        $actual = $this->builder->build();
+
+        self::assertEquals($expected, $actual);
+    }
+
+    private function assertAllRequirementsEquals(Requirements $expected): void
+    {
+        $actual = $this->builder->all();
+
+        self::assertEquals($expected, $actual);
     }
 }

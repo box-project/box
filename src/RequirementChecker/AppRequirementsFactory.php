@@ -23,9 +23,8 @@ use KevinGH\Box\Phar\CompressionAlgorithm;
  * Collect the list of requirements for running the application.
  *
  * @private
- * @final
  */
-class AppRequirementsFactory
+final class AppRequirementsFactory
 {
     private const SELF_PACKAGE = null;
 
@@ -40,7 +39,7 @@ class AppRequirementsFactory
                 $composerLock,
                 $compressionAlgorithm,
             )
-            ->getAll();
+            ->all();
     }
 
     public function create(

@@ -102,7 +102,16 @@ final readonly class Requirement
                     $packageName,
                     $extension,
                 ),
-            '',
+            null === $packageName
+                ? sprintf(
+                    'This application does not require the extension "%s", it is provided by the application itself.',
+                    $extension,
+                )
+                : sprintf(
+                    'This application does not require the extension "%s", it is provided by the package "%s".',
+                    $packageName,
+                    $extension,
+                ),
         );
     }
 

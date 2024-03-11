@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Phar\Differ;
 
 use Fidry\Console\IO;
-use KevinGH\Box\Console\Command\Extract;
+use KevinGH\Box\Console\Command\ExtractCommand;
 use KevinGH\Box\Phar\PharInfo;
 use function array_filter;
 use function explode;
@@ -48,7 +48,7 @@ final class GitDiffer implements Differ
 
         $pharMetaLine = sprintf(
             'a%2$s/%1$s b%3$s/%1$s',
-            Extract::PHAR_META_PATH,
+            ExtractCommand::PHAR_META_PATH,
             $pharInfoA->getFileName(),
             $pharInfoB->getFileName(),
         );

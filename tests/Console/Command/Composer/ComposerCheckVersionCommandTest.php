@@ -14,9 +14,11 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command\Composer;
 
+use Exception;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\CommandTester;
 use Fidry\Console\Test\OutputAssertions;
+use KevinGH\Box\Composer\Throwable\IncompatibleComposerVersion;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -28,15 +30,15 @@ use function Safe\getcwd;
 /**
  * @internal
  */
-#[CoversClass(ComposerVendorDir::class)]
-class ComposerVendorDirTest extends TestCase
+#[CoversClass(ComposerCheckVersionCommand::class)]
+class ComposerCheckVersionCommandTest extends TestCase
 {
     private CommandTester $commandTester;
     private string $cwd;
 
     protected function setUp(): void
     {
-        $this->commandTester = CommandTester::fromConsoleCommand(new ComposerVendorDir());
+        $this->commandTester = CommandTester::fromConsoleCommand(new ComposerCheckVersionCommand());
 
         $this->cwd = getcwd();
         chdir(__DIR__);
@@ -47,14 +49,14 @@ class ComposerVendorDirTest extends TestCase
         chdir($this->cwd);
     }
 
-    #[DataProvider('composerExecutableProvider')]
-    public function test_it_retrieves_the_vendor_bin_directory_path(
+    #[DataProvider('compatibleComposerExecutableProvider')]
+    public function test_it_succeeds_the_check_when_the_composer_version_is_compatible(
         array $input,
         array $options,
         string $expectedOutput,
         int $expectedStatusCode,
     ): void {
-        $input['command'] = 'composer:vendor-dir';
+        $input['command'] = 'composer:check-version';
 
         $this->commandTester->execute($input, $options);
 
@@ -65,10 +67,9 @@ class ComposerVendorDirTest extends TestCase
         );
     }
 
-    public static function composerExecutableProvider(): iterable
+    public static function compatibleComposerExecutableProvider(): iterable
     {
         $compatibleComposerPath = Path::normalize(__DIR__.'/compatible-composer.phar');
-        $incompatibleComposerPath = Path::normalize(__DIR__.'/incompatible-composer.phar');
 
         yield 'normal verbosity' => [
             [
@@ -76,8 +77,8 @@ class ComposerVendorDirTest extends TestCase
             ],
             [],
             <<<OUTPUT
-                [info] '{$compatibleComposerPath}' 'config' 'vendor-dir' '--no-ansi'
-                vendor
+                [info] '{$compatibleComposerPath}' '--version' '--no-ansi'
+                [info] Version detected: 2.6.3 (Box requires ^2.2.0)
 
                 OUTPUT,
             ExitCode::SUCCESS,
@@ -98,15 +99,41 @@ class ComposerVendorDirTest extends TestCase
             '',
             ExitCode::SUCCESS,
         ];
+    }
 
-        yield 'incompatible composer executable; quiet verbosity' => [
+    #[DataProvider('incompatibleComposerExecutableProvider')]
+    public function test_it_fails_the_check_when_the_composer_version_is_incompatible(
+        array $input,
+        array $options,
+        Exception $expected,
+    ): void {
+        $input['command'] = 'composer:check-version';
+
+        $this->expectExceptionObject($expected);
+
+        $this->commandTester->execute($input, $options);
+    }
+
+    public static function incompatibleComposerExecutableProvider(): iterable
+    {
+        yield 'normal verbosity' => [
+            [
+                '--composer-bin' => 'incompatible-composer.phar',
+            ],
+            [],
+            new IncompatibleComposerVersion(
+                'The Composer version "2.0.14" does not satisfy the constraint "^2.2.0".',
+            ),
+        ];
+
+        yield 'quiet verbosity' => [
             [
                 '--composer-bin' => 'incompatible-composer.phar',
             ],
             ['verbosity' => OutputInterface::VERBOSITY_QUIET],
-            // The output would be too unstable to test in normal verbosity
-            '',
-            ExitCode::SUCCESS,
+            new IncompatibleComposerVersion(
+                'The Composer version "2.0.14" does not satisfy the constraint "^2.2.0".',
+            ),
         ];
     }
 }

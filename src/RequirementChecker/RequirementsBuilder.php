@@ -49,7 +49,7 @@ final class RequirementsBuilder
         $this->conflictingExtensions[$extension->name][] = $source;
     }
 
-    public function getAll(): Requirements
+    public function all(): Requirements
     {
         $requirements = $this->predefinedRequirements;
 
@@ -120,6 +120,7 @@ final class RequirementsBuilder
             ),
         );
     }
+
     /**
      * @return array<string, list<string>>
      */
@@ -163,7 +164,7 @@ final class RequirementsBuilder
     /**
      * @template T
      *
-     * @param array<string, T> $extensions
+     * @param  array<string, T> $extensions
      * @return array<string, T>
      */
     private static function sortByExtensionName(array $extensions): array
