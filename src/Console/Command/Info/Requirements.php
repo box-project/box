@@ -27,9 +27,7 @@ use KevinGH\Box\RequirementChecker\Requirements as RequirementsCollection;
 use KevinGH\Box\RequirementChecker\RequirementType;
 use stdClass;
 use Symfony\Component\Console\Input\InputOption;
-use function array_filter;
 use function array_map;
-use function implode;
 use function iter\filter;
 use function iter\toArray;
 use function sprintf;
@@ -100,7 +98,7 @@ final readonly class Requirements implements Command
 
         $optimizedRequiredRequirements = toArray(
             filter(
-                static fn (Requirement $requirement) => $requirement->type === RequirementType::EXTENSION,
+                static fn (Requirement $requirement) => RequirementType::EXTENSION === $requirement->type,
                 $this->factory
                     ->create(
                         $composerJson,
@@ -212,7 +210,7 @@ final readonly class Requirements implements Command
      */
     private static function renderProvidedExtensionsSection(
         array $provided,
-        IO    $io,
+        IO $io,
     ): void {
         if (0 === count($provided)) {
             $io->writeln('<comment>No provided extension found.</comment>');
