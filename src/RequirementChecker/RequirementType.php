@@ -18,5 +18,6 @@ enum RequirementType: string
 {
     case PHP = 'php';
     case EXTENSION = 'extension';
+    case PROVIDED_EXTENSION = 'provided-extension';
     case EXTENSION_CONFLICT = 'extension-conflict';
 }
