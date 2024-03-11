@@ -18,6 +18,8 @@ use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration as ConsoleConfiguration;
 use Fidry\Console\ExitCode;
 use Fidry\Console\IO;
+use KevinGH\Box\Composer\Artifact\ComposerJson;
+use KevinGH\Box\Composer\Artifact\ComposerLock;
 use KevinGH\Box\Configuration\Configuration;
 use KevinGH\Box\Console\Command\ChangeWorkingDirOption;
 use KevinGH\Box\Console\Command\ConfigOption;
@@ -26,13 +28,17 @@ use KevinGH\Box\RequirementChecker\Requirement;
 use KevinGH\Box\RequirementChecker\Requirements as RequirementsCollection;
 use KevinGH\Box\RequirementChecker\RequirementType;
 use stdClass;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputOption;
 use function array_map;
+use function count;
+use function is_array;
 use function iter\filter;
 use function iter\toArray;
 use function sprintf;
 
-final readonly class Requirements implements Command
+final readonly class RequirementsCommand implements Command
 {
     private const NO_CONFIG_OPTION = 'no-config';
 
@@ -83,45 +89,87 @@ final readonly class Requirements implements Command
             return ExitCode::FAILURE;
         }
 
+        [
+            $phpRequirements,
+            $requiredExtensions,
+            $conflictingExtensions,
+        ] = $this->getAllRequirements(
+            $composerJson,
+            $composerLock,
+            $config,
+        );
+
+        $optimizedExtensionRequirements = $this->getOptimizedExtensionRequirements(
+            $composerJson,
+            $composerLock,
+            $config,
+        );
+
+        self::renderRequiredPHPVersionsSection($phpRequirements, $io);
+        $io->newLine();
+
+        self::renderExtensionsSection(
+            $requiredExtensions,
+            $io,
+        );
+        $io->newLine();
+
+        self::renderOptimizedRequiredExtensionsSection($optimizedExtensionRequirements, $io);
+        $io->newLine();
+
+        self::renderConflictingExtensionsSection($conflictingExtensions, $io);
+        $io->newLine();
+
+        return ExitCode::SUCCESS;
+    }
+
+    /**
+     * @return array{Requirement[], Requirement[], Requirement[]}
+     */
+    private function getAllRequirements(
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
+        Configuration $config,
+    ): array
+    {
         $requirements = $this->factory->createUnfiltered(
             $composerJson,
             $composerLock,
             $config->getCompressionAlgorithm(),
         );
 
-        [
-            $phpRequirements,
-            $requiredExtensions,
-            $providedExtensions,
-            $conflictingExtensions,
-        ] = self::filterRequirements($requirements);
-
-        $optimizedRequiredRequirements = toArray(
-            filter(
-                static fn (Requirement $requirement) => RequirementType::EXTENSION === $requirement->type,
-                $this->factory
-                    ->create(
-                        $composerJson,
-                        $composerLock,
-                        $config->getCompressionAlgorithm(),
-                    ),
-            ),
-        );
-
-        self::renderRequiredPHPVersionsSection($phpRequirements, $io);
-        self::renderRequiredExtensionsSection($requiredExtensions, $io);
-        self::renderProvidedExtensionsSection($providedExtensions, $io);
-        self::renderOptimizedRequiredExtensionsSection($optimizedRequiredRequirements, $io);
-        self::renderConflictingExtensionsSection($conflictingExtensions, $io);
-
-        return ExitCode::SUCCESS;
+        return self::filterRequirements($requirements);
     }
 
+    /**
+     * @return Requirement[]
+     */
+    private function getOptimizedExtensionRequirements(
+        ComposerJson $composerJson,
+        ComposerLock $composerLock,
+        Configuration $config,
+    ): array
+    {
+        $optimizedRequirements = $this->factory->create(
+            $composerJson,
+            $composerLock,
+            $config->getCompressionAlgorithm(),
+        );
+
+        $isExtension = static fn (Requirement $requirement) => RequirementType::EXTENSION === $requirement->type;
+
+        return toArray(
+            filter($isExtension, $optimizedRequirements),
+        );
+    }
+
+    /**
+     * @return array{Requirement[], Requirement[], Requirement[], Requirement[]}
+     */
     private static function filterRequirements(RequirementsCollection $requirements): array
     {
         $phpRequirements = [];
         $requiredExtensions = [];
-        $providedExtensions = [];
         $conflictingExtensions = [];
 
         foreach ($requirements as $requirement) {
@@ -132,11 +180,8 @@ final readonly class Requirements implements Command
                     break;
 
                 case RequirementType::EXTENSION:
-                    $requiredExtensions[] = $requirement;
-                    break;
-
                 case RequirementType::PROVIDED_EXTENSION:
-                    $providedExtensions[] = $requirement;
+                    $requiredExtensions[] = $requirement;
                     break;
 
                 case RequirementType::EXTENSION_CONFLICT:
@@ -148,33 +193,34 @@ final readonly class Requirements implements Command
         return [
             $phpRequirements,
             $requiredExtensions,
-            $providedExtensions,
             $conflictingExtensions,
         ];
     }
 
     /**
-     * @param Requirement[] $required
+     * @param Requirement[] $requirements
      */
     private static function renderRequiredPHPVersionsSection(
-        array $required,
-        IO $io,
+        array $requirements,
+        IO    $io,
     ): void {
-        if (0 === count($required)) {
-            $io->writeln('<comment>No PHP requirement found.</comment>');
+        if (0 === count($requirements)) {
+            $io->writeln('<comment>No PHP constraint found.</comment>');
 
             return;
         }
 
-        $io->writeln('<comment>Required PHP versions:</comment>');
-        $io->writeln(
+        $io->writeln('<comment>The following PHP constraints were found:</comment>');
+
+        self::renderTable(
+            $io,
+            ['Constraints', 'Source'],
             array_map(
-                static fn (Requirement $requirement) => sprintf(
-                    '  - %s (%s)',
+                static fn (Requirement $requirement) => [
                     $requirement->condition,
                     $requirement->source ?? 'root',
-                ),
-                $required,
+                ],
+                $requirements,
             ),
         );
     }
@@ -182,51 +228,31 @@ final readonly class Requirements implements Command
     /**
      * @param Requirement[] $required
      */
-    private static function renderRequiredExtensionsSection(
+    private static function renderExtensionsSection(
         array $required,
         IO $io,
     ): void {
         if (0 === count($required)) {
-            $io->writeln('<comment>No required extension found.</comment>');
+            $io->writeln('<comment>No extension constraint found.</comment>');
 
             return;
         }
 
-        $io->writeln('<comment>Required extensions:</comment>');
-        $io->writeln(
+        $io->writeln('<comment>The following extensions constraints were found:</comment>');
+
+        self::renderTable(
+            $io,
+            ['Type', 'Extension', 'Source'],
             array_map(
-                static fn (Requirement $requirement) => sprintf(
-                    '  - ext-%s (%s)',
+                static fn (Requirement $requirement) => [
+                    match ($requirement->type) {
+                        RequirementType::EXTENSION => 'required',
+                        RequirementType::PROVIDED_EXTENSION => 'provided',
+                    },
                     $requirement->condition,
                     $requirement->source ?? 'root',
-                ),
+                ],
                 $required,
-            ),
-        );
-    }
-
-    /**
-     * @param Requirement[] $provided
-     */
-    private static function renderProvidedExtensionsSection(
-        array $provided,
-        IO $io,
-    ): void {
-        if (0 === count($provided)) {
-            $io->writeln('<comment>No provided extension found.</comment>');
-
-            return;
-        }
-
-        $io->writeln('<comment>Provided extensions:</comment>');
-        $io->writeln(
-            array_map(
-                static fn (Requirement $requirement) => sprintf(
-                    '  - ext-%s (%s)',
-                    $requirement->condition,
-                    $requirement->source ?? 'root',
-                ),
-                $provided,
             ),
         );
     }
@@ -238,20 +264,24 @@ final readonly class Requirements implements Command
         array $required,
         IO $io,
     ): void {
+        $io->writeln('The required and provided extensions constraints (see above) are resolved to compute the final required extensions.');
+
         if (0 === count($required)) {
-            $io->writeln('<comment>No required extension found.</comment>');
+            $io->writeln('<comment>The application does not have any extension constraint.</comment>');
 
             return;
         }
 
-        $io->writeln('<comment>Final required extensions:</comment> (accounts for the provided extensions)');
-        $io->writeln(
+        $io->writeln('<comment>The application requires the following extension constraints:</comment>');
+
+        self::renderTable(
+            $io,
+            ['Extension', 'Source'],
             array_map(
-                static fn (Requirement $requirement) => sprintf(
-                    '  - ext-%s (%s)',
+                static fn (Requirement $requirement) => [
                     $requirement->condition,
                     $requirement->source ?? 'root',
-                ),
+                ],
                 $required,
             ),
         );
@@ -265,21 +295,46 @@ final readonly class Requirements implements Command
         IO $io,
     ): void {
         if (0 === count($conflicting)) {
-            $io->writeln('<comment>No conflicting package found.</comment>');
+            $io->writeln('<comment>No conflicting extension found.</comment>');
 
             return;
         }
 
         $io->writeln('<comment>Conflicting extensions:</comment>');
-        $io->writeln(
+
+        self::renderTable(
+            $io,
+            ['Extension', 'Source'],
             array_map(
-                static fn (Requirement $requirement) => sprintf(
-                    '  - ext-%s (%s)',
+                static fn (Requirement $requirement) => [
                     $requirement->condition,
                     $requirement->source ?? 'root',
-                ),
+                ],
                 $conflicting,
             ),
         );
+    }
+
+    private static function renderTable(
+        IO $io,
+        array $headers,
+        array|TableSeparator ...$rowsList,
+    ): void
+    {
+        /** @var Table $table */
+        $table = $io->createTable();
+        $table->setStyle('box');
+
+        $table->setHeaders($headers);
+
+        foreach ($rowsList as $rowsOrTableSeparator) {
+            if (is_array($rowsOrTableSeparator)) {
+                $table->addRows($rowsOrTableSeparator);
+            } else {
+                $table->addRow($rowsOrTableSeparator);
+            }
+        }
+
+        $table->render();
     }
 }

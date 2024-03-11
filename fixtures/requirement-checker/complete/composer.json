@@ -3,6 +3,7 @@
         "php": "*",
         "ext-aerospike": "*",
         "ext-http": "*",
+        "ext-mcrypt": "*",
         "ext-zend-opcache": "*",
         "paragonie/sodium_compat": "^1.20",
         "phpseclib/mcrypt_compat": "^2.0",

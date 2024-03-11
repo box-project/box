@@ -23,7 +23,7 @@ use KevinGH\Box\Console\Command\DiffCommand;
 use KevinGH\Box\Console\Command\ExtractCommand;
 use KevinGH\Box\Console\Command\GenerateDockerFileCommand;
 use KevinGH\Box\Console\Command\Info\InfoSignatureCommand as InfoSignature;
-use KevinGH\Box\Console\Command\Info\Requirements as InfoRequirements;
+use KevinGH\Box\Console\Command\Info\RequirementsCommand as InfoRequirements;
 use KevinGH\Box\Console\Command\InfoCommand;
 use KevinGH\Box\Console\Command\NamespaceCommand;
 use KevinGH\Box\Console\Command\ProcessCommand;

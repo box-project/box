@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Console\Command\Info;
 
 use Fidry\Console\Test\CommandTester;
-use KevinGH\Box\Console\Command\Info\Requirements as RequirementsCommand;
+use KevinGH\Box\Console\Command\Info\RequirementsCommand as RequirementsCommand;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
 use KevinGH\Box\RequirementChecker\Requirements;
 use PHPUnit\Framework\Attributes\CoversClass;
