@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Console\Command\Info;
 
 use Fidry\Console\Test\CommandTester;
-use KevinGH\Box\Console\Command\Info\RequirementsCommand as RequirementsCommand;
+use KevinGH\Box\Console\Command\Info\RequirementsCommand;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
 use KevinGH\Box\RequirementChecker\Requirement;
 use KevinGH\Box\RequirementChecker\Requirements;
@@ -74,16 +74,16 @@ class RequirementsCommandTest extends TestCase
             new Requirements([]),
             new Requirements([]),
             <<<'OUTPUT'
-            No PHP constraint found.
+                No PHP constraint found.
 
-            No extension constraint found.
+                No extension constraint found.
 
-            The required and provided extensions constraints (see above) are resolved to compute the final required extensions.
-            The application does not have any extension constraint.
+                The required and provided extensions constraints (see above) are resolved to compute the final required extensions.
+                The application does not have any extension constraint.
 
-            No conflicting extension found.
+                No conflicting extension found.
 
-            OUTPUT,
+                OUTPUT,
         ];
 
         yield 'a real case' => [
@@ -103,41 +103,41 @@ class RequirementsCommandTest extends TestCase
                 Requirement::forConflictingExtension('phar', 'package1'),
             ]),
             <<<'OUTPUT'
-            The following PHP constraints were found:
-            ┌─────────────┬────────┐
-            │ Constraints │ Source │
-            ├─────────────┼────────┤
-            │ >=7.2       │ root   │
-            └─────────────┴────────┘
-            
-            The following extensions constraints were found:
-            ┌──────────┬───────────┬──────────┐
-            │ Type     │ Extension │ Source   │
-            ├──────────┼───────────┼──────────┤
-            │ required │ http      │ package1 │
-            │ required │ http      │ package2 │
-            │ provided │ http      │ root     │
-            │ required │ openssl   │ package1 │
-            │ provided │ zip       │ root     │
-            └──────────┴───────────┴──────────┘
-            
-            The required and provided extensions constraints (see above) are resolved to compute the final required extensions.
-            The application requires the following extension constraints:
-            ┌───────────┬──────────┐
-            │ Extension │ Source   │
-            ├───────────┼──────────┤
-            │ openssl   │ package1 │
-            └───────────┴──────────┘
-            
-            Conflicting extensions:
-            ┌───────────┬──────────┐
-            │ Extension │ Source   │
-            ├───────────┼──────────┤
-            │ openssl   │ package3 │
-            │ phar      │ package1 │
-            └───────────┴──────────┘
+                The following PHP constraints were found:
+                ┌─────────────┬────────┐
+                │ Constraints │ Source │
+                ├─────────────┼────────┤
+                │ >=7.2       │ root   │
+                └─────────────┴────────┘
 
-            OUTPUT,
+                The following extensions constraints were found:
+                ┌──────────┬───────────┬──────────┐
+                │ Type     │ Extension │ Source   │
+                ├──────────┼───────────┼──────────┤
+                │ required │ http      │ package1 │
+                │ required │ http      │ package2 │
+                │ provided │ http      │ root     │
+                │ required │ openssl   │ package1 │
+                │ provided │ zip       │ root     │
+                └──────────┴───────────┴──────────┘
+
+                The required and provided extensions constraints (see above) are resolved to compute the final required extensions.
+                The application requires the following extension constraints:
+                ┌───────────┬──────────┐
+                │ Extension │ Source   │
+                ├───────────┼──────────┤
+                │ openssl   │ package1 │
+                └───────────┴──────────┘
+
+                Conflicting extensions:
+                ┌───────────┬──────────┐
+                │ Extension │ Source   │
+                ├───────────┼──────────┤
+                │ openssl   │ package3 │
+                │ phar      │ package1 │
+                └───────────┴──────────┘
+
+                OUTPUT,
         ];
     }
 }

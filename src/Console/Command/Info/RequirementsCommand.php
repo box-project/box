@@ -36,7 +36,6 @@ use function count;
 use function is_array;
 use function iter\filter;
 use function iter\toArray;
-use function sprintf;
 
 final readonly class RequirementsCommand implements Command
 {
@@ -129,8 +128,7 @@ final readonly class RequirementsCommand implements Command
         ComposerJson $composerJson,
         ComposerLock $composerLock,
         Configuration $config,
-    ): array
-    {
+    ): array {
         $requirements = $this->factory->createUnfiltered(
             $composerJson,
             $composerLock,
@@ -147,8 +145,7 @@ final readonly class RequirementsCommand implements Command
         ComposerJson $composerJson,
         ComposerLock $composerLock,
         Configuration $config,
-    ): array
-    {
+    ): array {
         $optimizedRequirements = $this->factory->create(
             $composerJson,
             $composerLock,
@@ -201,7 +198,7 @@ final readonly class RequirementsCommand implements Command
      */
     private static function renderRequiredPHPVersionsSection(
         array $requirements,
-        IO    $io,
+        IO $io,
     ): void {
         if (0 === count($requirements)) {
             $io->writeln('<comment>No PHP constraint found.</comment>');
@@ -318,8 +315,7 @@ final readonly class RequirementsCommand implements Command
         IO $io,
         array $headers,
         array|TableSeparator ...$rowsList,
-    ): void
-    {
+    ): void {
         /** @var Table $table */
         $table = $io->createTable();
         $table->setStyle('box');
