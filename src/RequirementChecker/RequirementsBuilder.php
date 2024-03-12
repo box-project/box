@@ -59,13 +59,13 @@ final class RequirementsBuilder
     public function addRequiredExtension(Extension $extension, ?string $source): void
     {
         $this->requiredExtensions[$extension->name][] = $source;
-        $this->allExtensions[$extension->name][] = [$source, RequirementType::EXTENSION];
+        $this->allExtensions[$extension->name][$source] = [$source, RequirementType::EXTENSION];
     }
 
     public function addProvidedExtension(Extension $extension, ?string $source): void
     {
         $this->providedExtensions[$extension->name][] = $source;
-        $this->allExtensions[$extension->name][] = [$source, RequirementType::PROVIDED_EXTENSION];
+        $this->allExtensions[$extension->name][$source] = [$source, RequirementType::PROVIDED_EXTENSION];
     }
 
     public function addConflictingExtension(Extension $extension, ?string $source): void
@@ -138,7 +138,7 @@ final class RequirementsBuilder
                 usort(
                     $sources,
                     static fn (array $sourceTypePairA, array $sourceTypePairB) => strcmp(
-                        (string) $sourceTypePairA[0],
+                        $sourceTypePairA[0],
                         (string) $sourceTypePairB[0],
                     ),
                 );
