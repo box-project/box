@@ -22,9 +22,10 @@ use KevinGH\Box\Phar\CompressionAlgorithm;
 /**
  * Collect the list of requirements for running the application.
  *
+ * @final
  * @private
  */
-final class AppRequirementsFactory
+class AppRequirementsFactory
 {
     private const SELF_PACKAGE = null;
 

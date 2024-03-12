@@ -17,6 +17,7 @@ namespace Console\Command\Info;
 use Fidry\Console\Test\CommandTester;
 use KevinGH\Box\Console\Command\Info\RequirementsCommand as RequirementsCommand;
 use KevinGH\Box\RequirementChecker\AppRequirementsFactory;
+use KevinGH\Box\RequirementChecker\Requirement;
 use KevinGH\Box\RequirementChecker\Requirements;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -33,8 +34,6 @@ class RequirementsCommandTest extends TestCase
 {
     use ProphecyTrait;
 
-    private const FIXTURES = __DIR__.'/../../../../fixtures/requirement-checker';
-
     private AppRequirementsFactory|ObjectProphecy $factoryProphecy;
     private CommandTester $commandTester;
 
@@ -49,12 +48,17 @@ class RequirementsCommandTest extends TestCase
 
     #[DataProvider('requirementsProvider')]
     public function test_it_provides_info_about_the_app_requirements(
-        Requirements $requirements,
+        Requirements $allRequirements,
+        Requirements $optimizedRequirements,
         string $expected,
     ): void {
         $this->factoryProphecy
+            ->createUnfiltered(Argument::cetera())
+            ->willReturn($allRequirements);
+
+        $this->factoryProphecy
             ->create(Argument::cetera())
-            ->willReturn($requirements);
+            ->willReturn($optimizedRequirements);
 
         $this->commandTester->execute(['--no-config' => null]);
 
@@ -68,45 +72,72 @@ class RequirementsCommandTest extends TestCase
     {
         yield 'empty' => [
             new Requirements([]),
-            '',
-        ];
-
-        yield 'a real case' => [,
-            '',
-        ];
-
-        return;
-        yield 'PHAR with requirement checker; one PHP and extension and conflict requirement' => [
-            ['phar' => self::FIXTURES.'/req-checker-ext-and-php-and-conflict.phar'],
+            new Requirements([]),
             <<<'OUTPUT'
+            No PHP constraint found.
 
-                API Version: 1.1.0
+            No extension constraint found.
 
-                Built with Box: dev-main@b2c33cd
+            The required and provided extensions constraints (see above) are resolved to compute the final required extensions.
+            The application does not have any extension constraint.
 
-                Archive Compression: None
-                Files Compression: None
+            No conflicting extension found.
 
-                Signature: SHA-1
-                Signature Hash: 2882E27FCEE2268DB6E18A7BBB8B92906F286458
+            OUTPUT,
+        ];
 
-                Metadata: None
+        yield 'a real case' => [
+            new Requirements([
+                Requirement::forPHP('>=7.2', null),
+                Requirement::forRequiredExtension('http', 'package1'),
+                Requirement::forRequiredExtension('http', 'package2'),
+                Requirement::forProvidedExtension('http', null),
+                Requirement::forRequiredExtension('openssl', 'package1'),
+                Requirement::forProvidedExtension('zip', null),
+                Requirement::forConflictingExtension('openssl', 'package3'),
+                Requirement::forConflictingExtension('phar', 'package1'),
+            ]),
+            new Requirements([
+                Requirement::forRequiredExtension('openssl', 'package1'),
+                Requirement::forConflictingExtension('openssl', 'package3'),
+                Requirement::forConflictingExtension('phar', 'package1'),
+            ]),
+            <<<'OUTPUT'
+            The following PHP constraints were found:
+            ┌─────────────┬────────┐
+            │ Constraints │ Source │
+            ├─────────────┼────────┤
+            │ >=7.2       │ root   │
+            └─────────────┴────────┘
+            
+            The following extensions constraints were found:
+            ┌──────────┬───────────┬──────────┐
+            │ Type     │ Extension │ Source   │
+            ├──────────┼───────────┼──────────┤
+            │ required │ http      │ package1 │
+            │ required │ http      │ package2 │
+            │ provided │ http      │ root     │
+            │ required │ openssl   │ package1 │
+            │ provided │ zip       │ root     │
+            └──────────┴───────────┴──────────┘
+            
+            The required and provided extensions constraints (see above) are resolved to compute the final required extensions.
+            The application requires the following extension constraints:
+            ┌───────────┬──────────┐
+            │ Extension │ Source   │
+            ├───────────┼──────────┤
+            │ openssl   │ package1 │
+            └───────────┴──────────┘
+            
+            Conflicting extensions:
+            ┌───────────┬──────────┐
+            │ Extension │ Source   │
+            ├───────────┼──────────┤
+            │ openssl   │ package3 │
+            │ phar      │ package1 │
+            └───────────┴──────────┘
 
-                Timestamp: 1697989559 (2023-10-22T15:45:59+00:00)
-
-                RequirementChecker:
-                  Required:
-                  - PHP ^7.2 (root)
-                  - ext-json (root)
-                  Conflict:
-                  - ext-aerospike (root)
-
-                Contents: 45 files (148.23KB)
-
-                 // Use the --list|-l option to list the content of the PHAR.
-
-
-                OUTPUT,
+            OUTPUT,
         ];
     }
 }

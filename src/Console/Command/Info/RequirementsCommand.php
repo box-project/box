@@ -118,7 +118,6 @@ final readonly class RequirementsCommand implements Command
         $io->newLine();
 
         self::renderConflictingExtensionsSection($conflictingExtensions, $io);
-        $io->newLine();
 
         return ExitCode::SUCCESS;
     }
