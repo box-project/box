@@ -50,7 +50,7 @@ final readonly class RequirementsCommand implements Command
     {
         return new ConsoleConfiguration(
             'info:requirements',
-            'Lists the application requirements found.',
+            'Lists the application requirements found',
             'The <info>%command.name%</info> command will list the PHP versions and extensions required to run the built PHAR.',
             options: [
                 new InputOption(
