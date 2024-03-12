@@ -29,7 +29,7 @@ use Prophecy\Prophecy\ObjectProphecy;
  * @internal
  */
 #[CoversClass(RequirementsCommand::class)]
-class RequirementsTest extends TestCase
+class RequirementsCommandTest extends TestCase
 {
     use ProphecyTrait;
 
