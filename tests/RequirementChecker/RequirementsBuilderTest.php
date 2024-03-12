@@ -179,9 +179,9 @@ final class RequirementsBuilderTest extends TestCase
         $expectedAllRequirements = new Requirements([
             Requirement::forRequiredExtension('http', 'package1'),
             Requirement::forRequiredExtension('http', 'package2'),
+            Requirement::forProvidedExtension('http', 'package3'),
             Requirement::forRequiredExtension('openssl', 'package3'),
             Requirement::forRequiredExtension('phar', 'package1'),
-            Requirement::forProvidedExtension('http', 'package3'),
         ]);
 
         $this->assertBuiltRequirementsEquals($expectedBuiltRequirements);
@@ -218,9 +218,9 @@ final class RequirementsBuilderTest extends TestCase
         $expectedAllRequirements = new Requirements([
             Requirement::forRequiredExtension('http', 'package1'),
             Requirement::forRequiredExtension('http', 'package2'),
+            Requirement::forProvidedExtension('http', 'package3'),
             Requirement::forRequiredExtension('openssl', 'package3'),
             Requirement::forRequiredExtension('phar', 'package1'),
-            Requirement::forProvidedExtension('http', 'package3'),
         ]);
 
         $this->assertBuiltRequirementsEquals($expectedBuiltRequirements);
