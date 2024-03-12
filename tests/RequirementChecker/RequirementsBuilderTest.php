@@ -69,6 +69,10 @@ final class RequirementsBuilderTest extends TestCase
             'package2',
         );
         $this->builder->addRequiredExtension(
+            new Extension('http'),
+            null,
+        );
+        $this->builder->addRequiredExtension(
             new Extension('phar'),
             'package1',
         );
@@ -83,6 +87,7 @@ final class RequirementsBuilderTest extends TestCase
         );
 
         $expected = new Requirements([
+            Requirement::forRequiredExtension('http', null),
             Requirement::forRequiredExtension('http', 'package1'),
             Requirement::forRequiredExtension('http', 'package2'),
             Requirement::forRequiredExtension('openssl', 'package3'),
