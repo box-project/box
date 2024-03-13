@@ -138,7 +138,7 @@ final class RequirementsBuilder
                 usort(
                     $sources,
                     static fn (array $sourceTypePairA, array $sourceTypePairB) => strcmp(
-                        $sourceTypePairA[0],
+                        (string) $sourceTypePairA[0],
                         (string) $sourceTypePairB[0],
                     ),
                 );
