@@ -108,9 +108,40 @@ final class RequirementsBuilderTest extends TestCase
             new Extension('http'),
             'package2',
         );
+        $this->builder->addProvidedExtension(
+            new Extension('http'),
+            null,
+        );
 
         $expectedBuiltRequirements = new Requirements([]);
         $expectedAllRequirements = new Requirements([
+            Requirement::forProvidedExtension('http', null),
+            Requirement::forProvidedExtension('http', 'package1'),
+            Requirement::forProvidedExtension('http', 'package2'),
+        ]);
+
+        $this->assertBuiltRequirementsEquals($expectedBuiltRequirements);
+        $this->assertAllRequirementsEquals($expectedAllRequirements);
+    }
+
+    public function test_it_can_build_requirements_from_provided_extensions_sorting_edge_case(): void
+    {
+        $this->builder->addProvidedExtension(
+            new Extension('http'),
+            null,
+        );
+        $this->builder->addProvidedExtension(
+            new Extension('http'),
+            'package1',
+        );
+        $this->builder->addProvidedExtension(
+            new Extension('http'),
+            'package2',
+        );
+
+        $expectedBuiltRequirements = new Requirements([]);
+        $expectedAllRequirements = new Requirements([
+            Requirement::forProvidedExtension('http', null),
             Requirement::forProvidedExtension('http', 'package1'),
             Requirement::forProvidedExtension('http', 'package2'),
         ]);
