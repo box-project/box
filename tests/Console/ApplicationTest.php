@@ -123,7 +123,6 @@ class ApplicationTest extends TestCase
               extract                 🚚  Extracts a given PHAR into a directory
               help                    Display help for a command
               info                    🔍  Displays information about the PHAR extension or file
-              info:requirements       Lists the application requirements found
               list                    List commands
               namespace               Prints the first part of the command namespace
               process                 ⚡  Applies the registered compactors and replacement values on a file
@@ -136,6 +135,7 @@ class ApplicationTest extends TestCase
               composer:vendor-dir     Shows the Composer vendor-dir configured
              info
               info:general            🔍  Displays information about the PHAR extension or file
+              info:requirements       Lists the application requirements found
               info:signature          Displays the hash of the signature
 
             EOF;
