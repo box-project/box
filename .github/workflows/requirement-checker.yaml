@@ -171,7 +171,7 @@ jobs:
             # wait step for _every_ e2e job, which will block more runners, we wait in one and only one
             # runner.
             -   name: Wait for the PHAR to be built
-                uses: fountainhead/action-wait-for-check@v1.1.0
+                uses: fountainhead/action-wait-for-check@v1.2.0
                 with:
                     checkName: Build PHAR
                     ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -179,7 +179,7 @@ jobs:
                     intervalSeconds: ${{ env.POLLING_INTERVALS_SEC }}
 
             -   name: Wait for the Docker images to be pushed
-                uses: fountainhead/action-wait-for-check@v1.1.0
+                uses: fountainhead/action-wait-for-check@v1.2.0
                 with:
                     checkName: Docker status
                     ref: ${{ github.event.pull_request.head.sha || github.sha }}
