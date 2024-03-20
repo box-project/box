@@ -16,7 +16,17 @@
         "global-ignoreSourceCodeByRegex": [
             "Assert::.*"
         ],
+        "Coalesce": {
+            ignore: [
+                "KevinGH\\Box\\Console\\Command\\Info\\RequirementsCommand::execute"
+            ]
+        },
         "IdenticalEqual": false,
+        "MethodCallRemoval": {
+            ignore: [
+                "KevinGH\\Box\\Console\\Command\\Info\\RequirementsCommand::execute"
+            ]
+        },
         "NotIdenticalNotEqual": false,
         "PublicVisibility": false
     }
