@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Composer;
 
+use Humbug\PhpScoper\Autoload\ComposerFileHasher;
 use Humbug\PhpScoper\Autoload\ScoperAutoloadGenerator;
 use Humbug\PhpScoper\Symbol\SymbolsRegistry;
 use KevinGH\Box\NotInstantiable;
@@ -23,6 +24,7 @@ use function explode;
 use function implode;
 use function preg_match;
 use function preg_replace;
+use function sprintf;
 use function str_replace;
 use const PHP_EOL;
 
@@ -30,14 +32,25 @@ final class AutoloadDumper
 {
     use NotInstantiable;
 
+    private const PACKAGE_PATH_REGEX = '~^%s/(?<vendor>[^/]+?/[^/]+?)/(?<path>.+?)$~';
+
+    /**
+     * @param string[] $excludedComposerAutoloadFiles
+     */
     public static function generateAutoloadStatements(
         SymbolsRegistry $symbolsRegistry,
-        array $excludedComposerAutoloadFileHashes,
+        string $vendorDir,
+        array $excludedComposerAutoloadFiles,
         string $autoloadContents,
     ): string {
         if (0 === $symbolsRegistry->count()) {
             return $autoloadContents;
         }
+
+        $excludedComposerAutoloadFileHashes = self::getExcludedComposerAutoloadFileHashes(
+            $vendorDir,
+            $excludedComposerAutoloadFiles,
+        );
 
         $autoloadContents = self::extractInlinedAutoloadContents($autoloadContents);
         $scoperStatements = self::getOriginalScoperAutoloaderContents(
@@ -57,6 +70,25 @@ final class AutoloadDumper
         );
 
         return self::cleanupDuplicateLineReturns($mergedAutoloadContents);
+    }
+
+    /**
+     * @param string[] $excludedComposerAutoloadFiles
+     */
+    private static function getExcludedComposerAutoloadFileHashes(
+        string $vendorDir,
+        array $excludedComposerAutoloadFiles,
+    ): array {
+        $fileHashGenerator = new ComposerFileHasher(
+            '',
+            $excludedComposerAutoloadFiles,
+            sprintf(
+                self::PACKAGE_PATH_REGEX,
+                $vendorDir,
+            ),
+        );
+
+        return $fileHashGenerator->generateHashes();
     }
 
     private static function extractInlinedAutoloadContents(string $autoloadContents): string
