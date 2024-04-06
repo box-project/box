@@ -4,7 +4,7 @@
 [debug] The xdebug extension is not loaded
 [debug] Configured `phar.readonly=0`
 [debug] Process restarting (BOX_ALLOW_XDEBUG=internal||1|*|*)
-[debug] Running /usr/local/bin/php bin/box.phar compile --working-dir=fixtures/php-settings-checker -vvv --no-ansi
+[debug] Running: [/usr/local/bin/php, bin/box.phar, compile, --working-dir=fixtures/php-settings-checker, -vvv, --no-ansi]
 [debug] Current memory limit: "-1"
 [debug] Checking BOX_ALLOW_XDEBUG
 [debug] Restarted (100 ms). The xdebug extension is not loaded
