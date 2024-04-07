@@ -110,11 +110,16 @@ final class ComposerOrchestrator
         }
     }
 
+    /**
+     * @param string[] $excludedComposerAutoloadFiles Relative paths of the files that were not scoped hence which need
+     *                                                to be configured as loaded to Composer as otherwise they would be
+     *                                                autoloaded twice.
+     */
     public function dumpAutoload(
         SymbolsRegistry $symbolsRegistry,
         string $prefix,
         bool $excludeDevFiles,
-        array $excludedComposerAutoloadFileHashes,
+        array $excludedComposerAutoloadFiles,
     ): void {
         $this->dumpAutoloader(true === $excludeDevFiles);
 
@@ -122,17 +127,22 @@ final class ComposerOrchestrator
             return;
         }
 
-        $autoloadFile = $this->getVendorDir().'/autoload.php';
+        $vendorDir = $this->getVendorDir();
+        $autoloadFile = $vendorDir.'/autoload.php';
 
         $autoloadContents = AutoloadDumper::generateAutoloadStatements(
             $symbolsRegistry,
-            $excludedComposerAutoloadFileHashes,
+            $vendorDir,
+            $excludedComposerAutoloadFiles,
             $this->fileSystem->getFileContents($autoloadFile),
         );
 
         $this->fileSystem->dumpFile($autoloadFile, $autoloadContents);
     }
 
+    /**
+     * @return string The vendor-dir directory path relative to its composer.json.
+     */
     public function getVendorDir(): string
     {
         $vendorDirProcess = $this->processFactory->getVendorDirProcess();
