@@ -18,6 +18,7 @@ use Amp\Parallel\Worker\Execution;
 use Amp\Parallel\Worker\TaskFailureThrowable;
 use Amp\Parallel\Worker\WorkerPool;
 use KevinGH\Box\Compactor\Compactors;
+use KevinGH\Box\Filesystem\LocalPharFile;
 use KevinGH\Box\MapFile;
 use function Amp\Future\await;
 use function Amp\Parallel\Worker\workerPool;
@@ -35,7 +36,7 @@ final class ParallelFileProcessor
      *
      * @throws TaskFailureThrowable
      *
-     * @return list<array{string, string}>
+     * @return LocalPharFile[]
      */
     public static function processFilesInParallel(
         array $filePaths,
@@ -55,7 +56,7 @@ final class ParallelFileProcessor
 
         $compactors->registerSymbolsRegistry($result->symbolsRegistry);
 
-        return $result->filesWithContents;
+        return $result->localPharFiles;
     }
 
     /**

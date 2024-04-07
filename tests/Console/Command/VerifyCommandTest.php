@@ -28,8 +28,8 @@ use function Safe\realpath;
 /**
  * @internal
  */
-#[CoversClass(Verify::class)]
-class VerifyTest extends CommandTestCase
+#[CoversClass(VerifyCommand::class)]
+class VerifyCommandTest extends CommandTestCase
 {
     use RequiresPharReadonlyOff;
 
@@ -44,7 +44,7 @@ class VerifyTest extends CommandTestCase
 
     protected function getCommand(): Command
     {
-        return new Verify();
+        return new VerifyCommand();
     }
 
     #[DataProvider('passingPharPathsProvider')]

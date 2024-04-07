@@ -12,7 +12,7 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\Console\Command\Check;
+namespace KevinGH\Box\Console\Command\Info;
 
 use Fidry\Console\Command\Command;
 use Fidry\Console\Command\Configuration;
@@ -26,30 +26,25 @@ use function sprintf;
 /**
  * @private
  */
-final class Signature implements Command
+final class InfoSignatureCommand implements Command
 {
     private const PHAR_ARG = 'phar';
-    private const HASH = 'hash';
 
     public function getConfiguration(): Configuration
     {
         return new Configuration(
-            'check:signature',
-            'Checks the hash of the signature',
+            'info:signature',
+            'Displays the hash of the signature',
             <<<'HELP'
-                The <info>%command.name%</info> command will check that the hash of the signature is the
-                one given.
+                The <info>%command.name%</info> command will display the hash of the signature. This may
+                be useful for some external tools that wishes to act base on the signature, e.g. to invalidate
+                some cache or compare signatures.
                 HELP,
             [
                 new InputArgument(
                     self::PHAR_ARG,
                     InputArgument::REQUIRED,
                     'The PHAR file.',
-                ),
-                new InputArgument(
-                    self::HASH,
-                    InputArgument::REQUIRED,
-                    'The expected signature hash.',
                 ),
             ],
         );
@@ -58,7 +53,6 @@ final class Signature implements Command
     public function execute(IO $io): int
     {
         $file = $io->getTypedArgument(self::PHAR_ARG)->asNonEmptyString();
-        $expectedHash = $io->getTypedArgument(self::HASH)->asNonEmptyString();
 
         $file = Path::canonicalize($file);
 
@@ -76,19 +70,8 @@ final class Signature implements Command
             return ExitCode::FAILURE;
         }
 
-        $actualHash = $signature['hash'];
+        $io->writeln($signature['hash']);
 
-        if ($expectedHash === $actualHash) {
-            return ExitCode::SUCCESS;
-        }
-
-        $io->error(
-            sprintf(
-                'Found the hash "%s".',
-                $actualHash,
-            ),
-        );
-
-        return ExitCode::FAILURE;
+        return ExitCode::SUCCESS;
     }
 }

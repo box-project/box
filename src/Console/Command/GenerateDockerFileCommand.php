@@ -35,7 +35,7 @@ use function sprintf;
 /**
  * @private
  */
-final class GenerateDockerFile implements CommandAware
+final class GenerateDockerFileCommand implements CommandAware
 {
     use CommandAwareness;
 
@@ -144,10 +144,10 @@ final class GenerateDockerFile implements CommandAware
         return $config->getOutputPath();
     }
 
-    private function getCompileCommand(): Compile
+    private function getCompileCommand(): CompileCommand
     {
         /* @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getCommandRegistry()->findCommand(Compile::NAME);
+        return $this->getCommandRegistry()->findCommand(CompileCommand::NAME);
     }
 
     private static function createCompileInput(IO $io): InputInterface

@@ -44,7 +44,7 @@ declare(strict_types=1);
 namespace KevinGH\Box\Phar;
 
 use Fidry\FileSystem\FS;
-use KevinGH\Box\Console\Command\Extract;
+use KevinGH\Box\Console\Command\ExtractCommand;
 use KevinGH\Box\ExecutableFinder;
 use KevinGH\Box\Phar\Throwable\InvalidPhar;
 use KevinGH\Box\RequirementChecker\Requirement;
@@ -257,7 +257,7 @@ final class PharInfo
 
     public function getStubPath(): string
     {
-        return Extract::STUB_PATH;
+        return ExtractCommand::STUB_PATH;
     }
 
     public function getStubContent(): ?string
@@ -366,8 +366,8 @@ final class PharInfo
             ),
         );
 
-        $meta = PharMeta::fromJson(FS::getFileContents($tmp.DIRECTORY_SEPARATOR.Extract::PHAR_META_PATH));
-        unset($dumpedFiles[Extract::PHAR_META_PATH]);
+        $meta = PharMeta::fromJson(FS::getFileContents($tmp.DIRECTORY_SEPARATOR.ExtractCommand::PHAR_META_PATH));
+        unset($dumpedFiles[ExtractCommand::PHAR_META_PATH]);
 
         return [$meta, $dumpedFiles];
     }

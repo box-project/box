@@ -28,13 +28,13 @@ use function str_replace;
 /**
  * @internal
  */
-#[CoversClass(Validate::class)]
+#[CoversClass(ValidateCommand::class)]
 #[CoversClass(MessageRenderer::class)]
-class ValidateTest extends CommandTestCase
+class ValidateCommandTest extends CommandTestCase
 {
     protected function getCommand(): Command
     {
-        return new Validate();
+        return new ValidateCommand();
     }
 
     public function test_it_validates_a_given_file(): void

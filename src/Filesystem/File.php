@@ -12,12 +12,11 @@ declare(strict_types=1);
  * with this source code in the file LICENSE.
  */
 
-namespace KevinGH\Box\RequirementChecker;
+namespace KevinGH\Box\Filesystem;
 
-enum RequirementType: string
+interface File
 {
-    case PHP = 'php';
-    case EXTENSION = 'extension';
-    case PROVIDED_EXTENSION = 'provided-extension';
-    case EXTENSION_CONFLICT = 'extension-conflict';
+    public function getPath(): string;
+
+    public function getContents(): string;
 }

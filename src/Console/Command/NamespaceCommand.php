@@ -21,7 +21,7 @@ use Fidry\Console\IO;
 use function current;
 use function explode;
 
-final class Namespace_ implements Command
+final class NamespaceCommand implements Command
 {
     public function getConfiguration(): Configuration
     {
