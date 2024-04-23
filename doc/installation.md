@@ -5,6 +5,7 @@
 1. [Homebrew](#homebrew)
 1. [GitHub](#github)
 1. [Docker](#docker)
+1. [shivammathur/setup-php (GitHub Actions)](#shivammathursetup-php-github-actions)
 
 
 ## Phive
@@ -90,6 +91,18 @@ The official docker image for the project is [`boxproject/box`][docker-image]:
 docker pull boxproject/box
 ```
 
+## `shivammathur/setup-php` (GitHub Actions)
+
+Box is supported as a [shivammathur/setup-php tool]:
+
+```yaml
+- name: Setup PHP with tools
+  uses: shivammathur/setup-php@v2
+  with:
+      php-version: '8.3'
+      tools: box
+```
+
 
 <br />
 <hr />
@@ -102,3 +115,4 @@ docker pull boxproject/box
 [docker-image]: https://hub.docker.com/r/boxproject/box
 [bamarni/composer-bin-plugin]: https://github.com/bamarni/composer-bin-plugin
 [phive]: https://github.com/phar-io/phive
+[shivammathur/setup-php tool]: https://github.com/shivammathur/setup-php?tab=readme-ov-file#wrench-tools-support
