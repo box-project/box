@@ -423,8 +423,8 @@ class PhpTest extends CompactorTestCase
                 <?php
 
                 /**
-                 * @param (string|stdClass $x
-                 */
+                @param (string|stdClass $x
+                */
                 function foo($x) {
                 }
                 PHP,
