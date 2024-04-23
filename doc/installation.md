@@ -68,9 +68,9 @@ You should however beware that it is not as secure as downloading it from the ot
 Hence, it is recommended to check the signature when doing so:
 
 ```shell
-# Do adjust the URL based on the latest release
-wget -O box.phar "https://github.com/box-project/box/releases/download/4.4.0/box.phar"
-wget -O box.phar.asc "https://github.com/box-project/box/releases/download/4.4.0/box.phar.asc"
+# Do adjust the URL if you need a release other than the latest
+wget -O box.phar "https://github.com/box-project/box/releases/latest/download/box.phar"
+wget -O box.phar.asc "https://github.com/box-project/box/releases/latest/download/box.phar.asc"
 
 # Check that the signature matches
 gpg --verify box.phar.asc box.phar
