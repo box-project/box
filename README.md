@@ -37,6 +37,7 @@ For the full documentation see https://box-project.github.io/box.
     1. [Homebrew](doc/installation.md#homebrew)
     1. [GitHub](doc/installation.md#github)
     1. [Docker](doc/installation.md#docker)
+    1. [shivammathur/setup-php (GitHub Actions)](#shivammathursetup-php-github-actions)
 1. [Usage](#usage)
 1. [Configuration][the configuration documentation]
     1. [Base path (`base-path`)](doc/configuration.md#base-path-base-path)
