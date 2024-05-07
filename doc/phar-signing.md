@@ -93,9 +93,10 @@ there is ways to void the signature:
 - Replace the signature used. An OpenSSL one will only make it slightly harder as this requires to change an external
   file (the public key), but in the context the attacker could inject code to the PHAR this is unlikely to be a real
   prevention measure.
+- The entire signature check can be disabled via the [PHP ini setting `phar.require_hash`][phar-require-hash].
 
 So to conclude, **this security mechanism CANNOT prevent modifications of the archive itself.** It is **NOT** a reliable
-protection measure.
+protection measure. It is merely a measure to prevent accidentally running a corrupted PHAR.
 
 The good news, there is a solution.
 
@@ -390,5 +391,6 @@ Credits:
 [keys.openpgp.org]: https://keys.openpgp.org/about
 [github-environment-secrets]: https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
 [github-workflow]: https://docs.github.com/en/actions/using-workflows
+[phar-require-hash]: https://www.php.net/manual/en/phar.configuration.php#ini.phar.require-hash
 [phive]: https://phar.io/
 [jar]: https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jarGuide.html
