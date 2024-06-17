@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox451\KevinGH\RequirementChecker;
+namespace HumbugBox462\KevinGH\RequirementChecker;
 
 use function array_shift;
 use function count;
@@ -15,7 +15,6 @@ use function strlen;
 use function trim;
 use function wordwrap;
 use const PHP_EOL;
-/** @internal */
 final class Printer
 {
     private $styles = ['reset' => "\x1b[0m", 'red' => "\x1b[31m", 'green' => "\x1b[32m", 'yellow' => "\x1b[33m", 'title' => "\x1b[33m", 'error' => "\x1b[37;41m", 'success' => "\x1b[30;42m"];
@@ -32,15 +31,15 @@ final class Printer
         $this->supportColors = $supportColors;
         $this->width = $width ?: 80;
     }
-    public function getVerbosity() : int
+    public function getVerbosity(): int
     {
         return $this->verbosity;
     }
-    public function setVerbosity($verbosity) : void
+    public function setVerbosity($verbosity): void
     {
         $this->verbosity = $verbosity;
     }
-    public function title(string $title, int $verbosity, ?string $style = null) : void
+    public function title(string $title, int $verbosity, ?string $style = null): void
     {
         if (null === $style) {
             $style = 'title';
@@ -50,14 +49,14 @@ final class Printer
         $this->printvln(str_repeat('=', min(strlen($title), $this->width)), $verbosity, $style);
         $this->printvln('', $verbosity, $style);
     }
-    public function getRequirementErrorMessage(Requirement $requirement) : ?string
+    public function getRequirementErrorMessage(Requirement $requirement): ?string
     {
         if ($requirement->isFulfilled()) {
             return null;
         }
         return wordwrap($requirement->getHelpText(), $this->width - 3, PHP_EOL . '   ') . PHP_EOL;
     }
-    public function block(string $title, string $message, int $verbosity, ?string $style = null) : void
+    public function block(string $title, string $message, int $verbosity, ?string $style = null): void
     {
         $prefix = ' [' . $title . '] ';
         $lineLength = $this->width - strlen($prefix) - 1;
@@ -84,22 +83,22 @@ final class Printer
         $this->printv(str_repeat(' ', $this->width), $verbosity, $style);
         $this->printvln('', $verbosity);
     }
-    public function printvln(string $message, int $verbosity, ?string $style = null) : void
+    public function printvln(string $message, int $verbosity, ?string $style = null): void
     {
         $this->printv($message, $verbosity, $style);
         $this->printv(PHP_EOL, $verbosity, null);
     }
-    public function printv(string $message, int $verbosity, ?string $style = null) : void
+    public function printv(string $message, int $verbosity, ?string $style = null): void
     {
         if ($verbosity > $this->verbosity) {
             return;
         }
         $message = wordwrap($message, $this->width);
-        $message = sprintf('%s%s%s', $this->supportColors && isset($this->styles[$style]) ? $this->styles[$style] : '', $message, $this->supportColors ? $this->styles['reset'] : '');
-        if ('1' === \getenv('BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT')) {
+        $message = sprintf('%s%s%s', ($this->supportColors && isset($this->styles[$style])) ? $this->styles[$style] : '', $message, $this->supportColors ? $this->styles['reset'] : '');
+        if ('1' === getenv('BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT')) {
             echo $message;
         } else {
-            \fwrite(\STDERR, $message);
+            fwrite(\STDERR, $message);
         }
     }
 }

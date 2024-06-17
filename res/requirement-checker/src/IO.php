@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox451\KevinGH\RequirementChecker;
+namespace HumbugBox462\KevinGH\RequirementChecker;
 
 use function fstat;
 use function function_exists;
@@ -16,7 +16,6 @@ use function str_replace;
 use function stream_isatty;
 use const DIRECTORY_SEPARATOR;
 use const STDOUT;
-/** @internal */
 final class IO
 {
     public const VERBOSITY_QUIET = 16;
@@ -35,30 +34,30 @@ final class IO
         $this->interactive = $this->checkInteractivity($shellVerbosity);
         $this->colorSupport = $this->checkColorSupport();
     }
-    public function isInteractive() : bool
+    public function isInteractive(): bool
     {
         return $this->interactive;
     }
-    public function getVerbosity() : int
+    public function getVerbosity(): int
     {
         return $this->verbosity;
     }
-    public function hasColorSupport() : bool
+    public function hasColorSupport(): bool
     {
         return $this->colorSupport;
     }
-    public function hasParameter($values) : bool
+    public function hasParameter($values): bool
     {
         $values = (array) $values;
         foreach ($values as $value) {
-            $regexp = sprintf('/\\s%s\\b/', str_replace(' ', '\\s+', preg_quote($value, '/')));
+            $regexp = sprintf('/\s%s\b/', str_replace(' ', '\s+', preg_quote($value, '/')));
             if (1 === preg_match($regexp, $this->options)) {
                 return \true;
             }
         }
         return \false;
     }
-    private function checkInteractivity(int $shellVerbosity) : bool
+    private function checkInteractivity(int $shellVerbosity): bool
     {
         if (-1 === $shellVerbosity) {
             return \false;
@@ -71,7 +70,7 @@ final class IO
         }
         return \true;
     }
-    private function configureVerbosity() : int
+    private function configureVerbosity(): int
     {
         switch ($shellVerbosity = (int) getenv('SHELL_VERBOSITY')) {
             case -1:
@@ -105,7 +104,7 @@ final class IO
         }
         return $shellVerbosity;
     }
-    private function checkColorSupport() : bool
+    private function checkColorSupport(): bool
     {
         if ($this->hasParameter(['--ansi'])) {
             return \true;

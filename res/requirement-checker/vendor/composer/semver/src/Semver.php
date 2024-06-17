@@ -1,9 +1,8 @@
 <?php
 
-namespace HumbugBox451\Composer\Semver;
+namespace HumbugBox462\Composer\Semver;
 
-use HumbugBox451\Composer\Semver\Constraint\Constraint;
-/** @internal */
+use HumbugBox462\Composer\Semver\Constraint\Constraint;
 class Semver
 {
     const SORT_ASC = 1;
@@ -21,10 +20,10 @@ class Semver
     }
     public static function satisfiedBy(array $versions, $constraints)
     {
-        $versions = \array_filter($versions, function ($version) use($constraints) {
+        $versions = array_filter($versions, function ($version) use ($constraints) {
             return Semver::satisfies($version, $constraints);
         });
-        return \array_values($versions);
+        return array_values($versions);
     }
     public static function sort(array $versions)
     {
@@ -46,7 +45,7 @@ class Semver
             $normalizedVersion = $versionParser->normalizeDefaultBranch($normalizedVersion);
             $normalized[] = array($normalizedVersion, $key);
         }
-        \usort($normalized, function (array $left, array $right) use($direction) {
+        usort($normalized, function (array $left, array $right) use ($direction) {
             if ($left[0] === $right[0]) {
                 return 0;
             }

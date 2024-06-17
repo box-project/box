@@ -1,10 +1,9 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox451\KevinGH\RequirementChecker;
+namespace HumbugBox462\KevinGH\RequirementChecker;
 
-/** @internal */
 interface IsFulfilled
 {
-    public function __invoke() : bool;
+    public function __invoke(): bool;
 }

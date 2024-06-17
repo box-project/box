@@ -1,13 +1,12 @@
 <?php
 
-namespace HumbugBox451\Composer\Semver;
+namespace HumbugBox462\Composer\Semver;
 
-use HumbugBox451\Composer\Semver\Constraint\Constraint;
-use HumbugBox451\Composer\Semver\Constraint\ConstraintInterface;
-use HumbugBox451\Composer\Semver\Constraint\MatchAllConstraint;
-use HumbugBox451\Composer\Semver\Constraint\MatchNoneConstraint;
-use HumbugBox451\Composer\Semver\Constraint\MultiConstraint;
-/** @internal */
+use HumbugBox462\Composer\Semver\Constraint\Constraint;
+use HumbugBox462\Composer\Semver\Constraint\ConstraintInterface;
+use HumbugBox462\Composer\Semver\Constraint\MatchAllConstraint;
+use HumbugBox462\Composer\Semver\Constraint\MatchNoneConstraint;
+use HumbugBox462\Composer\Semver\Constraint\MultiConstraint;
 class Intervals
 {
     /**
@@ -137,7 +136,7 @@ class Intervals
             }
             if ($intervals['branches']['exclude']) {
                 if (\count($constraints) > 1) {
-                    return new MultiConstraint(\array_merge(array(new MultiConstraint($constraints, \false)), $devConstraints), \true);
+                    return new MultiConstraint(array_merge(array(new MultiConstraint($constraints, \false)), $devConstraints), \true);
                 }
                 if (\count($constraints) === 1 && (string) $constraints[0] === (string) Interval::fromZero()) {
                     if (\count($devConstraints) > 1) {
@@ -145,9 +144,9 @@ class Intervals
                     }
                     return $devConstraints[0];
                 }
-                return new MultiConstraint(\array_merge($constraints, $devConstraints), \true);
+                return new MultiConstraint(array_merge($constraints, $devConstraints), \true);
             }
-            $constraints = \array_merge($constraints, $devConstraints);
+            $constraints = array_merge($constraints, $devConstraints);
         }
         if (\count($constraints) > 1) {
             return new MultiConstraint($constraints, \false);
@@ -198,17 +197,15 @@ class Intervals
             foreach ($constraintBranches as $b) {
                 if ($b['exclude']) {
                     if ($branches['exclude']) {
-                        $branches['names'] = \array_intersect($branches['names'], $b['names']);
+                        $branches['names'] = array_intersect($branches['names'], $b['names']);
                     } else {
                         $branches['exclude'] = \true;
-                        $branches['names'] = \array_diff($b['names'], $branches['names']);
+                        $branches['names'] = array_diff($b['names'], $branches['names']);
                     }
+                } else if ($branches['exclude']) {
+                    $branches['names'] = array_diff($branches['names'], $b['names']);
                 } else {
-                    if ($branches['exclude']) {
-                        $branches['names'] = \array_diff($branches['names'], $b['names']);
-                    } else {
-                        $branches['names'] = \array_merge($branches['names'], $b['names']);
-                    }
+                    $branches['names'] = array_merge($branches['names'], $b['names']);
                 }
             }
         } else {
@@ -216,21 +213,19 @@ class Intervals
             foreach ($constraintBranches as $b) {
                 if ($b['exclude']) {
                     if ($branches['exclude']) {
-                        $branches['names'] = \array_merge($branches['names'], $b['names']);
+                        $branches['names'] = array_merge($branches['names'], $b['names']);
                     } else {
-                        $branches['names'] = \array_diff($branches['names'], $b['names']);
+                        $branches['names'] = array_diff($branches['names'], $b['names']);
                     }
+                } else if ($branches['exclude']) {
+                    $branches['names'] = array_diff($b['names'], $branches['names']);
+                    $branches['exclude'] = \false;
                 } else {
-                    if ($branches['exclude']) {
-                        $branches['names'] = \array_diff($b['names'], $branches['names']);
-                        $branches['exclude'] = \false;
-                    } else {
-                        $branches['names'] = \array_intersect($branches['names'], $b['names']);
-                    }
+                    $branches['names'] = array_intersect($branches['names'], $b['names']);
                 }
             }
         }
-        $branches['names'] = \array_unique($branches['names']);
+        $branches['names'] = array_unique($branches['names']);
         if (\count($numericGroups) === 1) {
             return array('numeric' => $numericGroups[0], 'branches' => $branches);
         }
@@ -242,8 +237,8 @@ class Intervals
             }
         }
         $opSortOrder = self::$opSortOrder;
-        \usort($borders, function ($a, $b) use($opSortOrder) {
-            $order = \version_compare($a['version'], $b['version']);
+        usort($borders, function ($a, $b) use ($opSortOrder) {
+            $order = version_compare($a['version'], $b['version']);
             if ($order === 0) {
                 return $opSortOrder[$a['operator']] - $opSortOrder[$b['operator']];
             }
@@ -263,7 +258,7 @@ class Intervals
             if (!$start && $activeIntervals >= $activationThreshold) {
                 $start = new Constraint($border['operator'], $border['version']);
             } elseif ($start && $activeIntervals < $activationThreshold) {
-                if (\version_compare($start->getVersion(), $border['version'], '=') && ($start->getOperator() === '>' && $border['operator'] === '<=' || $start->getOperator() === '>=' && $border['operator'] === '<')) {
+                if (version_compare($start->getVersion(), $border['version'], '=') && ($start->getOperator() === '>' && $border['operator'] === '<=' || $start->getOperator() === '>=' && $border['operator'] === '<')) {
                     unset($intervals[$index]);
                 } else {
                     $intervals[$index] = new Interval($start, new Constraint($border['operator'], $border['version']));
@@ -283,7 +278,7 @@ class Intervals
     private static function generateSingleConstraintIntervals(Constraint $constraint)
     {
         $op = $constraint->getOperator();
-        if (\strpos($constraint->getVersion(), 'dev-') === 0) {
+        if (strpos($constraint->getVersion(), 'dev-') === 0) {
             $intervals = array();
             $branches = array('names' => array(), 'exclude' => \false);
             if ($op === '!=') {

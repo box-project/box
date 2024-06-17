@@ -1,10 +1,9 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox451\KevinGH\RequirementChecker;
+namespace HumbugBox462\KevinGH\RequirementChecker;
 
 use function extension_loaded;
-/** @internal */
 final class IsExtensionFulfilled implements IsFulfilled
 {
     private $requiredExtension;
@@ -12,7 +11,7 @@ final class IsExtensionFulfilled implements IsFulfilled
     {
         $this->requiredExtension = $requiredExtension;
     }
-    public function __invoke() : bool
+    public function __invoke(): bool
     {
         return extension_loaded($this->requiredExtension);
     }

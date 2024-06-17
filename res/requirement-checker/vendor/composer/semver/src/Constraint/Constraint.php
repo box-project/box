@@ -1,8 +1,7 @@
 <?php
 
-namespace HumbugBox451\Composer\Semver\Constraint;
+namespace HumbugBox462\Composer\Semver\Constraint;
 
-/** @internal */
 class Constraint implements ConstraintInterface
 {
     const OP_EQ = 0;
@@ -41,7 +40,7 @@ class Constraint implements ConstraintInterface
     public function __construct($operator, $version)
     {
         if (!isset(self::$transOpStr[$operator])) {
-            throw new \InvalidArgumentException(\sprintf('Invalid operator "%s" given, expected one of: %s', $operator, \implode(', ', self::getSupportedOperators())));
+            throw new \InvalidArgumentException(sprintf('Invalid operator "%s" given, expected one of: %s', $operator, implode(', ', self::getSupportedOperators())));
         }
         $this->operator = self::$transOpStr[$operator];
         $this->version = $version;
@@ -80,7 +79,7 @@ class Constraint implements ConstraintInterface
     */
     public static function getSupportedOperators()
     {
-        return \array_keys(self::$transOpStr);
+        return array_keys(self::$transOpStr);
     }
     /**
     @phpstan-param
@@ -96,10 +95,10 @@ class Constraint implements ConstraintInterface
     public function versionCompare($a, $b, $operator, $compareBranches = \false)
     {
         if (!isset(self::$transOpStr[$operator])) {
-            throw new \InvalidArgumentException(\sprintf('Invalid operator "%s" given, expected one of: %s', $operator, \implode(', ', self::getSupportedOperators())));
+            throw new \InvalidArgumentException(sprintf('Invalid operator "%s" given, expected one of: %s', $operator, implode(', ', self::getSupportedOperators())));
         }
-        $aIsBranch = \strpos($a, 'dev-') === 0;
-        $bIsBranch = \strpos($b, 'dev-') === 0;
+        $aIsBranch = strpos($a, 'dev-') === 0;
+        $bIsBranch = strpos($b, 'dev-') === 0;
         if ($operator === '!=' && ($aIsBranch || $bIsBranch)) {
             return $a !== $b;
         }
@@ -113,19 +112,19 @@ class Constraint implements ConstraintInterface
     }
     public function compile($otherOperator)
     {
-        if (\strpos($this->version, 'dev-') === 0) {
+        if (strpos($this->version, 'dev-') === 0) {
             if (self::OP_EQ === $this->operator) {
                 if (self::OP_EQ === $otherOperator) {
-                    return \sprintf('$b && $v === %s', \var_export($this->version, \true));
+                    return sprintf('$b && $v === %s', \var_export($this->version, \true));
                 }
                 if (self::OP_NE === $otherOperator) {
-                    return \sprintf('!$b || $v !== %s', \var_export($this->version, \true));
+                    return sprintf('!$b || $v !== %s', \var_export($this->version, \true));
                 }
                 return 'false';
             }
             if (self::OP_NE === $this->operator) {
                 if (self::OP_EQ === $otherOperator) {
-                    return \sprintf('!$b || $v !== %s', \var_export($this->version, \true));
+                    return sprintf('!$b || $v !== %s', \var_export($this->version, \true));
                 }
                 if (self::OP_NE === $otherOperator) {
                     return 'true';
@@ -136,16 +135,16 @@ class Constraint implements ConstraintInterface
         }
         if (self::OP_EQ === $this->operator) {
             if (self::OP_EQ === $otherOperator) {
-                return \sprintf('\\version_compare($v, %s, \'==\')', \var_export($this->version, \true));
+                return sprintf('\version_compare($v, %s, \'==\')', \var_export($this->version, \true));
             }
             if (self::OP_NE === $otherOperator) {
-                return \sprintf('$b || \\version_compare($v, %s, \'!=\')', \var_export($this->version, \true));
+                return sprintf('$b || \version_compare($v, %s, \'!=\')', \var_export($this->version, \true));
             }
-            return \sprintf('!$b && \\version_compare(%s, $v, \'%s\')', \var_export($this->version, \true), self::$transOpInt[$otherOperator]);
+            return sprintf('!$b && \version_compare(%s, $v, \'%s\')', \var_export($this->version, \true), self::$transOpInt[$otherOperator]);
         }
         if (self::OP_NE === $this->operator) {
             if (self::OP_EQ === $otherOperator) {
-                return \sprintf('$b || (!$b && \\version_compare($v, %s, \'!=\'))', \var_export($this->version, \true));
+                return sprintf('$b || (!$b && \version_compare($v, %s, \'!=\'))', \var_export($this->version, \true));
             }
             if (self::OP_NE === $otherOperator) {
                 return 'true';
@@ -156,39 +155,37 @@ class Constraint implements ConstraintInterface
             if (self::OP_LT === $otherOperator || self::OP_LE === $otherOperator) {
                 return '!$b';
             }
-        } else {
-            if (self::OP_GT === $otherOperator || self::OP_GE === $otherOperator) {
-                return '!$b';
-            }
+        } else if (self::OP_GT === $otherOperator || self::OP_GE === $otherOperator) {
+            return '!$b';
         }
         if (self::OP_NE === $otherOperator) {
             return 'true';
         }
-        $codeComparison = \sprintf('\\version_compare($v, %s, \'%s\')', \var_export($this->version, \true), self::$transOpInt[$this->operator]);
+        $codeComparison = sprintf('\version_compare($v, %s, \'%s\')', \var_export($this->version, \true), self::$transOpInt[$this->operator]);
         if ($this->operator === self::OP_LE) {
             if ($otherOperator === self::OP_GT) {
-                return \sprintf('!$b && \\version_compare($v, %s, \'!=\') && ', \var_export($this->version, \true)) . $codeComparison;
+                return sprintf('!$b && \version_compare($v, %s, \'!=\') && ', \var_export($this->version, \true)) . $codeComparison;
             }
         } elseif ($this->operator === self::OP_GE) {
             if ($otherOperator === self::OP_LT) {
-                return \sprintf('!$b && \\version_compare($v, %s, \'!=\') && ', \var_export($this->version, \true)) . $codeComparison;
+                return sprintf('!$b && \version_compare($v, %s, \'!=\') && ', \var_export($this->version, \true)) . $codeComparison;
             }
         }
-        return \sprintf('!$b && %s', $codeComparison);
+        return sprintf('!$b && %s', $codeComparison);
     }
     public function matchSpecific(Constraint $provider, $compareBranches = \false)
     {
-        $noEqualOp = \str_replace('=', '', self::$transOpInt[$this->operator]);
-        $providerNoEqualOp = \str_replace('=', '', self::$transOpInt[$provider->operator]);
+        $noEqualOp = str_replace('=', '', self::$transOpInt[$this->operator]);
+        $providerNoEqualOp = str_replace('=', '', self::$transOpInt[$provider->operator]);
         $isEqualOp = self::OP_EQ === $this->operator;
         $isNonEqualOp = self::OP_NE === $this->operator;
         $isProviderEqualOp = self::OP_EQ === $provider->operator;
         $isProviderNonEqualOp = self::OP_NE === $provider->operator;
         if ($isNonEqualOp || $isProviderNonEqualOp) {
-            if ($isNonEqualOp && !$isProviderNonEqualOp && !$isProviderEqualOp && \strpos($provider->version, 'dev-') === 0) {
+            if ($isNonEqualOp && !$isProviderNonEqualOp && !$isProviderEqualOp && strpos($provider->version, 'dev-') === 0) {
                 return \false;
             }
-            if ($isProviderNonEqualOp && !$isNonEqualOp && !$isEqualOp && \strpos($this->version, 'dev-') === 0) {
+            if ($isProviderNonEqualOp && !$isNonEqualOp && !$isEqualOp && strpos($this->version, 'dev-') === 0) {
                 return \false;
             }
             if (!$isEqualOp && !$isProviderEqualOp) {
@@ -197,7 +194,7 @@ class Constraint implements ConstraintInterface
             return $this->versionCompare($provider->version, $this->version, '!=', $compareBranches);
         }
         if ($this->operator !== self::OP_EQ && $noEqualOp === $providerNoEqualOp) {
-            return !(\strpos($this->version, 'dev-') === 0 || \strpos($provider->version, 'dev-') === 0);
+            return !(strpos($this->version, 'dev-') === 0 || strpos($provider->version, 'dev-') === 0);
         }
         $version1 = $isEqualOp ? $this->version : $provider->version;
         $version2 = $isEqualOp ? $provider->version : $this->version;
@@ -226,7 +223,7 @@ class Constraint implements ConstraintInterface
         if (null !== $this->lowerBound) {
             return;
         }
-        if (\strpos($this->version, 'dev-') === 0) {
+        if (strpos($this->version, 'dev-') === 0) {
             $this->lowerBound = Bound::zero();
             $this->upperBound = Bound::positiveInfinity();
             return;
