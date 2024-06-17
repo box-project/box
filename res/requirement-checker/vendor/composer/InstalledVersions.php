@@ -1,10 +1,9 @@
 <?php
 
-namespace HumbugBox451\Composer;
+namespace HumbugBox462\Composer;
 
-use HumbugBox451\Composer\Autoload\ClassLoader;
-use HumbugBox451\Composer\Semver\VersionParser;
-/** @internal */
+use HumbugBox462\Composer\Autoload\ClassLoader;
+use HumbugBox462\Composer\Semver\VersionParser;
 class InstalledVersions
 {
     /**
@@ -23,12 +22,12 @@ class InstalledVersions
     {
         $packages = array();
         foreach (self::getInstalled() as $installed) {
-            $packages[] = \array_keys($installed['versions']);
+            $packages[] = array_keys($installed['versions']);
         }
         if (1 === \count($packages)) {
             return $packages[0];
         }
-        return \array_keys(\array_flip(\call_user_func_array('HumbugBox451\\array_merge', $packages)));
+        return array_keys(array_flip(\call_user_func_array('array_merge', $packages)));
     }
     /**
     @psalm-return
@@ -70,16 +69,16 @@ class InstalledVersions
             if (isset($installed['versions'][$packageName]['pretty_version'])) {
                 $ranges[] = $installed['versions'][$packageName]['pretty_version'];
             }
-            if (\array_key_exists('aliases', $installed['versions'][$packageName])) {
-                $ranges = \array_merge($ranges, $installed['versions'][$packageName]['aliases']);
+            if (array_key_exists('aliases', $installed['versions'][$packageName])) {
+                $ranges = array_merge($ranges, $installed['versions'][$packageName]['aliases']);
             }
-            if (\array_key_exists('replaced', $installed['versions'][$packageName])) {
-                $ranges = \array_merge($ranges, $installed['versions'][$packageName]['replaced']);
+            if (array_key_exists('replaced', $installed['versions'][$packageName])) {
+                $ranges = array_merge($ranges, $installed['versions'][$packageName]['replaced']);
             }
-            if (\array_key_exists('provided', $installed['versions'][$packageName])) {
-                $ranges = \array_merge($ranges, $installed['versions'][$packageName]['provided']);
+            if (array_key_exists('provided', $installed['versions'][$packageName])) {
+                $ranges = array_merge($ranges, $installed['versions'][$packageName]['provided']);
             }
-            return \implode(' || ', $ranges);
+            return implode(' || ', $ranges);
         }
         throw new \OutOfBoundsException('Package "' . $packageName . '" is not installed');
     }
@@ -145,10 +144,10 @@ class InstalledVersions
     */
     public static function getRawData()
     {
-        @\trigger_error('getRawData only returns the first dataset loaded, which may not be what you expect. Use getAllRawData() instead which returns all datasets for all autoloaders present in the process.', \E_USER_DEPRECATED);
+        @trigger_error('getRawData only returns the first dataset loaded, which may not be what you expect. Use getAllRawData() instead which returns all datasets for all autoloaders present in the process.', \E_USER_DEPRECATED);
         if (null === self::$installed) {
-            if (\substr(__DIR__, -8, 1) !== 'C') {
-                self::$installed = (include __DIR__ . '/installed.php');
+            if (substr(__DIR__, -8, 1) !== 'C') {
+                self::$installed = include __DIR__ . '/installed.php';
             } else {
                 self::$installed = array();
             }
@@ -176,25 +175,25 @@ class InstalledVersions
     private static function getInstalled()
     {
         if (null === self::$canGetVendors) {
-            self::$canGetVendors = \method_exists('HumbugBox451\\Composer\\Autoload\\ClassLoader', 'getRegisteredLoaders');
+            self::$canGetVendors = method_exists('HumbugBox462\Composer\Autoload\ClassLoader', 'getRegisteredLoaders');
         }
         $installed = array();
         if (self::$canGetVendors) {
             foreach (ClassLoader::getRegisteredLoaders() as $vendorDir => $loader) {
                 if (isset(self::$installedByVendor[$vendorDir])) {
                     $installed[] = self::$installedByVendor[$vendorDir];
-                } elseif (\is_file($vendorDir . '/composer/installed.php')) {
-                    $required = (require $vendorDir . '/composer/installed.php');
+                } elseif (is_file($vendorDir . '/composer/installed.php')) {
+                    $required = require $vendorDir . '/composer/installed.php';
                     $installed[] = self::$installedByVendor[$vendorDir] = $required;
-                    if (null === self::$installed && \strtr($vendorDir . '/composer', '\\', '/') === \strtr(__DIR__, '\\', '/')) {
-                        self::$installed = $installed[\count($installed) - 1];
+                    if (null === self::$installed && strtr($vendorDir . '/composer', '\\', '/') === strtr(__DIR__, '\\', '/')) {
+                        self::$installed = $installed[count($installed) - 1];
                     }
                 }
             }
         }
         if (null === self::$installed) {
-            if (\substr(__DIR__, -8, 1) !== 'C') {
-                $required = (require __DIR__ . '/installed.php');
+            if (substr(__DIR__, -8, 1) !== 'C') {
+                $required = require __DIR__ . '/installed.php';
                 self::$installed = $required;
             } else {
                 self::$installed = array();
