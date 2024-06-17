@@ -1,8 +1,7 @@
 <?php
 
-namespace HumbugBox451\Composer\Semver\Constraint;
+namespace HumbugBox462\Composer\Semver\Constraint;
 
-/** @internal */
 class Bound
 {
     private $version;
@@ -36,15 +35,15 @@ class Bound
         if ($this == $other) {
             return \false;
         }
-        $compareResult = \version_compare($this->getVersion(), $other->getVersion());
+        $compareResult = version_compare($this->getVersion(), $other->getVersion());
         if (0 !== $compareResult) {
-            return ('>' === $operator ? 1 : -1) === $compareResult;
+            return (('>' === $operator) ? 1 : -1) === $compareResult;
         }
-        return '>' === $operator ? $other->isInclusive() : !$other->isInclusive();
+        return ('>' === $operator) ? $other->isInclusive() : !$other->isInclusive();
     }
     public function __toString()
     {
-        return \sprintf('%s [%s]', $this->getVersion(), $this->isInclusive() ? 'inclusive' : 'exclusive');
+        return sprintf('%s [%s]', $this->getVersion(), $this->isInclusive() ? 'inclusive' : 'exclusive');
     }
     public static function zero()
     {

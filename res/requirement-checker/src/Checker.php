@@ -1,16 +1,15 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox451\KevinGH\RequirementChecker;
+namespace HumbugBox462\KevinGH\RequirementChecker;
 
 use InvalidArgumentException;
 use function count;
 use function sprintf;
-/** @internal */
 final class Checker
 {
     private static $requirementsConfig;
-    public static function checkRequirements() : bool
+    public static function checkRequirements(): bool
     {
         $requirements = self::retrieveRequirements();
         $checkPassed = $requirements->evaluateRequirements();
@@ -18,7 +17,7 @@ final class Checker
         self::printCheck($checkPassed, new Printer($io->getVerbosity(), $io->hasColorSupport()), $requirements);
         return $checkPassed;
     }
-    public static function printCheck($checkPassed, Printer $printer, RequirementCollection $requirements) : void
+    public static function printCheck($checkPassed, Printer $printer, RequirementCollection $requirements): void
     {
         if (\false === $checkPassed && IO::VERBOSITY_VERY_VERBOSE > $printer->getVerbosity()) {
             $printer->setVerbosity(IO::VERBOSITY_VERY_VERBOSE);
@@ -75,19 +74,19 @@ final class Checker
         }
         $printer->printvln('', $verbosity);
     }
-    private static function retrieveRequirements() : RequirementCollection
+    private static function retrieveRequirements(): RequirementCollection
     {
         if (null === self::$requirementsConfig) {
             self::$requirementsConfig = __DIR__ . '/../.requirements.php';
         }
-        $config = (require self::$requirementsConfig);
+        $config = require self::$requirementsConfig;
         $requirements = new RequirementCollection();
         foreach ($config as $constraint) {
             $requirements->addRequirement(self::createCondition($constraint['type'], $constraint['condition']), $constraint['message'], $constraint['helpMessage']);
         }
         return $requirements;
     }
-    private static function createCondition($type, $condition) : IsFulfilled
+    private static function createCondition($type, $condition): IsFulfilled
     {
         switch ($type) {
             case 'php':

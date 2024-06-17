@@ -1,9 +1,8 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox451\KevinGH\RequirementChecker;
+namespace HumbugBox462\KevinGH\RequirementChecker;
 
-/** @internal */
 final class Requirement
 {
     private $checkIsFulfilled;
@@ -16,22 +15,22 @@ final class Requirement
         $this->testMessage = $testMessage;
         $this->helpText = $helpText;
     }
-    public function isFulfilled() : bool
+    public function isFulfilled(): bool
     {
         if (!isset($this->fulfilled)) {
             $this->fulfilled = $this->checkIsFulfilled->__invoke();
         }
         return $this->fulfilled;
     }
-    public function getIsFullfilledChecker() : IsFulfilled
+    public function getIsFullfilledChecker(): IsFulfilled
     {
         return $this->checkIsFulfilled;
     }
-    public function getTestMessage() : string
+    public function getTestMessage(): string
     {
         return $this->testMessage;
     }
-    public function getHelpText() : string
+    public function getHelpText(): string
     {
         return $this->helpText;
     }

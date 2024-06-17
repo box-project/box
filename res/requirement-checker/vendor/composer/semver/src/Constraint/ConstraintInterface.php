@@ -1,8 +1,7 @@
 <?php
 
-namespace HumbugBox451\Composer\Semver\Constraint;
+namespace HumbugBox462\Composer\Semver\Constraint;
 
-/** @internal */
 interface ConstraintInterface
 {
     public function matches(ConstraintInterface $provider);
