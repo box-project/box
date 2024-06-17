@@ -188,7 +188,7 @@ jobs:
                     echo "DOCKER_TEST_TAG=ghcr.io/box-project/box" >> $GITHUB_ENV
 
             -   name: Build and export to Docker
-                uses: docker/build-push-action@v5
+                uses: docker/build-push-action@v6
                 with:
                     context: .
                     file: ${{ env.DOCKERFILE }}
@@ -201,7 +201,7 @@ jobs:
 
             -   name: Build and push
                 if: github.event_name == 'release'
-                uses: docker/build-push-action@v5
+                uses: docker/build-push-action@v6
                 with:
                     context: .
                     file: ${{ env.DOCKERFILE }}
