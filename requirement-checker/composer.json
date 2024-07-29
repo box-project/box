@@ -19,8 +19,8 @@
     "require-dev": {
         "ergebnis/composer-normalize": "^2.29",
         "fidry/makefile": "^1.0.1",
-        "phpunit/phpunit": "^10.4",
-        "symfony/yaml": "^6.2"
+        "phpunit/phpunit": "^11.2",
+        "symfony/yaml": "^7.1"
     },
     "autoload": {
         "psr-4": {
