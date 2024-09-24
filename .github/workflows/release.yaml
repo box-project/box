@@ -16,7 +16,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    DOCKERFILE: .docker/Dockerfile
+    DOCKERFILE: .docker/dockerhub.dockerfile
     DOCKERHUB_USERNAME: boxproject
     TERM: xterm
 
