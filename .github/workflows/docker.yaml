@@ -33,10 +33,10 @@ jobs:
             matrix:
                 include:
                     - name: PHP 8.2
-                      docker-file: .docker/php82
+                      docker-file: .docker/php82.dockerfile
                       image-tag: ghcr.io/box-project/box_php82
                     - name: PHP 8.2 (Xdebug)
-                      docker-file: .docker/php82_xdebug
+                      docker-file: .docker/php82_xdebug.dockerfile
                       image-tag: ghcr.io/box-project/box_php82_xdebug
         steps:
             -   name: Checkout
