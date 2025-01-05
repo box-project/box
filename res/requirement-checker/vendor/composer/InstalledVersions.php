@@ -178,15 +178,18 @@ class InstalledVersions
             self::$canGetVendors = method_exists('HumbugBox462\Composer\Autoload\ClassLoader', 'getRegisteredLoaders');
         }
         $installed = array();
+        $copiedLocalDir = \false;
         if (self::$canGetVendors) {
             foreach (ClassLoader::getRegisteredLoaders() as $vendorDir => $loader) {
                 if (isset(self::$installedByVendor[$vendorDir])) {
                     $installed[] = self::$installedByVendor[$vendorDir];
                 } elseif (is_file($vendorDir . '/composer/installed.php')) {
                     $required = require $vendorDir . '/composer/installed.php';
-                    $installed[] = self::$installedByVendor[$vendorDir] = $required;
-                    if (null === self::$installed && strtr($vendorDir . '/composer', '\\', '/') === strtr(__DIR__, '\\', '/')) {
-                        self::$installed = $installed[count($installed) - 1];
+                    self::$installedByVendor[$vendorDir] = $required;
+                    $installed[] = $required;
+                    if (strtr($vendorDir . '/composer', '\\', '/') === strtr(__DIR__, '\\', '/')) {
+                        self::$installed = $required;
+                        $copiedLocalDir = \true;
                     }
                 }
             }
@@ -199,7 +202,7 @@ class InstalledVersions
                 self::$installed = array();
             }
         }
-        if (self::$installed !== array()) {
+        if (self::$installed !== array() && !$copiedLocalDir) {
             $installed[] = self::$installed;
         }
         return $installed;
