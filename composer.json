@@ -36,7 +36,7 @@
         "sebastian/diff": "^5.0",
         "seld/jsonlint": "^1.10.2",
         "seld/phar-utils": "^1.2",
-        "symfony/finder": "^6.4.0 || ^7.0.0",
+        "symfony/finder": "^6.4.14 || ^7.0.0",
         "symfony/polyfill-iconv": "^1.28",
         "symfony/polyfill-mbstring": "^1.28",
         "symfony/process": "^6.4.0 || ^7.0.0",
