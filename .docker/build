@@ -4,10 +4,14 @@ set -euf -o pipefail
 
 readonly SCRIPT_DIR=$(dirname $(realpath "${BASH_SOURCE:-$0}"))
 
+if [[ "$(docker images -q ghcr.io/box-project/box_php725 2> /dev/null)" == "" ]]; then
+    docker build --platform=linux/amd64 --tag=ghcr.io/box-project/box_php725 --file "${SCRIPT_DIR}/php725" .
+fi
+
 if [[ "$(docker images -q ghcr.io/box-project/box_php82 2> /dev/null)" == "" ]]; then
-    docker build --platform=linux/amd64 --tag=ghcr.io/box-project/box_php82 --file "${SCRIPT_DIR}/php82.dockerfile" .
+    docker build --platform=linux/amd64 --tag=ghcr.io/box-project/box_php82 --file "${SCRIPT_DIR}/php82" .
 fi
 
 if [[ "$(docker images -q ghcr.io/box-project/box_php82_xdebug 2> /dev/null)" == "" ]]; then
-    docker build --platform=linux/amd64 --tag=ghcr.io/box-project/box_php82_xdebug --file "${SCRIPT_DIR}/php82_xdebug.dockerfile" .
+    docker build --platform=linux/amd64 --tag=ghcr.io/box-project/box_php82_xdebug --file "${SCRIPT_DIR}/php82_xdebug" .
 fi

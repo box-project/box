@@ -16,7 +16,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    DOCKERFILE: .docker/dockerhub.dockerfile
+    DOCKERFILE: .docker/Dockerfile
     DOCKERHUB_USERNAME: boxproject
     TERM: xterm
 
@@ -192,7 +192,7 @@ jobs:
                 with:
                     context: .
                     file: ${{ env.DOCKERFILE }}
-                    platforms: linux/amd64
+                    platforms: linux/amd64,linux/arm64/v8
                     tags: ${{ env.DOCKER_TAGS }}
                     load: true
 
@@ -205,6 +205,6 @@ jobs:
                 with:
                     context: .
                     file: ${{ env.DOCKERFILE }}
-                    platforms: linux/amd64
+                    platforms: linux/amd64,linux/arm64/v8
                     tags: ${{ env.DOCKER_TAGS }}
                     push: true
