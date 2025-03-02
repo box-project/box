@@ -47,7 +47,7 @@ jobs:
                 uses: lycheeverse/lychee-action@v2.3.0
                 with:
                     # To keep in sync with Makefile#lychee
-                    args: "--verbose --no-progress '*.md' 'doc/**/*.md' --cache --max-cache-age 1d ."
+                    args: "--no-progress '*.md' 'doc/**/*.md' --cache --max-cache-age 1d ."
                     output: ${{ runner.temp }}/lychee/out.md
                     fail: true
 
