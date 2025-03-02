@@ -63,6 +63,9 @@
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
     },
+    "conflicts": {
+        "symfony/console": "<6.4.17"
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
