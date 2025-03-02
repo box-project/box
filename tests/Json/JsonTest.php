@@ -19,7 +19,7 @@ use KevinGH\Box\Test\FileSystemTestCase;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresExtension;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Seld\JsonLint\ParsingException;
 use stdClass;
 use Throwable;
@@ -32,7 +32,7 @@ use function mb_convert_encoding;
  * @internal
  */
 #[CoversClass(Json::class)]
-#[RequiresExtension('mbstring')]
+#[RequiresPhpExtension('mbstring')]
 class JsonTest extends FileSystemTestCase
 {
     private Json $json;
