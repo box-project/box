@@ -230,7 +230,7 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@v6
+                uses: dawidd6/action-download-artifact@v9
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
@@ -355,10 +355,10 @@ jobs:
 
             -   name: Create Pull Request
                 if: env.requirement_checker_changed == 'true'
-                uses: peter-evans/create-pull-request@v6
+                uses: peter-evans/create-pull-request@v7
                 with:
                     token: ${{ secrets.GITHUB_TOKEN }}
-                    branch-suffix: random
+                    branch: build/update-requirement-checker
                     delete-branch: true
                     title: "build: Update the RequirementChecker"
                     committer: "box-bot <box-project-bot@example.com>"

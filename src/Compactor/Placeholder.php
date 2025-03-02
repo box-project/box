@@ -18,12 +18,12 @@ use Webmozart\Assert\Assert;
 use function array_keys;
 use function str_replace;
 
-final class Placeholder implements Compactor
+final readonly class Placeholder implements Compactor
 {
     /**
      * @var scalar[]
      */
-    private readonly array $placeholders;
+    private array $placeholders;
 
     /**
      * @param scalar[] $placeholders

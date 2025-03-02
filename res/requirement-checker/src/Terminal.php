@@ -1,17 +1,18 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox462\KevinGH\RequirementChecker;
+namespace HumbugBox464\KevinGH\RequirementChecker;
 
 use function exec;
 use function fclose;
 use function fopen;
 use function function_exists;
 use function getenv;
-use function is_resource;
 use function preg_match;
 use function proc_close;
 use function proc_open;
+use function sapi_windows_cp_get;
+use function sapi_windows_cp_set;
 use function sapi_windows_vt100_support;
 use function stream_get_contents;
 use function trim;
@@ -104,14 +105,17 @@ class Terminal
             return null;
         }
         $descriptorspec = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
-        $process = proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => \true]);
-        if (!is_resource($process)) {
+        $cp = function_exists('sapi_windows_cp_set') ? sapi_windows_cp_get() : 0;
+        if (!$process = @proc_open($command, $descriptorspec, $pipes, null, null, ['suppress_errors' => \true])) {
             return null;
         }
         $info = stream_get_contents($pipes[1]);
         fclose($pipes[1]);
         fclose($pipes[2]);
         proc_close($process);
+        if ($cp) {
+            sapi_windows_cp_set($cp);
+        }
         return $info;
     }
 }
