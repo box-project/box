@@ -8,6 +8,10 @@ COPY --from=composer/composer /composer /usr/bin/composer
 
 COPY bin/box.phar /box.phar
 
+# Adjusts PHP settings
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini \
+    && echo "phar.readonly=Off" > /usr/local/etc/php/conf.d/phar-readonly.ini
+
 RUN mkdir -p /local
 WORKDIR /local
 ENTRYPOINT ["/box.phar"]
