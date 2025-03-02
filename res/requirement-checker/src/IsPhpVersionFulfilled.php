@@ -1,9 +1,9 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox464\KevinGH\RequirementChecker;
+namespace HumbugBox465\KevinGH\RequirementChecker;
 
-use HumbugBox464\Composer\Semver\Semver;
+use HumbugBox465\Composer\Semver\Semver;
 use function sprintf;
 use const PHP_MAJOR_VERSION;
 use const PHP_MINOR_VERSION;
