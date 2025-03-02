@@ -37,10 +37,9 @@ jobs:
                         composer-options: ''
                     -   version: '8.3'
                         dependency: highest
-                        composer-options: --ignore-platform-req=php+
                     -   version: '8.4'
                         dependency: highest
-                        composer-options: --ignore-platform-req=php+
+                        #composer-options: --ignore-platform-req=php+
                 tools:
                     - 'composer:2.2'
                     - 'composer:2.3'
