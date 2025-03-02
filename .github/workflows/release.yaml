@@ -187,7 +187,7 @@ jobs:
                     echo "DOCKER_TAGS=ghcr.io/box-project/box" >> $GITHUB_ENV
                     echo "DOCKER_TEST_TAG=ghcr.io/box-project/box" >> $GITHUB_ENV
 
-            -   name: Build and export to Docker
+            -   name: Build and export to Docker (amd64)
                 uses: docker/build-push-action@v6
                 with:
                     context: .
@@ -196,8 +196,20 @@ jobs:
                     tags: ${{ env.DOCKER_TAGS }}
                     load: true
 
-            -   name: Test the (release) image
-                run: docker run --rm ${{ env.DOCKER_TEST_TAG }} --version
+            -   name: Test the (release) image (amd64)
+                run: docker run --rm --platform=linux/amd64 ${{ env.DOCKER_TEST_TAG }} --version
+
+            -   name: Build and export to Docker (arm64)
+                uses: docker/build-push-action@v6
+                with:
+                    context: .
+                    file: ${{ env.DOCKERFILE }}
+                    platforms: linux/arm64/v8
+                    tags: ${{ env.DOCKER_TAGS }}
+                    load: true
+
+            -   name: Test the (release) image (arm64)
+                run: docker run --rm --platform=linux/arm64/v8 ${{ env.DOCKER_TEST_TAG }} --version
 
             -   name: Build and push
                 if: github.event_name == 'release'
