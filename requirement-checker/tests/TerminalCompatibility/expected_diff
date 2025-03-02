@@ -12,10 +12,11 @@ namespace Symfony\Component\Console;			      |	namespace KevinGH\RequirementChec
 							      >	use function fopen;
 							      >	use function function_exists;
 							      >	use function getenv;
-							      >	use function is_resource;
 							      >	use function preg_match;
 							      >	use function proc_close;
 							      >	use function proc_open;
+							      >	use function sapi_windows_cp_get;
+							      >	use function sapi_windows_cp_set;
 							      >	use function sapi_windows_vt100_support;
 							      >	use function stream_get_contents;
 							      >	use function trim;
@@ -50,10 +51,4 @@ namespace Symfony\Component\Console;			      |	namespace KevinGH\RequirementChec
      */							      <
     private static function initDimensionsUsingStty()	      <
         if (!\function_exists('proc_open')) {		      |	        if (!function_exists('proc_open')) {
-        $cp = \function_exists('sapi_windows_cp_set') ? sapi_ <
-							      <
-        if (!\is_resource($process)) {			      |	        if (!is_resource($process)) {
-							      <
-        if ($cp) {					      <
-            sapi_windows_cp_set($cp);			      <
-        }						      <
+        $cp = \function_exists('sapi_windows_cp_set') ? sapi_ |	        $cp = function_exists('sapi_windows_cp_set') ? sapi_w
