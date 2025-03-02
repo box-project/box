@@ -30,6 +30,7 @@ use org\bovigo\vfs\vfsStreamWrapper;
 use Phar;
 use PharFileInfo;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RequiresExtension;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -1344,9 +1345,7 @@ class BoxTest extends FileSystemTestCase
         }
     }
 
-    /**
-     * @requires extension zlib
-     */
+    #[RequiresExtension('zlib')]
     public function test_it_compresses_all_the_files_with_the_given_algorithm(): void
     {
         $this->box->startBuffering();
@@ -1425,9 +1424,7 @@ class BoxTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @requires extension openssl
-     */
+    #[RequiresExtension('openssl')]
     public function test_it_can_sign_the_phar(): void
     {
         [$key, $password] = $this->getPrivateKey();
@@ -1492,9 +1489,7 @@ class BoxTest extends FileSystemTestCase
         }
     }
 
-    /**
-     * @requires extension openssl
-     */
+    #[RequiresExtension('openssl')]
     public function test_it_can_sign_the_phar_using_a_private_key_with_password(): void
     {
         $phar = $this->box->getPhar();
@@ -1520,9 +1515,7 @@ class BoxTest extends FileSystemTestCase
         );
     }
 
-    /**
-     * @requires extension openssl
-     */
+    #[RequiresExtension('openssl')]
     public function test_it_cannot_sign_the_phar_using_a_private_key_with_the_wrong_password(): void
     {
         $key = $this->getPrivateKey()[0];
