@@ -24,7 +24,7 @@ jobs:
                 uses: actions/checkout@v4
 
             -   name: Check Markdown formatting
-                uses: DavidAnson/markdownlint-cli2-action@v16.0.0
+                uses: DavidAnson/markdownlint-cli2-action@v19.1.0
                 with:
                     globs: "*.md|doc/**/*.md"
 
@@ -44,7 +44,7 @@ jobs:
                     restore-keys: cache-lychee-
 
             -   name: Run Lychee
-                uses: lycheeverse/lychee-action@v1.10.0
+                uses: lycheeverse/lychee-action@v2.3.0
                 with:
                     # To keep in sync with Makefile#lychee
                     args: "--verbose --no-progress '*.md' 'doc/**/*.md' --cache --max-cache-age 1d ."
