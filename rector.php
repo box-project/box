@@ -22,7 +22,6 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         \Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
-        \Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector::class,
         \Rector\Php55\Rector\String_\StringClassNameToClassConstantRector::class => [
             __DIR__.'/src/Configuration/Configuration.php',
         ],

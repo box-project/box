@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console;
 
+use Composer\InstalledVersions;
+use Composer\Semver\VersionParser;
 use Fidry\Console\ExitCode;
 use Fidry\Console\Test\AppTester;
 use Fidry\Console\Test\OutputAssertions;
@@ -93,13 +95,22 @@ class ApplicationTest extends TestCase
 
         $appTester->run([]);
 
-        $expected = <<<'EOF'
+        $quietSilentSegment = self::isSymfonyConsole72OrHigher()
+            ? <<<'EOF'
+                      --silent          Do not output any message
+                  -q, --quiet           Only errors are displayed. All other output is suppressed
+                EOF
+            : <<<'EOF'
+                  -q, --quiet           Do not output any message
+                EOF;
+
+        $expected = <<<EOF
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version x.x-dev@151e40a
@@ -109,7 +120,7 @@ class ApplicationTest extends TestCase
 
             Options:
               -h, --help            Display help for the given command. When no command is given display help for the list command
-              -q, --quiet           Do not output any message
+            {$quietSilentSegment}
               -V, --version         Display this application version
                   --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
               -n, --no-interaction  Do not ask any interactive question
@@ -154,6 +165,15 @@ class ApplicationTest extends TestCase
         self::assertMatchesRegularExpression(
             '/^<info>Box<\/info> version <comment>.+@[a-z\d]{7}<\/comment>$/',
             $defaultApplication->getLongVersion(),
+        );
+    }
+
+    private static function isSymfonyConsole72OrHigher(): bool
+    {
+        return InstalledVersions::satisfies(
+            new VersionParser(),
+            'symfony/console',
+            '>=7.2',
         );
     }
 }

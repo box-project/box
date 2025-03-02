@@ -21,11 +21,11 @@ use function array_map;
 /**
  * @internal
  */
-final class PharDiff
+final readonly class PharDiff
 {
-    private readonly PharInfo $pharInfoA;
-    private readonly PharInfo $pharInfoB;
-    private readonly DifferFactory $differFactory;
+    private PharInfo $pharInfoA;
+    private PharInfo $pharInfoB;
+    private DifferFactory $differFactory;
 
     public function __construct(string $pathA, string $pathB)
     {
