@@ -355,7 +355,7 @@ jobs:
                 uses: peter-evans/create-pull-request@v6
                 with:
                     token: ${{ secrets.GITHUB_TOKEN }}
-                    branch-suffix: random
+                    branch: build/update-requirement-checker
                     delete-branch: true
                     title: "build: Update the RequirementChecker"
                     committer: "box-bot <box-project-bot@example.com>"
