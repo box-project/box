@@ -97,20 +97,20 @@ class ApplicationTest extends TestCase
 
         $quietSilentSegment = self::isSymfonyConsole72OrHigher()
             ? <<<'EOF'
-                  --silent          Do not output any message
-              -q, --quiet           Only errors are displayed. All other output is suppressed
-            EOF
+                      --silent          Do not output any message
+                  -q, --quiet           Only errors are displayed. All other output is suppressed
+                EOF
             : <<<'EOF'
-              -q, --quiet           Do not output any message
-            EOF;
+                  -q, --quiet           Do not output any message
+                EOF;
 
         $expected = <<<EOF
 
                 ____
                / __ )____  _  __
-              / __  / __ \| |/_/
+              / __  / __ \\| |/_/
              / /_/ / /_/ />  <
-            /_____/\____/_/|_|
+            /_____/\\____/_/|_|
 
 
             Box version x.x-dev@151e40a
@@ -120,7 +120,7 @@ class ApplicationTest extends TestCase
 
             Options:
               -h, --help            Display help for the given command. When no command is given display help for the list command
-            $quietSilentSegment
+            {$quietSilentSegment}
               -V, --version         Display this application version
                   --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
               -n, --no-interaction  Do not ask any interactive question

@@ -30,7 +30,7 @@ use const PHP_EOL;
 /**
  * @private
  */
-final class DockerFileGenerator
+final readonly class DockerFileGenerator
 {
     private const FILE_TEMPLATE = <<<'Dockerfile'
         FROM php:__BASE_PHP_IMAGE_TOKEN__
@@ -56,12 +56,12 @@ final class DockerFileGenerator
         '*' => 'to-define-manually',
     ];
 
-    private readonly string $image;
+    private string $image;
 
     /**
      * @var string[]
      */
-    private readonly array $extensions;
+    private array $extensions;
 
     /**
      * Creates a new instance of the generator.
@@ -87,7 +87,7 @@ final class DockerFileGenerator
     public function __construct(
         string $image,
         array $extensions,
-        private readonly string $sourcePhar,
+        private string $sourcePhar,
     ) {
         Assert::inArray($image, self::PHP_DOCKER_IMAGES);
         Assert::allString($extensions);

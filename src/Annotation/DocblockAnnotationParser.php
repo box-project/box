@@ -28,19 +28,19 @@ use function array_values;
 /**
  * @private
  */
-final class DocblockAnnotationParser
+final readonly class DocblockAnnotationParser
 {
     /**
      * @var array<string, mixed>
      */
-    private readonly array $ignoredAnnotationsAsKeys;
+    private array $ignoredAnnotationsAsKeys;
 
     /**
      * @param string[] $ignoredAnnotations
      */
     public function __construct(
-        private readonly DocBlockFactoryInterface $factory,
-        private readonly Formatter $tagsFormatter,
+        private DocBlockFactoryInterface $factory,
+        private Formatter $tagsFormatter,
         array $ignoredAnnotations,
     ) {
         $this->ignoredAnnotationsAsKeys = array_flip($ignoredAnnotations);
