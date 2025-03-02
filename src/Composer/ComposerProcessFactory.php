@@ -50,7 +50,7 @@ class ComposerProcessFactory
      */
     public function __construct(
         private readonly Closure $composerExecutableFactory,
-        private ?string $verbosity,
+        private readonly ?string $verbosity,
         private readonly bool $ansi,
         private readonly array $defaultEnvironmentVariables,
     ) {
