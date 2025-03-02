@@ -198,21 +198,21 @@ jobs:
             matrix:
                 e2e:
                     -   command: _test_e2e_pass_no_config_min_composer_php
-                        docker-image: ghcr.io/box-project/box_php82
+                        docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_pass_no_config_min_box_php
                         docker-image: ghcr.io/box-project/box_php82
                     -   command: _test_e2e_pass_complete_min_composer_php
-                        docker-image: ghcr.io/box-project/box_php82
+                        docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_pass_complete_min_box_php
                         docker-image: ghcr.io/box-project/box_php82
                     -   command: _test_e2e_fail_complete_min_composer_php
-                        docker-image: ghcr.io/box-project/box_php82
+                        docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_fail_complete_min_box_php
                         docker-image: ghcr.io/box-project/box_php82
                     -   command: _test_e2e_skip_min_composer_php
-                        docker-image: ghcr.io/box-project/box_php82
+                        docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_pass_complete_requirement_checker_not_disabled
-                        docker-image: ghcr.io/box-project/box_php82
+                        docker-image: ghcr.io/box-project/box_php725
                     -   command: _test_e2e_fail_conflict
                         docker-image: ghcr.io/box-project/box_php82
         steps:
