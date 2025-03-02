@@ -31,5 +31,5 @@ hands and tweak the `Dockerfile` to your needs.
 
 
 [docker]: https://www.docker.com/
-[docker-php-ext-install]: https://docs.docker.com/samples/library/php/
+[docker-php-ext-install]: https://github.com/mlocati/docker-php-extension-installer
 [requirement-checker]: requirement-checker.md#requirements-checker
