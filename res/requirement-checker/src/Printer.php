@@ -94,7 +94,7 @@ final class Printer
             return;
         }
         $message = wordwrap($message, $this->width);
-        $message = sprintf('%s%s%s', $this->supportColors && isset($this->styles[$style]) ? $this->styles[$style] : '', $message, $this->supportColors ? $this->styles['reset'] : '');
+        $message = sprintf('%s%s%s', ($this->supportColors && isset($this->styles[$style])) ? $this->styles[$style] : '', $message, $this->supportColors ? $this->styles['reset'] : '');
         if ('1' === getenv('BOX_REQUIREMENTS_CHECKER_LOG_TO_STDOUT')) {
             echo $message;
         } else {

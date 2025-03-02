@@ -37,9 +37,9 @@ class Bound
         }
         $compareResult = version_compare($this->getVersion(), $other->getVersion());
         if (0 !== $compareResult) {
-            return ('>' === $operator ? 1 : -1) === $compareResult;
+            return (('>' === $operator) ? 1 : -1) === $compareResult;
         }
-        return '>' === $operator ? $other->isInclusive() : !$other->isInclusive();
+        return ('>' === $operator) ? $other->isInclusive() : !$other->isInclusive();
     }
     public function __toString()
     {

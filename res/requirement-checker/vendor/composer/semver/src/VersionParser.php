@@ -39,7 +39,7 @@ class VersionParser
     public static function normalizeStability($stability)
     {
         $stability = strtolower((string) $stability);
-        return $stability === 'rc' ? 'RC' : $stability;
+        return ($stability === 'rc') ? 'RC' : $stability;
     }
     public function normalize($version, $fullVersion = null)
     {
@@ -64,7 +64,7 @@ class VersionParser
             $version = $match[1];
         }
         if (preg_match('{^v?(\d{1,5}+)(\.\d++)?(\.\d++)?(\.\d++)?' . self::$modifierRegex . '$}i', $version, $matches)) {
-            $version = $matches[1] . (!empty($matches[2]) ? $matches[2] : '.0') . (!empty($matches[3]) ? $matches[3] : '.0') . (!empty($matches[4]) ? $matches[4] : '.0');
+            $version = $matches[1] . ((!empty($matches[2])) ? $matches[2] : '.0') . ((!empty($matches[3])) ? $matches[3] : '.0') . ((!empty($matches[4])) ? $matches[4] : '.0');
             $index = 5;
         } elseif (preg_match('{^v?(\d{4}(?:[.:-]?\d{2}){1,6}(?:[.:-]?\d{1,3}){0,2})' . self::$modifierRegex . '$}i', $version, $matches)) {
             $version = (string) preg_replace('{\D}', '.', $matches[1]);
@@ -75,7 +75,7 @@ class VersionParser
                 if ('stable' === $matches[$index]) {
                     return $version;
                 }
-                $version .= '-' . $this->expandStability($matches[$index]) . (isset($matches[$index + 1]) && '' !== $matches[$index + 1] ? ltrim($matches[$index + 1], '.-') : '');
+                $version .= '-' . $this->expandStability($matches[$index]) . ((isset($matches[$index + 1]) && '' !== $matches[$index + 1]) ? ltrim($matches[$index + 1], '.-') : '');
             }
             if (!empty($matches[$index + 2])) {
                 $version .= '-dev';
@@ -168,7 +168,7 @@ class VersionParser
             $constraint = $match[1];
         }
         if (preg_match('{^([^,\s]*?)@(' . self::$stabilitiesRegex . ')$}i', $constraint, $match)) {
-            $constraint = '' !== $match[1] ? $match[1] : '*';
+            $constraint = ('' !== $match[1]) ? $match[1] : '*';
             if ($match[2] !== 'stable') {
                 $stabilityModifier = $match[2];
             }
@@ -251,7 +251,7 @@ class VersionParser
             $lowVersion = $this->normalize($matches['from']);
             $lowerBound = new Constraint('>=', $lowVersion . $lowStabilitySuffix);
             $empty = function ($x) {
-                return $x === 0 || $x === '0' ? \false : empty($x);
+                return ($x === 0 || $x === '0') ? \false : empty($x);
             };
             if (!$empty($matches[12]) && !$empty($matches[13]) || !empty($matches[15]) || !empty($matches[17]) || !empty($matches[18])) {
                 $highVersion = $this->normalize($matches['to']);
