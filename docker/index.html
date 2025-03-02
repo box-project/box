@@ -658,7 +658,7 @@ right away (you just need to run <code>$ docker build .</code> to create the doc
 </code></pre></div>
 <p>This cryptic one-liner PHP script is about installing the required extensions for your application: it compares the ones
 your application requires with the ones already provided by the base PHP image, and then install them using the
-<a href="https://docs.docker.com/samples/library/php/"><code>docker-php-ext-install</code></a> command. It is however possible that this fails for various reason:
+<a href="https://github.com/mlocati/docker-php-extension-installer"><code>docker-php-ext-install</code></a> command. It is however possible that this fails for various reason:
 the extension is not a known one, it cannot be installed the traditional way, it needs to be compiled with PHP... For
 all those cases (unless you have a better way to handle it in which case PRs are welcomed) you will have to dirty your
 hands and tweak the <code>Dockerfile</code> to your needs.</p>
