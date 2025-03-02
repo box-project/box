@@ -67,7 +67,7 @@ jobs:
                     - e2e_dockerfile_no_extension
                     - e2e_custom_composer_bin
                     - e2e_reproducible_build
-                php: [ '8.2', '8.3' ]
+                php: [ '8.2', '8.3', '8.4' ]
                 tools:
                     - 'composer:2.2'
                     - 'composer:2.3'
@@ -88,7 +88,7 @@ jobs:
                     coverage: pcov
 
             -   name: Allow Composer installation on future PHP versions
-                if: ${{ matrix.php == '8.3' }}
+                if: ${{ matrix.php == '8.3' || matrix.php == '8.4' }}
                 run: echo "COMPOSER_IGNORE_PLATFORM_REQ=--ignore-platform-req=php+" >> "$GITHUB_ENV"
 
             # We cannot use the regular actions/download-artifact here since the artifact is stored
