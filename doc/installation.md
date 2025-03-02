@@ -89,7 +89,16 @@ The official docker image for the project is [`boxproject/box`][docker-image]:
 
 ```shell
 docker pull boxproject/box
+docker run --rm -v $(pwd):/app boxproject/box
 ```
+
+Beware that with the above you may be limited with the Composer binary used. If you need your own
+Composer binary, you will have to create a docker file to add it to the same volume with the right
+permissions.
+
+Box automatically looks up for a Composer binary and the docker image ships one, if you want to use
+your own you may also need to specify it with `--composer-bin`.
+
 
 ## `shivammathur/setup-php` (GitHub Actions)
 
