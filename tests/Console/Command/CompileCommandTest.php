@@ -3061,7 +3061,7 @@ class CompileCommandTest extends FileSystemTestCase
     private static function createComposerPathNormalizer(): callable
     {
         return static fn (string $output): string => preg_replace(
-            '/(\/.*?composer)/',
+            '/(\/.*?composer(?:\.phar)?)/',
             '/usr/local/bin/composer',
             $output,
         );
