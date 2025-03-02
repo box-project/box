@@ -1,8 +1,8 @@
 <?php
 
-namespace HumbugBox464\Composer\Semver;
+namespace HumbugBox465\Composer\Semver;
 
-use HumbugBox464\Composer\Semver\Constraint\Constraint;
+use HumbugBox465\Composer\Semver\Constraint\Constraint;
 class Interval
 {
     private $start;
