@@ -28,7 +28,7 @@
         "fidry/console": "^0.6.0",
         "fidry/filesystem": "^1.2.1",
         "humbug/php-scoper": "^0.18.14",
-        "justinrainbow/json-schema": "^5.2.12",
+        "justinrainbow/json-schema": "^6.2.0",
         "nikic/iter": "^2.2",
         "phpdocumentor/reflection-docblock": "^5.4",
         "phpdocumentor/type-resolver": "^1.7",
