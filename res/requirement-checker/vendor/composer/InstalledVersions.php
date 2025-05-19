@@ -6,6 +6,7 @@ use HumbugBox465\Composer\Autoload\ClassLoader;
 use HumbugBox465\Composer\Semver\VersionParser;
 class InstalledVersions
 {
+    private static $selfDir = null;
     /**
     @psalm-var
     */
@@ -171,6 +172,13 @@ class InstalledVersions
         self::$installedByVendor = array();
         self::$installedIsLocalDir = \false;
     }
+    private static function getSelfDir()
+    {
+        if (self::$selfDir === null) {
+            self::$selfDir = strtr(__DIR__, '\\', '/');
+        }
+        return self::$selfDir;
+    }
     /**
     @psalm-return
     */
@@ -182,7 +190,7 @@ class InstalledVersions
         $installed = array();
         $copiedLocalDir = \false;
         if (self::$canGetVendors) {
-            $selfDir = strtr(__DIR__, '\\', '/');
+            $selfDir = self::getSelfDir();
             foreach (ClassLoader::getRegisteredLoaders() as $vendorDir => $loader) {
                 $vendorDir = strtr($vendorDir, '\\', '/');
                 if (isset(self::$installedByVendor[$vendorDir])) {
