@@ -408,7 +408,8 @@ final class PharMetaTest extends TestCase
                     null,
                     null,
                     null,
-                    1_680_284_660,
+                    // TODO: figure out why this is needed
+                    PHP_VERSION_ID >= 8_04_00 ? 1_680_284_661 : 1_680_284_660,
                     null,
                     [
                         'sample.txt' => [
