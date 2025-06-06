@@ -1,13 +1,13 @@
 {
     "require-dev": {
-        "infection/infection": "^0.26"
+        "infection/infection": "^0.29.14"
     },
     "config": {
         "allow-plugins": {
             "infection/extension-installer": true
         },
         "platform": {
-            "php": "8.2"
+            "php": "8.4"
         },
         "sort-packages": true
     }
