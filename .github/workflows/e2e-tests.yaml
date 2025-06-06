@@ -69,7 +69,6 @@ jobs:
                     - e2e_reproducible_build
                 php: [ '8.2', '8.3', '8.4' ]
                 tools:
-                    - 'composer:2.7'
                     - 'composer:2.8'
                     - 'composer'
         steps:

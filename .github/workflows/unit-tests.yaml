@@ -41,7 +41,6 @@ jobs:
                         dependency: highest
                         #composer-options: --ignore-platform-req=php+
                 tools:
-                    - 'composer:2.7'
                     - 'composer:2.8'
                     - 'composer'
                 phar-readonly: [ true, false ]
