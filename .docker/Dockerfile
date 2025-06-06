@@ -4,7 +4,7 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 RUN install-php-extensions zlib phar sodium tokenizer filter
 
 # Include Composer as it is required for dumping the autoloader when no external Composer bin is provided.
-COPY --from=composer/composer /composer /usr/bin/composer
+COPY --from=composer/composer:2-bin /composer /usr/local/bin/composer
 
 COPY bin/box.phar /box.phar
 
