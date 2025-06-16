@@ -111,7 +111,7 @@ jobs:
         if: github.event_name == 'release'
         steps:
             -   name: Update Homebrew formula
-                uses: dawidd6/action-homebrew-bump-formula@v4
+                uses: dawidd6/action-homebrew-bump-formula@v5
                 with:
                     token: ${{ secrets.BOX_HOMEBREW_TAP_TOKEN }}
                     tap: box-project/box
