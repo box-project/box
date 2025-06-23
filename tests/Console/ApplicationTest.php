@@ -146,6 +146,7 @@ class ApplicationTest extends TestCase
               composer:vendor-dir     Shows the Composer vendor-dir configured
              info
               info:general            🔍  Displays information about the PHAR extension or file
+              info:requirements       Lists the application requirements found
               info:signature          Displays the hash of the signature
 
             EOF;

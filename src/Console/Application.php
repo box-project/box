@@ -23,6 +23,7 @@ use KevinGH\Box\Console\Command\DiffCommand;
 use KevinGH\Box\Console\Command\ExtractCommand;
 use KevinGH\Box\Console\Command\GenerateDockerFileCommand;
 use KevinGH\Box\Console\Command\Info\InfoSignatureCommand as InfoSignature;
+use KevinGH\Box\Console\Command\Info\RequirementsCommand as InfoRequirements;
 use KevinGH\Box\Console\Command\InfoCommand;
 use KevinGH\Box\Console\Command\NamespaceCommand;
 use KevinGH\Box\Console\Command\ProcessCommand;
@@ -105,6 +106,9 @@ final class Application implements FidryApplication
             new InfoCommand(),
             new InfoCommand('info:general'),
             new InfoSignature(),
+            new InfoRequirements(
+                new AppRequirementsFactory(),
+            ),
             new CheckSignature(),
             new ProcessCommand(),
             new ExtractCommand(),
