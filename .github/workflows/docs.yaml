@@ -44,7 +44,7 @@ jobs:
                     restore-keys: cache-lychee-
 
             -   name: Run Lychee
-                uses: lycheeverse/lychee-action@v2.4.1
+                uses: lycheeverse/lychee-action@v2.5.0
                 with:
                     # To keep in sync with Makefile#lychee
                     args: "--no-progress '*.md' 'doc/**/*.md' --cache --max-cache-age 1d ."
@@ -109,7 +109,7 @@ jobs:
         needs:
             - build
         steps:
-            -   uses: actions/download-artifact@v4
+            -   uses: actions/download-artifact@v5
                 with:
                     name: docs-website
                     path: dist/website
