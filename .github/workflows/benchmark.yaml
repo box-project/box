@@ -17,7 +17,7 @@ jobs:
         name: Benchmark main branch
         steps:
             -   name: Checkout main branch
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
                 with:
                     ref: main
                     fetch-depth: 0
@@ -54,7 +54,7 @@ jobs:
         name: Benchmark PR
         steps:
             -   name: Checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
                 with:
                     fetch-depth: 0
 
@@ -87,7 +87,7 @@ jobs:
 #        needs: main-bench-test
 #        steps:
 #            -   name: Checkout
-#                uses: actions/checkout@v4
+#                uses: actions/checkout@v5
 #                with:
 #                    fetch-depth: 0
 #

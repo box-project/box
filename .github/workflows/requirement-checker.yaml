@@ -25,7 +25,7 @@ jobs:
         name: Lint CS
         steps:
             -   name: Checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
@@ -72,7 +72,7 @@ jobs:
         name: AutoReview Tests
         steps:
             -   name: Checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
@@ -120,7 +120,7 @@ jobs:
 
         steps:
             -   name: Checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
@@ -217,7 +217,7 @@ jobs:
                         docker-image: ghcr.io/box-project/box_php82
         steps:
             -   name: Checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
@@ -230,7 +230,7 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@v9
+                uses: dawidd6/action-download-artifact@v11
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
@@ -295,7 +295,7 @@ jobs:
             contents: write
         steps:
             -   name: Checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
                 with:
                     ref: ${{ github.head_ref }}
                     fetch-depth: '0'  # Ensures the tags are fetched
