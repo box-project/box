@@ -16,7 +16,6 @@
         "global-ignoreSourceCodeByRegex": [
             "Assert::.*"
         ],
-        "IdenticalEqual": false,
         "NotIdenticalNotEqual": false,
         "PublicVisibility": false
     }
