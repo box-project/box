@@ -5,12 +5,12 @@
         "php": "^8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "symfony/console": "6.2.*",
-        "symfony/dotenv": "6.2.*",
+        "symfony/console": "6.4.*",
+        "symfony/dotenv": "6.4.*",
         "symfony/flex": "^2.0",
-        "symfony/framework-bundle": "6.2.*",
+        "symfony/framework-bundle": "6.4.*",
         "symfony/runtime": "6.4.*",
-        "symfony/yaml": "6.2.*"
+        "symfony/yaml": "6.4.*"
     },
     "config": {
         "sort-packages": true,
@@ -59,7 +59,7 @@
         "bin-dir": "new-bin",
         "symfony": {
             "allow-contrib": false,
-            "require": "6.2.*"
+            "require": "6.4.*"
         }
     }
 }
