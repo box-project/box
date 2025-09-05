@@ -29,7 +29,6 @@
         "fidry/filesystem": "^1.2.1",
         "humbug/php-scoper": "^0.18.14",
         "justinrainbow/json-schema": "^6.2.0",
-        "marc-mabe/php-enum": "^4.4",
         "nikic/iter": "^2.2",
         "phpdocumentor/reflection-docblock": "^5.4",
         "phpdocumentor/type-resolver": "^1.7",
@@ -60,6 +59,9 @@
         "symfony/polyfill-php80": "*",
         "symfony/polyfill-php81": "*",
         "symfony/polyfill-php82": "*"
+    },
+    "conflict": {
+        "marc-mabe/php-enum": "<4.4"
     },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
