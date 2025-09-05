@@ -148,7 +148,7 @@ is `bin/acme.php` or `bin/acme` then the output will be `bin/acme.phar`.
 The chmod (`string`|`null`) setting is used to change the file permissions of the newly built PHAR. The string contains
 an octal value e.g. `0750`. By default the permissions of the created PHAR are unchanged so it should be `0644`.
 
-Check the following [link](https://secure.php.net/manual/en/function.chmod.php) for more on the possible values.
+Check the following [PHP official documentation for `chmod()`](https://secure.php.net/manual/en/function.chmod.php) for more on the possible values.
 
 
 ## Check requirements (`check-requirements`)
@@ -1074,6 +1074,6 @@ The short commit hash will only be used if no tag is available.
 [the signing best practices]: ./phar-signing.md#phar-signing-best-practices
 [stub-stub]: #stub-stub
 [stub]: #stub
-[symfony-finder]: https://symfony.com/doc/current//components/finder.html
+[symfony-finder]: https://symfony.com/doc/current/components/finder.html
 [zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
 [#1152]: https://github.com/box-project/box/issues/1152
