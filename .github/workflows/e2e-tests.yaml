@@ -163,7 +163,6 @@ jobs:
                     workflow: release.yaml
                     check_artifacts: true
                     name: box-phar
-                    allow_forks: true
 
             # The original target is for the publishing, which is different from the internal name used.
             -   name: Ensure the make target is up to date
