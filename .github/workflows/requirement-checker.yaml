@@ -230,13 +230,12 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@v10
+                uses: dawidd6/action-download-artifact@v9
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
                     check_artifacts: true
                     name: box-phar
-                    allow_forks: true
 
             # The original target is for the publishing, which is different from the internal name used.
             -   name: Ensure the make target is up to date
