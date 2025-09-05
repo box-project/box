@@ -35,7 +35,7 @@ PHPUNIT_COVERAGE_HTML = XDEBUG_MODE=coverage php -dphar.readonly=0 $(PHPUNIT) --
 INFECTION_BIN = vendor-bin/infection/vendor/bin/infection
 INFECTION := SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --skip-initial-tests --coverage=$(COVERAGE_DIR) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --show-mutations
 INFECTION_CI = $(eval INFECTION_CI := $(INFECTION) ${INFECTION_FLAGS})$(INFECTION_CI)
-INFECTION_WITH_INITIAL_TESTS := SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --only-covered --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --show-mutations
+INFECTION_WITH_INITIAL_TESTS := SYMFONY_DEPRECATIONS_HELPER="disabled=1" php -dzend.enable_gc=0 $(INFECTION_BIN) --show-mutations --min-msi=100 --min-covered-msi=100 --ansi --threads=max --show-mutations
 INFECTION_SRC := $(shell find src tests) phpunit.xml.dist
 
 PHP_CS_FIXER_BIN = vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer
