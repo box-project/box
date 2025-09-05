@@ -61,6 +61,9 @@
         "symfony/polyfill-php81": "*",
         "symfony/polyfill-php82": "*"
     },
+    "conflict": {
+        "marc-mabe/php-enum": "<4.4"
+    },
     "suggest": {
         "ext-openssl": "To accelerate private key generation."
     },
