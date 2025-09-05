@@ -69,7 +69,9 @@ jobs:
                     - e2e_reproducible_build
                 php: [ '8.2', '8.3', '8.4' ]
                 tools:
-                    - 'composer:2.8'
+                    - 'composer:2.2'
+                    - 'composer:2.3'
+                    - 'composer:2.4'
                     - 'composer'
         steps:
             -   name: Checkout
@@ -93,13 +95,12 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@v10
+                uses: dawidd6/action-download-artifact@v9
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
                     check_artifacts: true
                     name: box-phar
-                    allow_forks: true
 
             # The original target is for the publishing, which is different from the internal name used.
             -   name: Ensure the make target is up to date
@@ -149,13 +150,12 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@v10
+                uses: dawidd6/action-download-artifact@v9
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
                     check_artifacts: true
                     name: box-phar
-                    allow_forks: true
 
             # The original target is for the publishing, which is different from the internal name used.
             -   name: Ensure the make target is up to date
