@@ -1074,6 +1074,6 @@ The short commit hash will only be used if no tag is available.
 [the signing best practices]: ./phar-signing.md#phar-signing-best-practices
 [stub-stub]: #stub-stub
 [stub]: #stub
-[symfony-finder]: https://symfony.com/doc/current//components/finder.html
+[symfony-finder]: https://symfony.com/doc/current/components/finder.html
 [zlib-extension]: https://secure.php.net/manual/en/book.zlib.php
 [#1152]: https://github.com/box-project/box/issues/1152
