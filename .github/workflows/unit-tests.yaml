@@ -57,9 +57,23 @@ jobs:
                         tools: composer
                         phar-readonly: false
                         php-extra-extensions: ', :bz2'
+                exclude:
+                    -   php:
+                            version: '8.4'
+                            dependency: highest
+                        tools: 'composer:2.2'
+                    -   php:
+                            version: '8.4'
+                            dependency: highest
+                        tools: 'composer:2.3'
+                    -   php:
+                            version: '8.4'
+                            dependency: highest
+                        tools: 'composer:2.4'
+
         steps:
             -   name: Checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
                 with:
                     fetch-depth: 0
 
@@ -93,11 +107,11 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php: [ '8.2' ]
+                php: [ '8.4' ]
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         steps:
             -   name: Checkout
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
                 with:
                     fetch-depth: 0
 

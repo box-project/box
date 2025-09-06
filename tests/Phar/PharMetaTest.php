@@ -20,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use function rtrim;
 use function Safe\file_get_contents;
+use const PHP_VERSION_ID;
 
 /**
  * @internal
@@ -408,7 +409,9 @@ final class PharMetaTest extends TestCase
                     null,
                     null,
                     null,
-                    1_680_284_660,
+                    self::isPHP84OrHigher()
+                        ? 1_680_284_661
+                        : 1_680_284_660,
                     null,
                     [
                         'sample.txt' => [
@@ -521,5 +524,10 @@ final class PharMetaTest extends TestCase
             file_get_contents($path),
             "\n",
         );
+    }
+
+    private static function isPHP84OrHigher(): bool
+    {
+        return PHP_VERSION_ID >= 8_04_00;
     }
 }
