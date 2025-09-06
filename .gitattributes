@@ -2,7 +2,6 @@
 /dist/ export-ignore
 /fixtures/ export-ignore
 /requirement-checker/ export-ignore
-/res/ export-ignore
 /tests/ export-ignore
 /vendor-bin/ export-ignore
 /composer.lock export-ignore
