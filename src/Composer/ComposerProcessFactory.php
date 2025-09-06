@@ -20,6 +20,7 @@ use KevinGH\Box\Constants;
 use RuntimeException;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
+use const PHP_OS_FAMILY;
 
 /**
  * @final
@@ -153,12 +154,22 @@ class ComposerProcessFactory
     private static function retrieveComposerExecutable(): string
     {
         $executableFinder = new ExecutableFinder();
-        $executableFinder->addSuffix('.phar');
+
+        if (self::isWindows()) {
+            $executableFinder->setSuffixes(['.exe', '.bat', '.cmd', '.com']);
+        } else {
+            $executableFinder->addSuffix('.phar');
+        }
 
         if (null === $composer = $executableFinder->find('composer')) {
             throw new RuntimeException('Could not find a Composer executable.');
         }
 
         return $composer;
+    }
+
+    private static function isWindows(): bool
+    {
+        return PHP_OS_FAMILY !== 'Windows';
     }
 }
