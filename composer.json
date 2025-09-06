@@ -33,7 +33,7 @@
         "phpdocumentor/reflection-docblock": "^5.4",
         "phpdocumentor/type-resolver": "^1.7",
         "psr/log": "^3.0",
-        "sebastian/diff": "^5.0",
+        "sebastian/diff": "^5.0 || ^6.0 || ^7.0",
         "seld/jsonlint": "^1.10.2",
         "seld/phar-utils": "^1.2",
         "symfony/finder": "^6.4.0 || ^7.0.0",
