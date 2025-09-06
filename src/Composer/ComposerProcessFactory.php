@@ -170,6 +170,6 @@ class ComposerProcessFactory
 
     private static function isWindows(): bool
     {
-        return PHP_OS_FAMILY !== 'Windows';
+        return PHP_OS_FAMILY === 'Windows';
     }
 }
