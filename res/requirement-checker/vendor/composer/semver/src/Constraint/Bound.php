@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox465\Composer\Semver\Constraint;
+namespace HumbugBox467\Composer\Semver\Constraint;
 
 class Bound
 {

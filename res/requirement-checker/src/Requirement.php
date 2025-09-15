@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox465\KevinGH\RequirementChecker;
+namespace HumbugBox467\KevinGH\RequirementChecker;
 
 final class Requirement
 {
