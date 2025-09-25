@@ -35,6 +35,7 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use Seld\PharUtils\Timestamps;
 use SplFileInfo;
+use Symfony\Component\Finder\Finder;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function array_unshift;
@@ -154,7 +155,12 @@ final class Box implements Countable
 
             chdir($cwd);
 
-            $this->phar->buildFromDirectory($tmp);
+            $sortedFiles = Finder::create()
+                ->files()
+                ->in($tmp)
+                ->sortByName();
+
+            $this->phar->buildFromIterator($sortedFiles->getIterator(), $tmp);
         } finally {
             FS::remove($tmp);
         }
