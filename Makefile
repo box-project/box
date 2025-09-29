@@ -319,10 +319,10 @@ test_e2e: e2e_scoper_alias \
 blackfire:		 ## Profiles the compile step
 blackfire: $(SCOPED_BOX_BIN)
 	# Profile compiling the PHAR from the source code
-	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d $(BOX) compile --sort-compiled-files ---quiet --no-parallel
+	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d $(BOX) compile ---quiet --no-parallel
 
 	# Profile compiling the PHAR from the PHAR
-	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d $(SCOPED_BOX) compile --sort-compiled-files --quiet --no-parallel
+	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d $(SCOPED_BOX) compile --quiet --no-parallel
 
 
 #
@@ -501,18 +501,18 @@ $(REQUIREMENT_CHECKER_EXTRACT):
 $(SCOPED_BOX_BIN): $(SCOPED_BOX_DEPS)
 	@echo "$(YELLOW_COLOR)Compile Box.$(NO_COLOR)"
 	@# Use parallelization
-	$(BOX) compile --sort-compiled-files --ansi
+	$(BOX) compile --ansi
 
 	rm $(TMP_SCOPED_BOX_BIN) || true
 	mv -v bin/box.phar $(TMP_SCOPED_BOX_BIN)
 
 	@echo "$(YELLOW_COLOR)Compile Box with the isolated Box PHAR.$(NO_COLOR)"
-	php $(TMP_SCOPED_BOX_BIN) compile --sort-compiled-files --ansi
+	php $(TMP_SCOPED_BOX_BIN) compile --ansi
 
 	mv -fv bin/box.phar box
 
 	@echo "$(YELLOW_COLOR)Test the PHAR which has been created by the isolated PHAR.$(NO_COLOR)"
-	./box compile --sort-compiled-files --ansi
+	./box compile --ansi
 
 	mv -fv box bin/box.phar
 	rm $(TMP_SCOPED_BOX_BIN)
