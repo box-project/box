@@ -73,6 +73,7 @@ final class Box implements Countable
         private Phar $phar,
         private readonly string $pharFilePath,
         private readonly bool $enableParallelization,
+        private readonly bool $sortCompiledFiles,
     ) {
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
@@ -94,6 +95,7 @@ final class Box implements Countable
         int $pharFlags = 0,
         ?string $pharAlias = null,
         bool $enableParallelization = false,
+        bool $sortCompiledFiles = false,
     ): self {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
@@ -103,6 +105,7 @@ final class Box implements Countable
             new Phar($pharFilePath, $pharFlags, $pharAlias),
             $pharFilePath,
             $enableParallelization,
+            $sortCompiledFiles,
         );
     }
 
@@ -138,7 +141,13 @@ final class Box implements Countable
         }
 
         try {
+            $files = [];
+
             foreach ($this->bufferedFiles as $file) {
+                if ($this->sortCompiledFiles) {
+                    $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
+                }
+
                 FS::dumpFile(
                     $file->getPath(),
                     $file->getContents(),
@@ -155,12 +164,19 @@ final class Box implements Countable
 
             chdir($cwd);
 
-            $sortedFiles = Finder::create()
-                ->files()
-                ->in($tmp)
-                ->sortByName();
+            if ($this->sortCompiledFiles) {
+                $unknownFiles = Finder::create()
+                    ->files()
+                    ->in($tmp)
+                    ->notPath(array_keys($files))
+                    ->sortByName();
 
-            $this->phar->buildFromIterator($sortedFiles->getIterator(), $tmp);
+                $files = [...$files, ...$unknownFiles];
+
+                $this->phar->buildFromIterator(new \ArrayIterator($files), $tmp);
+            } else {
+                $this->phar->buildFromDirectory($tmp);
+            }
         } finally {
             FS::remove($tmp);
         }
