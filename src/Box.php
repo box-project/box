@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\Parallel\Worker\TaskFailureThrowable;
+use ArrayIterator;
 use BadMethodCallException;
 use Countable;
 use DateTimeImmutable;
@@ -173,7 +174,7 @@ final class Box implements Countable
 
                 $files = [...$files, ...$unknownFiles];
 
-                $this->phar->buildFromIterator(new \ArrayIterator($files), $tmp);
+                $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
             } else {
                 $this->phar->buildFromDirectory($tmp);
             }
