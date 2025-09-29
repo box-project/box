@@ -208,6 +208,7 @@ final class CompileCommand implements CommandAware
         }
 
         $sortCompiledFiles = $io->getTypedOption(self::SORT_COMPILED_FILES)->asBoolean();
+        $sortCompiledFiles = true;
 
         ChangeWorkingDirOption::changeWorkingDirectory($io);
 

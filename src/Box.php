@@ -96,7 +96,7 @@ final class Box implements Countable
         int $pharFlags = 0,
         ?string $pharAlias = null,
         bool $enableParallelization = false,
-        bool $sortCompiledFiles = true,
+        bool $sortCompiledFiles = false,
     ): self {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
