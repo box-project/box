@@ -174,6 +174,13 @@ final class Box implements Countable
 
                 $files = [...$files, ...$unknownFiles];
 
+                uasort($files, function (string|SplFileInfo $a, string|SplFileInfo $b) {
+                    $a = is_string($a) ? $a : $a->getPath();
+                    $b = is_string($b) ? $b : $b->getPath();
+
+                    return strcmp($a, $b);
+                });
+
                 $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
             } else {
                 $this->phar->buildFromDirectory($tmp);
