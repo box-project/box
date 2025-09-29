@@ -319,7 +319,7 @@ test_e2e: e2e_scoper_alias \
 blackfire:		 ## Profiles the compile step
 blackfire: $(SCOPED_BOX_BIN)
 	# Profile compiling the PHAR from the source code
-	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d $(BOX) compile ---quiet --no-parallel
+	blackfire --reference=1 --samples=5 run $(PHPNOGC) -d $(BOX) compile --quiet --no-parallel
 
 	# Profile compiling the PHAR from the PHAR
 	blackfire --reference=2 --samples=5 run $(PHPNOGC) -d $(SCOPED_BOX) compile --quiet --no-parallel
