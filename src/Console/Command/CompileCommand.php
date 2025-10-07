@@ -209,6 +209,13 @@ final class CompileCommand implements CommandAware
 
         $sortCompiledFiles = $io->getTypedOption(self::SORT_COMPILED_FILES)->asBoolean();
 
+        if ($sortCompiledFiles) {
+            $io->writeln(
+                '<info>[debug] Enabled sorting compiled files</info>',
+                OutputInterface::VERBOSITY_DEBUG,
+            );
+        }
+
         ChangeWorkingDirOption::changeWorkingDirectory($io);
 
         $io->writeln($this->header);
