@@ -89,10 +89,8 @@ final class Box implements Countable
      * Creates a new PHAR and Box instance.
      *
      * @param string $pharFilePath The PHAR file name
-     * @param int    $pharFlags    Flags to pass to the Phar parent class
-     *                             RecursiveDirectoryIterator
-     * @param string $pharAlias    Alias with which the Phar archive should be referred to in calls
-     *                             to stream functionality
+     * @param int    $pharFlags    Flags to pass to the Phar parent class RecursiveDirectoryIterator
+     * @param string $pharAlias    Alias with which the Phar archive should be referred to in calls to stream functionality
      *
      * @see RecursiveDirectoryIterator
      */
