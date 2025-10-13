@@ -156,8 +156,6 @@ final class Box implements Countable
                 $this->scoper->getExcludedFilePaths(),
             );
 
-            chdir($cwd);
-
             $unknownFiles = Finder::create()
                 ->files()
                 ->in($tmp)
@@ -176,6 +174,8 @@ final class Box implements Countable
             $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
         } finally {
             FS::remove($tmp);
+            // Must happen _after_ the remove as the latter has higher priority.
+            chdir($cwd);
         }
 
         $this->buffering = false;
