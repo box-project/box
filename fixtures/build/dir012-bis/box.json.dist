@@ -1,0 +1,13 @@
+{
+    "files-bin": [
+        ".env.local.php",
+        "src/Controller/.gitignore"
+    ],
+    "directories": [
+        "config",
+        "var"
+    ],
+    "force-autodiscovery": true,
+    "check-requirements": false,
+    "exclude-composer-files": false
+}
