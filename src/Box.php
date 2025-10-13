@@ -124,6 +124,7 @@ final class Box implements Countable
     }
 
     /**
+     * TODO: replace callable by Closure.
      * @param callable(SymbolsRegistry, string, string[]): void $dumpAutoload
      */
     public function endBuffering(?callable $dumpAutoload): void

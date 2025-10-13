@@ -324,7 +324,7 @@ class ValidateCommandTest extends CommandTestCase
         $this->assertSameOutput(
             $expected,
             ExitCode::FAILURE,
-            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
+            DisplayNormalizer::normalizeLoadingFilePathOutput(...),
         );
     }
 
@@ -384,7 +384,7 @@ class ValidateCommandTest extends CommandTestCase
         $this->assertSameOutput(
             $expected,
             ExitCode::FAILURE,
-            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
+            DisplayNormalizer::normalizeLoadingFilePathOutput(...),
         );
     }
 

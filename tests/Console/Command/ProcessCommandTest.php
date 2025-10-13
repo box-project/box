@@ -268,8 +268,8 @@ class ProcessCommandTest extends CommandTestCase
         parent::assertSameOutput(
             $expectedOutput,
             $expectedStatusCode,
-            DisplayNormalizer::createVarDumperObjectReferenceNormalizer(),
-            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
+            DisplayNormalizer::normalizeVarDumperObjectReference(...),
+            DisplayNormalizer::normalizeLoadingFilePathOutput(...),
             ...$extraNormalizers,
         );
     }
