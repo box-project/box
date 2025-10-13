@@ -35,8 +35,8 @@ use Phar;
 use RecursiveDirectoryIterator;
 use RuntimeException;
 use Seld\PharUtils\Timestamps;
-use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function array_unshift;
@@ -46,11 +46,15 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use function iter\fromPairs;
+use function iter\map;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
 use function sprintf;
+use function strcmp;
 use function strval;
+use function uksort;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -156,19 +160,22 @@ final class Box implements Countable
                 $this->scoper->getExcludedFilePaths(),
             );
 
-            $unknownFiles = Finder::create()
-                ->files()
-                ->in($tmp)
-                ->notPath(array_keys($files));
+            $unknownFiles = fromPairs(
+                map(
+                    static fn (SplFileInfo $fileInfo) => [
+                        $fileInfo->getRelativePathname(),
+                        $fileInfo->getPathname(),
+                    ],
+                    Finder::create()
+                        ->files()
+                        ->in($tmp)
+                        ->notPath(array_keys($files)),
+                ),
+            );
 
             $files = [...$files, ...$unknownFiles];
 
-            uasort($files, static function (SplFileInfo|string $a, SplFileInfo|string $b) {
-                $a = is_string($a) ? $a : $a->getPath();
-                $b = is_string($b) ? $b : $b->getPath();
-
-                return strcmp($a, $b);
-            });
+            uksort($files, strcmp(...));
 
             $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
         } finally {
