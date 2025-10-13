@@ -308,12 +308,14 @@ test_e2e: e2e_scoper_alias \
 	e2e_php_settings_checker_memory_limit_lower \
 	e2e_php_settings_checker_memory_limit_higher \
 	e2e_symfony6 \
+	e2e_symfony7 \
 	e2e_composer_installed_versions \
 	e2e_phpstorm_stubs \
 	e2e_dockerfile \
 	e2e_dockerfile_no_extension \
 	e2e_custom_composer_bin \
 	e2e_symfony6_runtime \
+	e2e_symfony7_runtime \
 	e2e_reproducible_build
 
 
