@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 use Amp\Parallel\Worker\TaskFailureThrowable;
 use ArrayIterator;
 use BadMethodCallException;
+use Closure;
 use Countable;
 use DateTimeImmutable;
 use Fidry\FileSystem\FS;
@@ -127,7 +128,7 @@ final class Box implements Countable
     {
         Assert::true($this->buffering, 'The buffering must be started before ending it');
 
-        $dumpAutoload ??= static fn () => null;
+        $completeDumpAutoload = self::createDumpAutoload($dumpAutoload);
         $cwd = getcwd();
 
         $tmp = FS::makeTmpDir('box', self::class);
@@ -156,11 +157,7 @@ final class Box implements Countable
                 );
             }
 
-            $dumpAutoload(
-                $this->scoper->getSymbolsRegistry(),
-                $this->scoper->getPrefix(),
-                $this->scoper->getExcludedFilePaths(),
-            );
+            $completeDumpAutoload();
 
             $unknownFiles = fromPairs(
                 map(
@@ -189,6 +186,22 @@ final class Box implements Countable
         $this->buffering = false;
 
         $this->phar->stopBuffering();
+    }
+
+    /**
+     * @param null|(callable(SymbolsRegistry, string, string[]): void) $dumpAutoload
+     *
+     * @return Closure():void
+     */
+    private function createDumpAutoload(?callable $dumpAutoload): Closure
+    {
+        return null === $dumpAutoload
+            ? static fn () => null
+            : fn () => $dumpAutoload(
+                $this->scoper->getSymbolsRegistry(),
+                $this->scoper->getPrefix(),
+                $this->scoper->getExcludedFilePaths(),
+            );
     }
 
     /**
