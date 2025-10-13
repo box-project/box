@@ -17,6 +17,7 @@ namespace KevinGH\Box;
 use Amp\Parallel\Worker\TaskFailureThrowable;
 use ArrayIterator;
 use BadMethodCallException;
+use Closure;
 use Countable;
 use DateTimeImmutable;
 use Fidry\FileSystem\FS;
@@ -37,7 +38,9 @@ use RuntimeException;
 use Seld\PharUtils\Timestamps;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use Traversable;
 use Webmozart\Assert\Assert;
+use function array_keys;
 use function array_map;
 use function array_unshift;
 use function chdir;
@@ -46,6 +49,7 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use function iter\map;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
@@ -85,8 +89,10 @@ final class Box implements Countable
      * Creates a new PHAR and Box instance.
      *
      * @param string $pharFilePath The PHAR file name
-     * @param int    $pharFlags    Flags to pass to the Phar parent class RecursiveDirectoryIterator
-     * @param string $pharAlias    Alias with which the Phar archive should be referred to in calls to stream functionality
+     * @param int    $pharFlags    Flags to pass to the Phar parent class
+     *                             RecursiveDirectoryIterator
+     * @param string $pharAlias    Alias with which the Phar archive should be referred to in calls
+     *                             to stream functionality
      *
      * @see RecursiveDirectoryIterator
      */
@@ -123,7 +129,7 @@ final class Box implements Countable
     {
         Assert::true($this->buffering, 'The buffering must be started before ending it');
 
-        $dumpAutoload ??= static fn () => null;
+        $completeDumpAutoload = self::createDumpAutoload($dumpAutoload);
         $cwd = getcwd();
 
         $tmp = FS::makeTmpDir('box', self::class);
@@ -139,39 +145,18 @@ final class Box implements Countable
         }
 
         try {
-            $files = [];
+            $bufferedFiles = $this->dumpBufferedFiles($tmp);
 
-            foreach ($this->bufferedFiles as $file) {
-                $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
+            $completeDumpAutoload();
 
-                FS::dumpFile(
-                    $file->getPath(),
-                    $file->getContents(),
-                );
-            }
-
-            $dumpAutoload(
-                $this->scoper->getSymbolsRegistry(),
-                $this->scoper->getPrefix(),
-                $this->scoper->getExcludedFilePaths(),
+            $remainingFiles = self::collectRemainingFiles(
+                $tmp,
+                array_keys($bufferedFiles),
             );
 
-            $unknownFiles = Finder::create()
-                ->files()
-                ->in($tmp)
-                ->notPath(array_keys($files))
-                ->sortByName();
+            $iterator = self::createFileSortedIterator($bufferedFiles, $remainingFiles);
 
-            $files = [...$files, ...$unknownFiles];
-
-            uasort($files, static function (SplFileInfo|string $a, SplFileInfo|string $b) {
-                $a = is_string($a) ? $a : $a->getPath();
-                $b = is_string($b) ? $b : $b->getPath();
-
-                return strcmp($a, $b);
-            });
-
-            $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
+            $this->phar->buildFromIterator($iterator, $tmp);
         } finally {
             FS::remove($tmp);
             // Must happen _after_ the remove as the latter has higher priority.
@@ -184,7 +169,83 @@ final class Box implements Countable
     }
 
     /**
-     * @param non-empty-string $normalizedVendorDir Normalized path ("/" path separator and no trailing "/") to the Composer vendor directory
+     * @param null|callable(SymbolsRegistry, string, string[]):void $dumpAutoload
+     */
+    private function createDumpAutoload(?callable $dumpAutoload): Closure
+    {
+        return null === $dumpAutoload
+            ? static fn () => null
+            : fn() => $dumpAutoload(
+                $this->scoper->getSymbolsRegistry(),
+                $this->scoper->getPrefix(),
+                $this->scoper->getExcludedFilePaths(),
+            );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function dumpBufferedFiles(string $tmp): array
+    {
+        $files = [];
+        $bufferedFiles = $this->bufferedFiles;
+        $this->bufferedFiles = [];
+
+        foreach ($bufferedFiles as $file) {
+            $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
+
+            FS::dumpFile(
+                $file->getPath(),
+                $file->getContents(),
+            );
+        }
+
+        return $files;
+    }
+
+    /**
+     * @param list<string> $bufferedFileNames
+     *
+     * @return iterable<string, string>
+     */
+    private static function collectRemainingFiles(
+        string $tmp,
+        array $bufferedFileNames,
+    ): iterable
+    {
+        // TODO: extract the map
+        return map(
+            // TODO: maybe having the relative pathname would make more sense to be consistent
+            static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
+            Finder::create()
+                ->files()
+                ->in($tmp)
+                ->notPath($bufferedFileNames),
+            // TODO: extract the sortName() removal
+        );
+    }
+
+    /**
+     * @param array<string, string> $bufferedFiles
+     * @param array<string, string> $remainingFiles
+     *
+     * @return Traversable
+     */
+    private static function createFileSortedIterator(
+        array $bufferedFiles,
+        array $remainingFiles
+    ): Traversable
+    {
+        $files = [...$bufferedFiles, ...$remainingFiles];
+        uasort($files, strcmp(...));
+
+        // TODO: is ArrayIterator necessary? Can't it be just a Traversable i.e. the current array?
+        return new ArrayIterator($files);
+    }
+
+    /**
+     * @param non-empty-string $normalizedVendorDir Normalized path ("/" path separator and no
+     *                                              trailing "/") to the Composer vendor directory
      */
     public function removeComposerArtifacts(string $normalizedVendorDir): void
     {
