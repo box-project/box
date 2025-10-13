@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace KevinGH\Box;
 
 use Amp\Parallel\Worker\TaskFailureThrowable;
+use ArrayIterator;
 use BadMethodCallException;
 use Countable;
 use DateTimeImmutable;
@@ -35,6 +36,7 @@ use RecursiveDirectoryIterator;
 use RuntimeException;
 use Seld\PharUtils\Timestamps;
 use SplFileInfo;
+use Symfony\Component\Finder\Finder;
 use Webmozart\Assert\Assert;
 use function array_map;
 use function array_unshift;
@@ -137,7 +139,11 @@ final class Box implements Countable
         }
 
         try {
+            $files = [];
+
             foreach ($this->bufferedFiles as $file) {
+                $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
+
                 FS::dumpFile(
                     $file->getPath(),
                     $file->getContents(),
@@ -154,7 +160,22 @@ final class Box implements Countable
 
             chdir($cwd);
 
-            $this->phar->buildFromDirectory($tmp);
+            $unknownFiles = Finder::create()
+                ->files()
+                ->in($tmp)
+                ->notPath(array_keys($files))
+                ->sortByName();
+
+            $files = [...$files, ...$unknownFiles];
+
+            uasort($files, static function (SplFileInfo|string $a, SplFileInfo|string $b) {
+                $a = is_string($a) ? $a : $a->getPath();
+                $b = is_string($b) ? $b : $b->getPath();
+
+                return strcmp($a, $b);
+            });
+
+            $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
         } finally {
             FS::remove($tmp);
         }
