@@ -223,13 +223,13 @@ final class Box implements Countable
 
     /**
      * @param array<string, string> $bufferedFiles
-     * @param array<string, string> $remainingFiles
+     * @param iterable<string, string> $remainingFiles
      *
      * @return Traversable<string, string>
      */
     private static function createFileSortedIterator(
         array $bufferedFiles,
-        array $remainingFiles
+        iterable $remainingFiles
     ): Traversable {
         $files = [...$bufferedFiles, ...$remainingFiles];
         uasort($files, strcmp(...));
