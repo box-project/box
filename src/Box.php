@@ -74,7 +74,6 @@ final class Box implements Countable
         private Phar $phar,
         private readonly string $pharFilePath,
         private readonly bool $enableParallelization,
-        private readonly bool $sortCompiledFiles,
     ) {
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
@@ -96,7 +95,6 @@ final class Box implements Countable
         int $pharFlags = 0,
         ?string $pharAlias = null,
         bool $enableParallelization = false,
-        bool $sortCompiledFiles = false,
     ): self {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
@@ -106,7 +104,6 @@ final class Box implements Countable
             new Phar($pharFilePath, $pharFlags, $pharAlias),
             $pharFilePath,
             $enableParallelization,
-            $sortCompiledFiles,
         );
     }
 
@@ -145,9 +142,7 @@ final class Box implements Countable
             $files = [];
 
             foreach ($this->bufferedFiles as $file) {
-                if ($this->sortCompiledFiles) {
-                    $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
-                }
+                $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
 
                 FS::dumpFile(
                     $file->getPath(),
@@ -165,26 +160,22 @@ final class Box implements Countable
 
             chdir($cwd);
 
-            if ($this->sortCompiledFiles) {
-                $unknownFiles = Finder::create()
-                    ->files()
-                    ->in($tmp)
-                    ->notPath(array_keys($files))
-                    ->sortByName();
+            $unknownFiles = Finder::create()
+                ->files()
+                ->in($tmp)
+                ->notPath(array_keys($files))
+                ->sortByName();
 
-                $files = [...$files, ...$unknownFiles];
+            $files = [...$files, ...$unknownFiles];
 
-                uasort($files, static function (SplFileInfo|string $a, SplFileInfo|string $b) {
-                    $a = is_string($a) ? $a : $a->getPath();
-                    $b = is_string($b) ? $b : $b->getPath();
+            uasort($files, static function (SplFileInfo|string $a, SplFileInfo|string $b) {
+                $a = is_string($a) ? $a : $a->getPath();
+                $b = is_string($b) ? $b : $b->getPath();
 
-                    return strcmp($a, $b);
-                });
+                return strcmp($a, $b);
+            });
 
-                $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
-            } else {
-                $this->phar->buildFromDirectory($tmp);
-            }
+            $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
         } finally {
             FS::remove($tmp);
         }

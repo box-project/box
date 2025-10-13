@@ -100,7 +100,6 @@ final class CompileCommand implements CommandAware
 
     private const DEBUG_OPTION = 'debug';
     private const NO_PARALLEL_PROCESSING_OPTION = 'no-parallel';
-    private const SORT_COMPILED_FILES = 'sort-compiled-files';
     private const NO_RESTART_OPTION = 'no-restart';
     private const DEV_OPTION = 'dev';
     private const NO_CONFIG_OPTION = 'no-config';
@@ -135,12 +134,6 @@ final class CompileCommand implements CommandAware
                     null,
                     InputOption::VALUE_NONE,
                     'Disable the parallel processing',
-                ),
-                new InputOption(
-                    self::SORT_COMPILED_FILES,
-                    null,
-                    InputOption::VALUE_NONE,
-                    'Sort compiled files',
                 ),
                 new InputOption(
                     self::NO_RESTART_OPTION,
@@ -207,15 +200,6 @@ final class CompileCommand implements CommandAware
             );
         }
 
-        $sortCompiledFiles = $io->getTypedOption(self::SORT_COMPILED_FILES)->asBoolean();
-
-        if ($sortCompiledFiles) {
-            $io->writeln(
-                '<info>[debug] Enabled sorting compiled files</info>',
-                OutputInterface::VERBOSITY_DEBUG,
-            );
-        }
-
         ChangeWorkingDirOption::changeWorkingDirectory($io);
 
         $io->writeln($this->header);
@@ -240,7 +224,7 @@ final class CompileCommand implements CommandAware
         $restoreLimit = OpenFileDescriptorLimiter::bumpLimit(2048, $io);
 
         try {
-            $box = $this->createPhar($config, $logger, $io, !$disableParallelization, $sortCompiledFiles, $debug);
+            $box = $this->createPhar($config, $logger, $io, !$disableParallelization, $debug);
         } finally {
             $restoreLimit();
         }
@@ -261,11 +245,10 @@ final class CompileCommand implements CommandAware
         CompilerLogger $logger,
         IO $io,
         bool $enableParallelization,
-        bool $sortCompiledFiles,
         bool $debug,
     ): Box {
         $tmpOutputPath = $config->getTmpOutputPath();
-        $box = Box::create($tmpOutputPath, enableParallelization: $enableParallelization, sortCompiledFiles: $sortCompiledFiles);
+        $box = Box::create($tmpOutputPath, enableParallelization: $enableParallelization);
         $composerOrchestrator = new ComposerOrchestrator(
             ComposerProcessFactory::create(
                 $config->getComposerBin(),
