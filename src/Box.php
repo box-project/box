@@ -167,13 +167,15 @@ final class Box implements Countable
     }
 
     /**
-     * @param null|callable(SymbolsRegistry, string, string[]):void $dumpAutoload
+     * @param null|(callable(SymbolsRegistry, string, string[]): void) $dumpAutoload
+     *
+     * @return Closure():void
      */
     private function createDumpAutoload(?callable $dumpAutoload): Closure
     {
         return null === $dumpAutoload
             ? static fn () => null
-            : fn() => $dumpAutoload(
+            : fn () => $dumpAutoload(
                 $this->scoper->getSymbolsRegistry(),
                 $this->scoper->getPrefix(),
                 $this->scoper->getExcludedFilePaths(),
@@ -209,17 +211,13 @@ final class Box implements Countable
     private static function collectRemainingFiles(
         string $tmp,
         array $bufferedFileNames,
-    ): iterable
-    {
-        // TODO: extract the map
+    ): iterable {
         return map(
-            // TODO: maybe having the relative pathname would make more sense to be consistent
-            static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
+            static fn (SplFileInfo $fileInfo) => $fileInfo->getPath(),
             Finder::create()
                 ->files()
                 ->in($tmp)
                 ->notPath($bufferedFileNames),
-            // TODO: extract the sortName() removal
         );
     }
 
@@ -227,23 +225,20 @@ final class Box implements Countable
      * @param array<string, string> $bufferedFiles
      * @param array<string, string> $remainingFiles
      *
-     * @return Traversable
+     * @return Traversable<string, string>
      */
     private static function createFileSortedIterator(
         array $bufferedFiles,
         array $remainingFiles
-    ): Traversable
-    {
+    ): Traversable {
         $files = [...$bufferedFiles, ...$remainingFiles];
         uasort($files, strcmp(...));
 
-        // TODO: is ArrayIterator necessary? Can't it be just a Traversable i.e. the current array?
         return new ArrayIterator($files);
     }
 
     /**
-     * @param non-empty-string $normalizedVendorDir Normalized path ("/" path separator and no
-     *                                              trailing "/") to the Composer vendor directory
+     * @param non-empty-string $normalizedVendorDir Normalized path ("/" path separator and no trailing "/") to the Composer vendor directory
      */
     public function removeComposerArtifacts(string $normalizedVendorDir): void
     {
