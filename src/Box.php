@@ -140,8 +140,10 @@ final class Box implements Countable
 
         try {
             $files = [];
+            $bufferedFiles = $this->bufferedFiles;
+            $this->bufferedFiles = [];
 
-            foreach ($this->bufferedFiles as $file) {
+            foreach ($bufferedFiles as $file) {
                 $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
 
                 FS::dumpFile(
