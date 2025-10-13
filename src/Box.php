@@ -38,7 +38,9 @@ use RuntimeException;
 use Seld\PharUtils\Timestamps;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Traversable;
 use Webmozart\Assert\Assert;
+use function array_keys;
 use function array_map;
 use function array_unshift;
 use function chdir;
@@ -144,39 +146,18 @@ final class Box implements Countable
         }
 
         try {
-            $files = [];
-            $bufferedFiles = $this->bufferedFiles;
-            $this->bufferedFiles = [];
-
-            foreach ($bufferedFiles as $file) {
-                $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
-
-                FS::dumpFile(
-                    $file->getPath(),
-                    $file->getContents(),
-                );
-            }
+            $bufferedFiles = $this->dumpBufferedFiles($tmp);
 
             $completeDumpAutoload();
 
-            $unknownFiles = fromPairs(
-                map(
-                    static fn (SplFileInfo $fileInfo) => [
-                        $fileInfo->getRelativePathname(),
-                        $fileInfo->getPathname(),
-                    ],
-                    Finder::create()
-                        ->files()
-                        ->in($tmp)
-                        ->notPath(array_keys($files)),
-                ),
+            $remainingFiles = self::collectRemainingFiles(
+                $tmp,
+                array_keys($bufferedFiles),
             );
 
-            $files = [...$files, ...$unknownFiles];
+            $iterator = self::createFileSortedIterator($bufferedFiles, $remainingFiles);
 
-            uksort($files, strcmp(...));
-
-            $this->phar->buildFromIterator(new ArrayIterator($files), $tmp);
+            $this->phar->buildFromIterator($iterator, $tmp);
         } finally {
             FS::remove($tmp);
             // Must happen _after_ the remove as the latter has higher priority.
@@ -202,6 +183,66 @@ final class Box implements Countable
                 $this->scoper->getPrefix(),
                 $this->scoper->getExcludedFilePaths(),
             );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function dumpBufferedFiles(string $tmp): array
+    {
+        $files = [];
+        $bufferedFiles = $this->bufferedFiles;
+        $this->bufferedFiles = [];
+
+        foreach ($bufferedFiles as $file) {
+            $files[$file->getPath()] = $tmp.DIRECTORY_SEPARATOR.$file->getPath();
+
+            FS::dumpFile(
+                $file->getPath(),
+                $file->getContents(),
+            );
+        }
+
+        return $files;
+    }
+
+    /**
+     * @param list<string> $bufferedFileNames
+     *
+     * @return iterable<string, string>
+     */
+    private static function collectRemainingFiles(
+        string $tmp,
+        array $bufferedFileNames,
+    ): iterable {
+        return fromPairs(
+            map(
+                static fn (SplFileInfo $fileInfo) => [
+                    $fileInfo->getRelativePathname(),
+                    $fileInfo->getPathname(),
+                ],
+                Finder::create()
+                    ->files()
+                    ->in($tmp)
+                    ->notPath($bufferedFileNames),
+            ),
+        );
+    }
+
+    /**
+     * @param array<string, string>    $bufferedFiles
+     * @param iterable<string, string> $remainingFiles
+     *
+     * @return Traversable<string, string>
+     */
+    private static function createFileSortedIterator(
+        array $bufferedFiles,
+        iterable $remainingFiles
+    ): Traversable {
+        $files = [...$bufferedFiles, ...$remainingFiles];
+        uksort($files, strcmp(...));
+
+        return new ArrayIterator($files);
     }
 
     /**
