@@ -159,8 +159,7 @@ final class Box implements Countable
             $unknownFiles = Finder::create()
                 ->files()
                 ->in($tmp)
-                ->notPath(array_keys($files))
-                ->sortByName();
+                ->notPath(array_keys($files));
 
             $files = [...$files, ...$unknownFiles];
 
