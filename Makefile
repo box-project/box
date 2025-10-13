@@ -96,8 +96,10 @@ clean:
 		fixtures/build/dir010/index.phar \
 		fixtures/build/dir012/bin/console.phar \
 		$(E2E_PHP_SETTINGS_CHECKER_DIR)/index.phar \
-		$(E2E_SYMFONY_DIR)/var \
-		$(E2E_SYMFONY_DIR)/.env.local.php \
+		$(E2E_symfony6_DIR)/var \
+		$(E2E_symfony6_DIR)/.env.local.php \
+		$(E2E_symfony6_RUNTIME_DIR)/var \
+		$(E2E_symfony6_RUNTIME_DIR)/.env.local.php \
 		$(DEFAULT_STUB) \
 		fixtures/composer-dump/*/vendor \
 		 || true
@@ -305,13 +307,13 @@ test_e2e: e2e_scoper_alias \
 	e2e_php_settings_checker_readonly_enabled \
 	e2e_php_settings_checker_memory_limit_lower \
 	e2e_php_settings_checker_memory_limit_higher \
-	e2e_symfony \
+	e2e_symfony6 \
 	e2e_composer_installed_versions \
 	e2e_phpstorm_stubs \
 	e2e_dockerfile \
 	e2e_dockerfile_no_extension \
 	e2e_custom_composer_bin \
-	e2e_symfony_runtime \
+	e2e_symfony_runtime64 \
 	e2e_reproducible_build
 
 
