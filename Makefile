@@ -313,7 +313,7 @@ test_e2e: e2e_scoper_alias \
 	e2e_dockerfile \
 	e2e_dockerfile_no_extension \
 	e2e_custom_composer_bin \
-	e2e_symfony_runtime64 \
+	e2e_symfony6_runtime \
 	e2e_reproducible_build
 
 
