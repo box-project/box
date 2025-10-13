@@ -222,7 +222,7 @@ final class Box implements Countable
     }
 
     /**
-     * @param array<string, string> $bufferedFiles
+     * @param array<string, string>    $bufferedFiles
      * @param iterable<string, string> $remainingFiles
      *
      * @return Traversable<string, string>
