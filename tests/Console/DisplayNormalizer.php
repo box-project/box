@@ -52,7 +52,7 @@ final class DisplayNormalizer
     public static function createVarDumperObjectReferenceNormalizer(): callable
     {
         return static fn ($output) => preg_replace(
-            '/ \{#\d{3,}/',
+            '/ \{#\d+/',
             ' {#140',
             $output,
         );

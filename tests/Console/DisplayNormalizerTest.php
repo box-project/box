@@ -83,4 +83,72 @@ final class DisplayNormalizerTest extends TestCase
                 EOF,
         ];
     }
+
+    #[DataProvider('varDumperObjectReferenceProvider')]
+    public static function test_it_can_normalize_an_object_reference_from_the_var_dumper(
+        string $value,
+        ?string $expected,
+    ): void {
+        $expected ??= $value;
+
+        $actual = DisplayNormalizer::createVarDumperObjectReferenceNormalizer()($value);
+
+        self::assertSame($expected, $actual);
+    }
+
+    public static function varDumperObjectReferenceProvider(): iterable
+    {
+        $unchanged = null;
+
+        yield '3 digits' => [
+            <<<'EOF'
+                Humbug\\PhpScoper\\Symbol\\SymbolsRegistry {#500
+                  -recordedFunctions: []
+                  -recordedClasses: []
+                }
+
+                EOF,
+            <<<'EOF'
+                Humbug\\PhpScoper\\Symbol\\SymbolsRegistry {#140
+                  -recordedFunctions: []
+                  -recordedClasses: []
+                }
+
+                EOF,
+        ];
+
+        yield '2 digits' => [
+            <<<'EOF'
+                Humbug\\PhpScoper\\Symbol\\SymbolsRegistry {#50
+                  -recordedFunctions: []
+                  -recordedClasses: []
+                }
+
+                EOF,
+            <<<'EOF'
+                Humbug\\PhpScoper\\Symbol\\SymbolsRegistry {#140
+                  -recordedFunctions: []
+                  -recordedClasses: []
+                }
+
+                EOF,
+        ];
+
+        yield '1 digit' => [
+            <<<'EOF'
+                Humbug\\PhpScoper\\Symbol\\SymbolsRegistry {#5
+                  -recordedFunctions: []
+                  -recordedClasses: []
+                }
+
+                EOF,
+            <<<'EOF'
+                Humbug\\PhpScoper\\Symbol\\SymbolsRegistry {#140
+                  -recordedFunctions: []
+                  -recordedClasses: []
+                }
+
+                EOF,
+        ];
+    }
 }
