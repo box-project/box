@@ -150,13 +150,11 @@ final class Box implements Countable
                 );
             }
 
-            if (null !== $dumpAutoload) {
-                $dumpAutoload(
-                    $this->scoper->getSymbolsRegistry(),
-                    $this->scoper->getPrefix(),
-                    $this->scoper->getExcludedFilePaths(),
-                );
-            }
+            $dumpAutoload(
+                $this->scoper->getSymbolsRegistry(),
+                $this->scoper->getPrefix(),
+                $this->scoper->getExcludedFilePaths(),
+            );
 
             chdir($cwd);
 
