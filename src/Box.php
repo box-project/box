@@ -224,7 +224,7 @@ final class Box implements Countable
                 Finder::create()
                     ->files()
                     ->in($tmp)
-                    ->notPath(array_keys($bufferedFileNames)),
+                    ->notPath($bufferedFileNames),
             ),
         );
     }
