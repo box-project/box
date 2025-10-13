@@ -47,24 +47,24 @@ E2E_PHP_SETTINGS_CHECKER_EXPECTED_STDERR_MEMORY_LIMIT_HIGHER = $(E2E_PHP_SETTING
 E2E_PHP_SETTINGS_CHECKER_ACTUAL_STDOUT_MEMORY_LIMIT_HIGHER = $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)/actual-stdout-memory-limit-higher
 E2E_PHP_SETTINGS_CHECKER_ACTUAL_STDERR_MEMORY_LIMIT_HIGHER = $(E2E_PHP_SETTINGS_CHECKER_OUTPUT_DIR)/actual-stderr-memory-limit-higher
 
-E2E_symfony6_DIR = fixtures/build/dir012
-E2E_symfony6_OUTPUT_DIR = dist/dir012
-E2E_symfony6_TMP_PHAR := $(E2E_symfony6_DIR)/bin/console.phar
-E2E_symfony6_PHAR := $(E2E_symfony6_OUTPUT_DIR)/console.phar
-E2E_symfony6_EXPECTED_STDOUT := $(E2E_symfony6_OUTPUT_DIR)/expected-stdout
-E2E_symfony6_EXPECTED_STDERR := $(E2E_symfony6_OUTPUT_DIR)/expected-stderr
-E2E_symfony6_ACTUAL_STDOUT := $(E2E_symfony6_OUTPUT_DIR)/actual-stdout
-E2E_symfony6_ACTUAL_STDERR := $(E2E_symfony6_OUTPUT_DIR)/actual-stderr
+E2E_SYMFONY6_DIR = fixtures/build/dir012
+E2E_SYMFONY6_OUTPUT_DIR = dist/dir012
+E2E_SYMFONY6_TMP_PHAR := $(E2E_SYMFONY6_DIR)/bin/console.phar
+E2E_SYMFONY6_PHAR := $(E2E_SYMFONY6_OUTPUT_DIR)/console.phar
+E2E_SYMFONY6_EXPECTED_STDOUT := $(E2E_SYMFONY6_OUTPUT_DIR)/expected-stdout
+E2E_SYMFONY6_EXPECTED_STDERR := $(E2E_SYMFONY6_OUTPUT_DIR)/expected-stderr
+E2E_SYMFONY6_ACTUAL_STDOUT := $(E2E_SYMFONY6_OUTPUT_DIR)/actual-stdout
+E2E_SYMFONY6_ACTUAL_STDERR := $(E2E_SYMFONY6_OUTPUT_DIR)/actual-stderr
 
-E2E_symfony6_RUNTIME_DIR = fixtures/build/dir018
-E2E_symfony6_RUNTIME_OUTPUT_DIR = dist/dir018
-E2E_symfony6_RUNTIME_CONSOLE := $(E2E_symfony6_RUNTIME_DIR)/new-bin/console
-E2E_symfony6_RUNTIME_TMP_PHAR := $(E2E_symfony6_RUNTIME_DIR)/new-bin/console.phar
-E2E_symfony6_RUNTIME_PHAR := $(E2E_symfony6_RUNTIME_OUTPUT_DIR)/console.phar
-E2E_symfony6_RUNTIME_EXPECTED_STDOUT := $(E2E_symfony6_RUNTIME_OUTPUT_DIR)/expected-stdout
-E2E_symfony6_RUNTIME_EXPECTED_STDERR := $(E2E_symfony6_RUNTIME_OUTPUT_DIR)/expected-stderr
-E2E_symfony6_RUNTIME_ACTUAL_STDOUT := $(E2E_symfony6_RUNTIME_OUTPUT_DIR)/actual-stdout
-E2E_symfony6_RUNTIME_ACTUAL_STDERR := $(E2E_symfony6_RUNTIME_OUTPUT_DIR)/actual-stderr
+E2E_SYMFONY6_RUNTIME_DIR = fixtures/build/dir018
+E2E_SYMFONY6_RUNTIME_OUTPUT_DIR = dist/dir018
+E2E_SYMFONY6_RUNTIME_CONSOLE := $(E2E_SYMFONY6_RUNTIME_DIR)/new-bin/console
+E2E_SYMFONY6_RUNTIME_TMP_PHAR := $(E2E_SYMFONY6_RUNTIME_DIR)/new-bin/console.phar
+E2E_SYMFONY6_RUNTIME_PHAR := $(E2E_SYMFONY6_RUNTIME_OUTPUT_DIR)/console.phar
+E2E_SYMFONY6_RUNTIME_EXPECTED_STDOUT := $(E2E_SYMFONY6_RUNTIME_OUTPUT_DIR)/expected-stdout
+E2E_SYMFONY6_RUNTIME_EXPECTED_STDERR := $(E2E_SYMFONY6_RUNTIME_OUTPUT_DIR)/expected-stderr
+E2E_SYMFONY6_RUNTIME_ACTUAL_STDOUT := $(E2E_SYMFONY6_RUNTIME_OUTPUT_DIR)/actual-stdout
+E2E_SYMFONY6_RUNTIME_ACTUAL_STDERR := $(E2E_SYMFONY6_RUNTIME_OUTPUT_DIR)/actual-stderr
 
 E2E_COMPOSER_INSTALLED_DIR = fixtures/build/dir013
 E2E_COMPOSER_INSTALLED_OUTPUT_DIR = dist/dir013
@@ -294,50 +294,50 @@ _e2e_php_settings_checker_memory_limit_higher: $(SCOPED_BOX_BIN)
 	$(DIFF) $(E2E_PHP_SETTINGS_CHECKER_EXPECTED_STDERR_MEMORY_LIMIT_HIGHER) $(E2E_PHP_SETTINGS_CHECKER_ACTUAL_STDERR_MEMORY_LIMIT_HIGHER)
 
 .PHONY: e2e_symfony6
-e2e_symfony6: $(SCOPED_BOX_BIN) $(E2E_symfony6_DIR)/vendor $(E2E_symfony6_DIR)/.env.local.php
+e2e_symfony6: $(SCOPED_BOX_BIN) $(E2E_SYMFONY6_DIR)/vendor $(E2E_SYMFONY6_DIR)/.env.local.php
 	@# Packages a fresh Symfony app
-	@mkdir -p $(E2E_symfony6_OUTPUT_DIR)
-	php $(E2E_symfony6_DIR)/bin/console --version --no-ansi \
-		1>$(E2E_symfony6_EXPECTED_STDOUT) \
-		2>$(E2E_symfony6_EXPECTED_STDERR)
+	@mkdir -p $(E2E_SYMFONY6_OUTPUT_DIR)
+	php $(E2E_SYMFONY6_DIR)/bin/console --version --no-ansi \
+		1>$(E2E_SYMFONY6_EXPECTED_STDOUT) \
+		2>$(E2E_SYMFONY6_EXPECTED_STDERR)
 
 	@# Clear the cache: we want to make sure it works on a clean installation
-	$(E2E_symfony6_DIR)/bin/console cache:pool:clear cache.global_clearer --env=prod --ansi
-	$(E2E_symfony6_DIR)/bin/console cache:clear --env=prod --ansi
-	rm -rf $(E2E_symfony6_DIR)/var/cache/prod/*
+	$(E2E_SYMFONY6_DIR)/bin/console cache:pool:clear cache.global_clearer --env=prod --ansi
+	$(E2E_SYMFONY6_DIR)/bin/console cache:clear --env=prod --ansi
+	rm -rf $(E2E_SYMFONY6_DIR)/var/cache/prod/*
 
-	$(SCOPED_BOX) compile --working-dir=$(E2E_symfony6_DIR) --no-parallel --ansi
-	mv -fv $(E2E_symfony6_TMP_PHAR) $(E2E_symfony6_PHAR)
+	$(SCOPED_BOX) compile --working-dir=$(E2E_SYMFONY6_DIR) --no-parallel --ansi
+	mv -fv $(E2E_SYMFONY6_TMP_PHAR) $(E2E_SYMFONY6_PHAR)
 
-	php $(E2E_symfony6_PHAR) --version --no-ansi \
-		1>$(E2E_symfony6_ACTUAL_STDOUT) \
-		2>$(E2E_symfony6_ACTUAL_STDERR) || true
+	php $(E2E_SYMFONY6_PHAR) --version --no-ansi \
+		1>$(E2E_SYMFONY6_ACTUAL_STDOUT) \
+		2>$(E2E_SYMFONY6_ACTUAL_STDERR) || true
 
-	$(DIFF) $(E2E_symfony6_EXPECTED_STDOUT) $(E2E_symfony6_ACTUAL_STDOUT)
-	$(DIFF) $(E2E_symfony6_EXPECTED_STDERR) $(E2E_symfony6_ACTUAL_STDERR)
+	$(DIFF) $(E2E_SYMFONY6_EXPECTED_STDOUT) $(E2E_SYMFONY6_ACTUAL_STDOUT)
+	$(DIFF) $(E2E_SYMFONY6_EXPECTED_STDERR) $(E2E_SYMFONY6_ACTUAL_STDERR)
 
 .PHONY: e2e_symfony6_runtime
-e2e_symfony6_runtime: $(SCOPED_BOX_BIN) $(E2E_symfony6_RUNTIME_DIR)/vendor $(E2E_symfony6_RUNTIME_DIR)/.env.local.php
+e2e_symfony6_runtime: $(SCOPED_BOX_BIN) $(E2E_SYMFONY6_RUNTIME_DIR)/vendor $(E2E_SYMFONY6_RUNTIME_DIR)/.env.local.php
 	@# Packages a fresh Symfony app
-	@mkdir -p $(E2E_symfony6_RUNTIME_OUTPUT_DIR)
-	php $(E2E_symfony6_RUNTIME_CONSOLE) --version --no-ansi \
-		1>$(E2E_symfony6_RUNTIME_EXPECTED_STDOUT) \
-		2>$(E2E_symfony6_RUNTIME_EXPECTED_STDERR)
+	@mkdir -p $(E2E_SYMFONY6_RUNTIME_OUTPUT_DIR)
+	php $(E2E_SYMFONY6_RUNTIME_CONSOLE) --version --no-ansi \
+		1>$(E2E_SYMFONY6_RUNTIME_EXPECTED_STDOUT) \
+		2>$(E2E_SYMFONY6_RUNTIME_EXPECTED_STDERR)
 
 	@# Clear the cache: we want to make sure it works on a clean installation
-	$(E2E_symfony6_RUNTIME_CONSOLE) cache:pool:clear cache.global_clearer --env=prod --ansi
-	$(E2E_symfony6_RUNTIME_CONSOLE) cache:clear --env=prod --ansi
-	rm -rf $(E2E_symfony6_RUNTIME_DIR)/var/cache/prod/*
+	$(E2E_SYMFONY6_RUNTIME_CONSOLE) cache:pool:clear cache.global_clearer --env=prod --ansi
+	$(E2E_SYMFONY6_RUNTIME_CONSOLE) cache:clear --env=prod --ansi
+	rm -rf $(E2E_SYMFONY6_RUNTIME_DIR)/var/cache/prod/*
 
-	$(SCOPED_BOX) compile --working-dir=$(E2E_symfony6_RUNTIME_DIR) --no-parallel --ansi
-	mv -fv $(E2E_symfony6_RUNTIME_TMP_PHAR) $(E2E_symfony6_RUNTIME_PHAR)
+	$(SCOPED_BOX) compile --working-dir=$(E2E_SYMFONY6_RUNTIME_DIR) --no-parallel --ansi
+	mv -fv $(E2E_SYMFONY6_RUNTIME_TMP_PHAR) $(E2E_SYMFONY6_RUNTIME_PHAR)
 
-	php $(E2E_symfony6_RUNTIME_PHAR) --version --no-ansi \
-		1>$(E2E_symfony6_RUNTIME_ACTUAL_STDOUT) \
-		2>$(E2E_symfony6_RUNTIME_ACTUAL_STDERR) || true
+	php $(E2E_SYMFONY6_RUNTIME_PHAR) --version --no-ansi \
+		1>$(E2E_SYMFONY6_RUNTIME_ACTUAL_STDOUT) \
+		2>$(E2E_SYMFONY6_RUNTIME_ACTUAL_STDERR) || true
 
-	$(DIFF) $(E2E_symfony6_RUNTIME_EXPECTED_STDOUT) $(E2E_symfony6_RUNTIME_ACTUAL_STDOUT)
-	$(DIFF) $(E2E_symfony6_RUNTIME_EXPECTED_STDERR) $(E2E_symfony6_RUNTIME_ACTUAL_STDERR)
+	$(DIFF) $(E2E_SYMFONY6_RUNTIME_EXPECTED_STDOUT) $(E2E_SYMFONY6_RUNTIME_ACTUAL_STDOUT)
+	$(DIFF) $(E2E_SYMFONY6_RUNTIME_EXPECTED_STDERR) $(E2E_SYMFONY6_RUNTIME_ACTUAL_STDERR)
 
 .PHONY: e2e_composer_installed_versions
 e2e_composer_installed_versions: $(SCOPED_BOX_BIN) $(E2E_COMPOSER_INSTALLED_DIR)/vendor
@@ -467,25 +467,25 @@ $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)/composer.lock: $(E2E_SCOPER_EXPOSE_SYMBOLS_DIR)
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
 	@echo "$$ composer update --lock --working-dir=$(E2E_SCOPER_EXPOSE_SYMBOLS_DIR) && touch -c $(@)"
 
-$(E2E_symfony6_DIR)/.env.local.php: $(E2E_symfony6_DIR)/vendor $(E2E_symfony6_DIR)/.env
-	composer dump-env prod --working-dir=$(E2E_symfony6_DIR) --ansi
+$(E2E_SYMFONY6_DIR)/.env.local.php: $(E2E_SYMFONY6_DIR)/vendor $(E2E_SYMFONY6_DIR)/.env
+	composer dump-env prod --working-dir=$(E2E_SYMFONY6_DIR) --ansi
 	touch -c $@
-$(E2E_symfony6_DIR)/vendor:
-	composer install --ansi --working-dir=$(E2E_symfony6_DIR)
+$(E2E_SYMFONY6_DIR)/vendor:
+	composer install --ansi --working-dir=$(E2E_SYMFONY6_DIR)
 	touch -c $@
-$(E2E_symfony6_DIR)/composer.lock: $(E2E_symfony6_DIR)/composer.json
+$(E2E_SYMFONY6_DIR)/composer.lock: $(E2E_SYMFONY6_DIR)/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
-	@echo "$$ composer update --lock --working-dir=$(E2E_symfony6_DIR) && touch -c $(@)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_SYMFONY6_DIR) && touch -c $(@)"
 
-$(E2E_symfony6_RUNTIME_DIR)/.env.local.php: $(E2E_symfony6_RUNTIME_DIR)/vendor $(E2E_symfony6_RUNTIME_DIR)/.env
-	composer dump-env prod --working-dir=$(E2E_symfony6_RUNTIME_DIR) --ansi
+$(E2E_SYMFONY6_RUNTIME_DIR)/.env.local.php: $(E2E_SYMFONY6_RUNTIME_DIR)/vendor $(E2E_SYMFONY6_RUNTIME_DIR)/.env
+	composer dump-env prod --working-dir=$(E2E_SYMFONY6_RUNTIME_DIR) --ansi
 	touch -c $@
-$(E2E_symfony6_RUNTIME_DIR)/vendor:
-	composer install --ansi --working-dir=$(E2E_symfony6_RUNTIME_DIR)
+$(E2E_SYMFONY6_RUNTIME_DIR)/vendor:
+	composer install --ansi --working-dir=$(E2E_SYMFONY6_RUNTIME_DIR)
 	touch -c $@
-$(E2E_symfony6_RUNTIME_DIR)/composer.lock: $(E2E_symfony6_RUNTIME_DIR)/composer.json
+$(E2E_SYMFONY6_RUNTIME_DIR)/composer.lock: $(E2E_SYMFONY6_RUNTIME_DIR)/composer.json
 	@echo "$(ERROR_COLOR)$(@) is not up to date. You may want to run the following command:$(NO_COLOR)"
-	@echo "$$ composer update --lock --working-dir=$(E2E_symfony6_RUNTIME_DIR) && touch -c $(@)"
+	@echo "$$ composer update --lock --working-dir=$(E2E_SYMFONY6_RUNTIME_DIR) && touch -c $(@)"
 
 $(E2E_COMPOSER_INSTALLED_DIR)/vendor: $(E2E_COMPOSER_INSTALLED_DIR)/composer.lock
 	composer install --ansi --working-dir=$(E2E_COMPOSER_INSTALLED_DIR)
