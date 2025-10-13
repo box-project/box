@@ -36,8 +36,8 @@ use Phar;
 use RecursiveDirectoryIterator;
 use RuntimeException;
 use Seld\PharUtils\Timestamps;
-use SplFileInfo;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Traversable;
 use Webmozart\Assert\Assert;
 use function array_keys;
@@ -49,12 +49,15 @@ use function extension_loaded;
 use function file_exists;
 use function getcwd;
 use function is_object;
+use function iter\fromPairs;
 use function iter\map;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
 use function sprintf;
+use function strcmp;
 use function strval;
+use function uksort;
 
 /**
  * Box is a utility class to generate a PHAR.
@@ -212,12 +215,17 @@ final class Box implements Countable
         string $tmp,
         array $bufferedFileNames,
     ): iterable {
-        return map(
-            static fn (SplFileInfo $fileInfo) => $fileInfo->getPath(),
-            Finder::create()
-                ->files()
-                ->in($tmp)
-                ->notPath($bufferedFileNames),
+        return fromPairs(
+            map(
+                static fn (SplFileInfo $fileInfo) => [
+                    $fileInfo->getRelativePathname(),
+                    $fileInfo->getPathname(),
+                ],
+                Finder::create()
+                    ->files()
+                    ->in($tmp)
+                    ->notPath(array_keys($bufferedFileNames)),
+            ),
         );
     }
 
@@ -232,7 +240,7 @@ final class Box implements Countable
         iterable $remainingFiles
     ): Traversable {
         $files = [...$bufferedFiles, ...$remainingFiles];
-        uasort($files, strcmp(...));
+        uksort($files, strcmp(...));
 
         return new ArrayIterator($files);
     }
