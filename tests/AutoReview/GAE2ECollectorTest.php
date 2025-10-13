@@ -24,6 +24,8 @@ use function count;
 #[CoversClass(GAE2ECollector::class)]
 class GAE2ECollectorTest extends TestCase
 {
+    private const E2E_NAME_REGEX = '/^e2e_[\p{L}\d_]+$/';
+
     public function test_it_collects_the_e2e_test_names(): void
     {
         $names = GAE2ECollector::getExecutedE2ETests();
@@ -31,7 +33,7 @@ class GAE2ECollectorTest extends TestCase
         self::assertGreaterThan(0, count($names));
 
         foreach ($names as $name) {
-            self::assertMatchesRegularExpression('/^e2e_[\p{L}_]+$/', $name);
+            self::assertMatchesRegularExpression(self::E2E_NAME_REGEX, $name);
         }
     }
 }
