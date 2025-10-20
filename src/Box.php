@@ -81,6 +81,7 @@ final class Box implements Countable
         private Phar $phar,
         private readonly string $pharFilePath,
         private readonly bool $enableParallelization,
+        private readonly bool $sortCompiledFiles,
     ) {
         $this->compactors = new Compactors();
         $this->placeholderCompactor = new Placeholder([]);
@@ -102,6 +103,7 @@ final class Box implements Countable
         int $pharFlags = 0,
         ?string $pharAlias = null,
         bool $enableParallelization = false,
+        bool $sortCompiledFiles = false,
     ): self {
         // Ensure the parent directory of the PHAR file exists as `new \Phar()` does not create it and would fail
         // otherwise.
@@ -111,6 +113,7 @@ final class Box implements Countable
             new Phar($pharFilePath, $pharFlags, $pharAlias),
             $pharFilePath,
             $enableParallelization,
+            $sortCompiledFiles,
         );
     }
 
@@ -150,14 +153,18 @@ final class Box implements Countable
 
             $completeDumpAutoload();
 
-            $remainingFiles = self::collectRemainingFiles(
-                $tmp,
-                array_keys($bufferedFiles),
-            );
+            if ($this->sortCompiledFiles) {
+                $remainingFiles = self::collectRemainingFiles(
+                    $tmp,
+                    array_keys($bufferedFiles),
+                );
 
-            $iterator = self::createFileSortedIterator($bufferedFiles, $remainingFiles);
+                $iterator = self::createFileSortedIterator($bufferedFiles, $remainingFiles);
 
-            $this->phar->buildFromIterator($iterator, $tmp);
+                $this->phar->buildFromIterator($iterator, $tmp);
+            } else {
+                $this->phar->buildFromDirectory($tmp);
+            }
         } finally {
             FS::remove($tmp);
             // Must happen _after_ the remove as the latter has higher priority.
