@@ -24,6 +24,7 @@ use Symfony\Component\Finder\SplFileInfo as SymfonySplFileInfo;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use function array_map;
+use function get_class;
 use function sort;
 use const SORT_STRING;
 
@@ -70,7 +71,7 @@ final readonly class ExportableConfiguration
             $configuration->dumpAutoload(),
             $configuration->excludeComposerArtifacts(),
             $configuration->excludeDevFiles(),
-            array_map('get_class', $configuration->getCompactors()->toArray()),
+            array_map(get_class(...), $configuration->getCompactors()->toArray()),
             $configuration->getCompressionAlgorithm()->name,
             '0'.decoct($configuration->getFileMode()),
             $normalizePath($configuration->getMainScriptPath()),

@@ -161,7 +161,7 @@ final class DiffCommand implements Command
         Assert::allFile($paths);
 
         return array_map(
-            static fn (string $path) => Path::canonicalize($path),
+            Path::canonicalize(...),
             $paths,
         );
     }

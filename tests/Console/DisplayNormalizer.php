@@ -18,6 +18,7 @@ use function array_map;
 use function explode;
 use function implode;
 use function preg_match_all;
+use function rtrim;
 use function str_replace;
 
 final class DisplayNormalizer
@@ -27,7 +28,7 @@ final class DisplayNormalizer
         $lines = explode("\n", $display);
 
         $lines = array_map(
-            'rtrim',
+            rtrim(...),
             $lines,
         );
 

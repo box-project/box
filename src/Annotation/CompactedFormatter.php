@@ -55,7 +55,7 @@ final class CompactedFormatter implements Formatter
             return trim('@'.$tag->getName());
         }
 
-        $description = implode('', array_map('trim', explode("\n", (string) $tag)));
+        $description = implode('', array_map(trim(...), explode("\n", (string) $tag)));
 
         return trim('@'.$tag->getName().$description);
     }
