@@ -262,7 +262,7 @@ class ConfigurationFileNoConfigTest extends ConfigurationTestCase
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame(
-                'The file "'.$this->tmp.'/file1" does not exist.',
+                'The path "'.$this->tmp.'/file1" is not a file.',
                 $exception->getMessage(),
             );
         }

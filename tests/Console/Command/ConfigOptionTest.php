@@ -106,7 +106,7 @@ class ConfigOptionTest extends CommandTestCase
         FS::dumpFile('box.json', '{}');
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The file "'.$this->tmp.'/index.php" does not exist.');
+        $this->expectExceptionMessage('The path "'.$this->tmp.'/index.php" is not a file.');
 
         $this->executeAndGetConfig([]);
     }

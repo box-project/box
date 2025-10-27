@@ -972,7 +972,7 @@ class ConfigurationTest extends ConfigurationTestCase
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame(
-                "The file \"{$this->tmp}/test.php\" does not exist.",
+                "The path \"{$this->tmp}/test.php\" is not a file.",
                 $exception->getMessage(),
             );
         }
@@ -2341,7 +2341,7 @@ class ConfigurationTest extends ConfigurationTestCase
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame(
-                'The file "/does/not/exist" does not exist.',
+                'The path "/does/not/exist" is not a file.',
                 $exception->getMessage(),
             );
         }
