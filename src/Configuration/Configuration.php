@@ -2373,7 +2373,7 @@ final class Configuration
         }
 
         $banner = explode("\n", $contents);
-        $banner = array_map('trim', $banner);
+        $banner = array_map(trim(...), $banner);
 
         return implode("\n", $banner);
     }
