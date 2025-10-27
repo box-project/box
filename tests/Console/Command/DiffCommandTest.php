@@ -187,7 +187,7 @@ class DiffCommandTest extends CommandTestCase
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame(
-                'The file "unknown" does not exist.',
+                'The path "unknown" is not a file.',
                 $exception->getMessage(),
             );
         }

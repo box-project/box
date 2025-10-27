@@ -123,7 +123,7 @@ class VerifyCommandTest extends CommandTestCase
     public function test_it_cannot_verify_an_unknown_file(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The file "unknown" does not exist.');
+        $this->expectExceptionMessage('The path "unknown" is not a file.');
 
         $this->commandTester->execute(
             [

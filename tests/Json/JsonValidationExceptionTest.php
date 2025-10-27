@@ -33,7 +33,7 @@ class JsonValidationExceptionTest extends FileSystemTestCase
 
             self::fail('Expected exception to be thrown');
         } catch (InvalidArgumentException $exception) {
-            self::assertSame('The file "unknown file" does not exist.', $exception->getMessage());
+            self::assertSame('The path "unknown file" is not a file.', $exception->getMessage());
         }
     }
 

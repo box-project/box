@@ -507,7 +507,7 @@ class BoxTest extends FileSystemTestCase
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame(
-                'The file "/nowhere/foo" does not exist.',
+                'The path "/nowhere/foo" is not a file.',
                 $exception->getMessage(),
             );
             self::assertNull($exception->getPrevious());
@@ -1068,7 +1068,7 @@ class BoxTest extends FileSystemTestCase
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame(
-                'The file "/nowhere/foo" does not exist.',
+                'The path "/nowhere/foo" is not a file.',
                 $exception->getMessage(),
             );
             self::assertNull($exception->getPrevious());
@@ -1273,7 +1273,7 @@ class BoxTest extends FileSystemTestCase
             self::fail('Expected exception to be thrown.');
         } catch (Exception $exception) {
             self::assertSame(
-                'The file "/does/not/exist" does not exist.',
+                'The path "/does/not/exist" is not a file.',
                 $exception->getMessage(),
             );
         }
@@ -1545,7 +1545,7 @@ class BoxTest extends FileSystemTestCase
             self::fail('Expected exception to be thrown.');
         } catch (InvalidArgumentException $exception) {
             self::assertSame(
-                'The file "/does/not/exist" does not exist.',
+                'The path "/does/not/exist" is not a file.',
                 $exception->getMessage(),
             );
         }
