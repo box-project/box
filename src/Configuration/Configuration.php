@@ -1183,7 +1183,7 @@ final class Configuration
             }
 
             if ('exclude' === $method) {
-                $arguments = array_unique(array_map('trim', $arguments));
+                $arguments = array_unique(array_map(trim(...), $arguments));
             }
 
             if ('append' === $method) {
@@ -2373,7 +2373,7 @@ final class Configuration
         }
 
         $banner = explode("\n", $contents);
-        $banner = array_map('trim', $banner);
+        $banner = array_map(trim(...), $banner);
 
         return implode("\n", $banner);
     }

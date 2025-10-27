@@ -191,7 +191,7 @@ final readonly class InfoCommand implements Command
         PharInfoRenderer::renderShortSummary(
             $pharInfo,
             $io,
-            static fn () => $io->newLine(),
+            $io->newLine(...),
         );
 
         if ($content) {
@@ -207,19 +207,6 @@ final readonly class InfoCommand implements Command
         }
 
         return ExitCode::SUCCESS;
-    }
-
-    private static function showPharMeta(PharInfo $pharInfo, IO $io): void
-    {
-        PharInfoRenderer::renderVersion($pharInfo, $io);
-
-        $io->newLine();
-
-        PharInfoRenderer::renderShortSummary(
-            $pharInfo,
-            $io,
-            static fn () => $io->newLine(),
-        );
     }
 
     private static function render(IO $io, array $attributes): void

@@ -43,7 +43,7 @@ final class FilenameDiffer implements Differ
             array_diff($pharAFiles, $pharBFiles),
             array_diff($pharBFiles, $pharAFiles),
         ];
-        $diffCount = array_sum(array_map('count', $diffResult));
+        $diffCount = array_sum(array_map(count(...), $diffResult));
 
         if (0 === $diffCount) {
             $io->writeln(Differ::NO_DIFF_MESSAGE);
