@@ -74,7 +74,7 @@ jobs:
             -   name: Rebuild website
                 run: make _website_build
 
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v5
                 name: Upload the docs artifact
                 with:
                     name: docs-website
@@ -109,7 +109,7 @@ jobs:
         needs:
             - build
         steps:
-            -   uses: actions/download-artifact@v5
+            -   uses: actions/download-artifact@v6
                 with:
                     name: docs-website
                     path: dist/website
