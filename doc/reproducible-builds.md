@@ -10,6 +10,7 @@
        1. [Requirement Checker](#requirement-checker)
        1. [Box banner](#box-banner)
        1. [Timestamp](#timestamp)
+       1. [Sort compiled files](#sort-compiled-files)
 1. [Usages](#usages)
 
 
@@ -111,6 +112,20 @@ you add a PHAR to a file, it is changed to the time at when you added it).
 To fix this, you can leverage configure the [timestamp].
 
 
+### Sort compiled files
+
+When compiling files into a PHAR, PHP does not always find files in a deterministic order. This means that two builds on
+the same files can result in two different PHAR files. The two PHAR files will be functionally equivalent but will not be
+the same file.
+
+To ensure consistent file sorting across PHAR builds, you may pass the `--sort-compiled-files` option when compiling:
+
+```shell
+box compile --sort-compiled-files
+```
+
+Note that sorting files may incur a performance penalty in some situations.
+
 ## Usages
 
 Deterministic builds are a highly desirable property to prevent targeted malware attacks. They also make it easier to
@@ -144,3 +159,4 @@ but it is enough to know if the PHARs are identical or not.
 [php-scoper-prefix-doc]: https://github.com/humbug/php-scoper/blob/main/docs/configuration.md#prefix
 [requirement-checker]: ./requirement-checker.md
 [timestamp]: ./configuration.md#forcing-the-timestamp-timestamp
+[sort-compiled-files]: ./configuration.md#sort-compiled-files
