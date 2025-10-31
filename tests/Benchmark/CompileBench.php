@@ -67,9 +67,10 @@ final readonly class CompileBench
     public function bench(array $params): void
     {
         $enableParallelization = $params[1];
+        $sortCompiledFiles = $params[2];
 
         $exitCode = $this->runner->run(
-            self::createIO($enableParallelization),
+            self::createIO($enableParallelization, $sortCompiledFiles),
         );
 
         Assert::assertSame(ExitCode::SUCCESS, $exitCode);
@@ -97,20 +98,35 @@ final readonly class CompileBench
         yield 'no compactors' => [
             self::WITHOUT_COMPACTORS_DIR,
             false,
+            false,
         ];
 
         yield 'with compactors; no parallel processing' => [
             self::WITH_COMPACTORS_DIR,
+            false,
             false,
         ];
 
         yield 'with compactors; parallel processing' => [
             self::WITH_COMPACTORS_DIR,
             true,
+            false,
+        ];
+
+        yield 'with compactors; no parallel processing; sort compiled files' => [
+            self::WITH_COMPACTORS_DIR,
+            false,
+            true,
+        ];
+
+        yield 'with compactors; parallel processing; sort compiled files' => [
+            self::WITH_COMPACTORS_DIR,
+            true,
+            true,
         ];
     }
 
-    private static function createIO(bool $enableParallelization): IO
+    private static function createIO(bool $enableParallelization, bool $sortCompiledFiles): IO
     {
         $input = [
             'compile',
@@ -119,6 +135,10 @@ final readonly class CompileBench
 
         if (!$enableParallelization) {
             $input['--no-parallel'] = null;
+        }
+
+        if ($sortCompiledFiles) {
+            $input['--sort-compiled-files'] = null;
         }
 
         return new IO(

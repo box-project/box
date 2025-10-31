@@ -110,6 +110,7 @@ For the full documentation see https://box-project.github.io/box.
           1. [PHAR alias](doc/reproducible-builds.md#phar-alias)
           1. [Requirement Checker](doc/reproducible-builds.md#requirement-checker)
           1. [Box banner](doc/reproducible-builds.md#box-banner)
+          1. [Sort compiled files](doc/reproducible-builds.md#sort-compiled-files)
       1. [PHAR](doc/reproducible-builds.md#phar)
    1. [Usages](doc/reproducible-builds.md#usages)
 1. [PHAR signing best practices](doc/phar-signing.md#phar-signing-best-practices)
