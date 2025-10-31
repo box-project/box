@@ -702,6 +702,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#sort-compiled-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sort compiled files
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -907,6 +916,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#sort-compiled-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sort compiled files
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -951,6 +969,7 @@
 <li><a href="#requirement-checker">Requirement Checker</a></li>
 <li><a href="#box-banner">Box banner</a></li>
 <li><a href="#timestamp">Timestamp</a></li>
+<li><a href="#sort-compiled-files">Sort compiled files</a></li>
 </ol>
 </li>
 <li><a href="#usages">Usages</a></li>
@@ -1011,6 +1030,14 @@ different Box versions will result in a different PHAR signature.</p>
 <p>The files unix timestamp are part of the PHAR signature, hence if they have a different timestamp (which they do as when
 you add a PHAR to a file, it is changed to the time at when you added it).</p>
 <p>To fix this, you can leverage configure the <a href="../configuration/#forcing-the-timestamp-timestamp">timestamp</a>.</p>
+<h3 id="sort-compiled-files">Sort compiled files<a class="headerlink" href="#sort-compiled-files" title="Permanent link">&para;</a></h3>
+<p>When compiling files into a PHAR, PHP does not always find files in a deterministic order. This means that two builds on
+the same files can result in two different PHAR files. The two PHAR files will be functionally equivalent but will not be
+the same file.</p>
+<p>To ensure consistent file sorting across PHAR builds, you may pass the <code>--sort-compiled-files</code> option when compiling:</p>
+<div class="highlight"><pre><span></span><code>box<span class="w"> </span>compile<span class="w"> </span>--sort-compiled-files
+</code></pre></div>
+<p>Note that sorting files may incur a performance penalty in some situations.</p>
 <h2 id="usages">Usages<a class="headerlink" href="#usages" title="Permanent link">&para;</a></h2>
 <p>Deterministic builds are a highly desirable property to prevent targeted malware attacks. They also make it easier to
 detect if there is any real change. As non-exhaustive examples in the wild: <a href="https://github.com/composer/composer">Composer</a> and <a href="https://github.com/phpstan/phpstan">PHPStan</a>.</p>
