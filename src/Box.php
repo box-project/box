@@ -48,9 +48,8 @@ use function dirname;
 use function extension_loaded;
 use function file_exists;
 use function getcwd;
+use function in_array;
 use function is_object;
-use function iter\fromPairs;
-use function iter\map;
 use function openssl_pkey_export;
 use function openssl_pkey_get_details;
 use function openssl_pkey_get_private;
@@ -222,18 +221,15 @@ final class Box implements Countable
         string $tmp,
         array $bufferedFileNames,
     ): iterable {
-        return fromPairs(
-            map(
-                static fn (SplFileInfo $fileInfo) => [
-                    $fileInfo->getRelativePathname(),
-                    $fileInfo->getPathname(),
-                ],
-                Finder::create()
-                    ->files()
-                    ->in($tmp)
-                    ->notPath($bufferedFileNames),
-            ),
-        );
+        $finder = Finder::create()->files()->in($tmp);
+
+        foreach ($finder as $fileInfo) {
+            if (in_array($fileInfo->getRelativePathname(), $bufferedFileNames, true)) {
+                continue;
+            }
+
+            yield $fileInfo->getRelativePathname() => $fileInfo->getPathname();
+        }
     }
 
     /**
