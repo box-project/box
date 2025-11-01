@@ -52,7 +52,7 @@ class ApplicationTest extends TestCase
             $expected,
             ExitCode::SUCCESS,
             $appTester,
-            DisplayNormalizer::createReplaceBoxVersionNormalizer(),
+            DisplayNormalizer::normalizeBoxVersion(...),
         );
     }
 
@@ -154,7 +154,7 @@ class ApplicationTest extends TestCase
             $expected,
             ExitCode::SUCCESS,
             $appTester,
-            DisplayNormalizer::createReplaceBoxVersionNormalizer(),
+            DisplayNormalizer::normalizeBoxVersion(...),
         );
     }
 
