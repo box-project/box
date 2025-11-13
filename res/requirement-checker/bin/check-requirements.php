@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox469\KevinGH\RequirementChecker;
+namespace HumbugBox4610\KevinGH\RequirementChecker;
 
 if (isset($_SERVER['BOX_REQUIREMENT_CHECKER'])) {
     $enableRequirementChecker = $_SERVER['BOX_REQUIREMENT_CHECKER'];
