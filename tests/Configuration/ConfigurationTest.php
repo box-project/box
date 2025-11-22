@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Closure;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Fidry\FileSystem\FS;
@@ -316,7 +317,7 @@ class ConfigurationTest extends ConfigurationTestCase
 
     #[DataProvider('composerArtifactsProvider')]
     public function test_it_attempts_to_get_and_decode_the_json_and_lock_files(
-        callable $setup,
+        Closure $setup,
         ?string $expectedJsonPath,
         ?array $expectedJsonContents,
         ?string $expectedLockPath,
