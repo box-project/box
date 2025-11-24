@@ -26,7 +26,7 @@ jobs:
         name: Build PHAR
         steps:
             -   name: Checkout
-                uses: actions/checkout@v5
+                uses: actions/checkout@v6
                 with:
                     fetch-depth: 0
 
@@ -72,7 +72,7 @@ jobs:
                         --output bin/box.phar.asc \
                         bin/box.phar
 
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v5
                 name: Upload the PHAR artifact
                 with:
                     name: box-phar
@@ -89,7 +89,7 @@ jobs:
         permissions:
             contents: write
         steps:
-            -   uses: actions/download-artifact@v5
+            -   uses: actions/download-artifact@v6
                 with:
                     name: box-phar
                     path: .
@@ -111,7 +111,7 @@ jobs:
         if: github.event_name == 'release'
         steps:
             -   name: Update Homebrew formula
-                uses: dawidd6/action-homebrew-bump-formula@v5
+                uses: dawidd6/action-homebrew-bump-formula@v6
                 with:
                     token: ${{ secrets.BOX_HOMEBREW_TAP_TOKEN }}
                     tap: box-project/box
@@ -127,14 +127,14 @@ jobs:
             - build-phar
         steps:
             -   name: Checkout
-                uses: actions/checkout@v5
+                uses: actions/checkout@v6
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: '8.2'
 
-            -   uses: actions/download-artifact@v5
+            -   uses: actions/download-artifact@v6
                 with:
                     name: box-phar
                     path: .

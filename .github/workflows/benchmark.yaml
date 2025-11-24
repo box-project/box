@@ -17,7 +17,7 @@ jobs:
         name: Benchmark main branch
         steps:
             -   name: Checkout main branch
-                uses: actions/checkout@v5
+                uses: actions/checkout@v6
                 with:
                     ref: main
                     fetch-depth: 0
@@ -43,7 +43,7 @@ jobs:
             -   name: Run PHPBench
                 run: make phpbench_main
 
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v5
                 name: Upload the Benchmark results
                 with:
                     name: bench-main-result
@@ -54,7 +54,7 @@ jobs:
         name: Benchmark PR
         steps:
             -   name: Checkout
-                uses: actions/checkout@v5
+                uses: actions/checkout@v6
                 with:
                     fetch-depth: 0
 
@@ -87,7 +87,7 @@ jobs:
 #        needs: main-bench-test
 #        steps:
 #            -   name: Checkout
-#                uses: actions/checkout@v5
+#                uses: actions/checkout@v6
 #                with:
 #                    fetch-depth: 0
 #
