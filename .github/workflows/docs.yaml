@@ -21,10 +21,10 @@ jobs:
         timeout-minutes: 1
         steps:
             -   name: Checkout repository
-                uses: actions/checkout@v5
+                uses: actions/checkout@v6
 
             -   name: Check Markdown formatting
-                uses: DavidAnson/markdownlint-cli2-action@v20.0.0
+                uses: DavidAnson/markdownlint-cli2-action@v22.0.0
                 with:
                     globs: "*.md|doc/**/*.md"
 
@@ -34,17 +34,17 @@ jobs:
         timeout-minutes: 1
         steps:
             -   name: Checkout repository
-                uses: actions/checkout@v5
+                uses: actions/checkout@v6
 
             -   name: Restore lychee cache
-                uses: actions/cache@v4
+                uses: actions/cache@v5
                 with:
                     path: .lycheecache
                     key: cache-lychee-${{ github.sha }}
                     restore-keys: cache-lychee-
 
             -   name: Run Lychee
-                uses: lycheeverse/lychee-action@v2.6.1
+                uses: lycheeverse/lychee-action@v2.7.0
                 with:
                     # To keep in sync with Makefile#lychee
                     args: "--no-progress '*.md' 'doc/**/*.md' --cache --max-cache-age 1d ."
@@ -58,7 +58,7 @@ jobs:
             contents: write
         steps:
             -   name: Checkout
-                uses: actions/checkout@v5
+                uses: actions/checkout@v6
 
             -   name: Setup Python
                 uses: actions/setup-python@v6
@@ -74,7 +74,7 @@ jobs:
             -   name: Rebuild website
                 run: make _website_build
 
-            -   uses: actions/upload-artifact@v4
+            -   uses: actions/upload-artifact@v6
                 name: Upload the docs artifact
                 with:
                     name: docs-website
@@ -109,7 +109,7 @@ jobs:
         needs:
             - build
         steps:
-            -   uses: actions/download-artifact@v5
+            -   uses: actions/download-artifact@v7
                 with:
                     name: docs-website
                     path: dist/website
