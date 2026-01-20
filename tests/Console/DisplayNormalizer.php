@@ -35,36 +35,27 @@ final class DisplayNormalizer
         return implode("\n", $lines);
     }
 
-    /**
-     * @return callable(string):string
-     */
-    public static function createLoadingFilePathOutputNormalizer(): callable
+    public static function normalizeLoadingFilePathOutput(string $output): string
     {
-        return static fn ($output) => preg_replace(
+        return preg_replace(
             '/\s\/\/ Loading the configuration file([\s\S]*)box\.json[comment\<\>\n\s\/]*"\./',
             ' // Loading the configuration file "box.json".',
             $output,
         );
     }
 
-    /**
-     * @return callable(string):string
-     */
-    public static function createVarDumperObjectReferenceNormalizer(): callable
+    public static function normalizeVarDumperObjectReference(string $output): string
     {
-        return static fn ($output) => preg_replace(
+        return preg_replace(
             '/ \{#\d+/',
             ' {#140',
             $output,
         );
     }
 
-    /**
-     * @return callable(string):string
-     */
-    public static function createReplaceBoxVersionNormalizer(): callable
+    public static function normalizeBoxVersion(string $output): string
     {
-        return static fn (string $output): string => preg_replace(
+        return preg_replace(
             '/Box version .+@[a-z\d]{7}/',
             'Box version x.x-dev@151e40a',
             $output,
