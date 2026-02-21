@@ -58,6 +58,9 @@ final class RequirementsBuilder
 
     public function addRequiredExtension(Extension $extension, ?string $source): void
     {
+        if (!$source) {
+            $source = '';
+        }
         $this->requiredExtensions[$extension->name][] = $source;
         $this->allExtensions[$extension->name][$source] = [$source, RequirementType::EXTENSION];
     }
