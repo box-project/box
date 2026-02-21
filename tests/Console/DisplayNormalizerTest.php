@@ -91,7 +91,7 @@ final class DisplayNormalizerTest extends TestCase
     ): void {
         $expected ??= $value;
 
-        $actual = DisplayNormalizer::createVarDumperObjectReferenceNormalizer()($value);
+        $actual = DisplayNormalizer::normalizeVarDumperObjectReference($value);
 
         self::assertSame($expected, $actual);
     }

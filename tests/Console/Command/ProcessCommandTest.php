@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Closure;
 use Fidry\Console\Command\Command;
 use Fidry\Console\ExitCode;
 use Fidry\FileSystem\FS;
@@ -263,13 +264,13 @@ class ProcessCommandTest extends CommandTestCase
     public function assertSameOutput(
         string $expectedOutput,
         int $expectedStatusCode,
-        callable ...$extraNormalizers,
+        Closure ...$extraNormalizers,
     ): void {
         parent::assertSameOutput(
             $expectedOutput,
             $expectedStatusCode,
-            DisplayNormalizer::createVarDumperObjectReferenceNormalizer(),
-            DisplayNormalizer::createLoadingFilePathOutputNormalizer(),
+            DisplayNormalizer::normalizeVarDumperObjectReference(...),
+            DisplayNormalizer::normalizeLoadingFilePathOutput(...),
             ...$extraNormalizers,
         );
     }
