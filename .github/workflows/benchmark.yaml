@@ -43,7 +43,7 @@ jobs:
             -   name: Run PHPBench
                 run: make phpbench_main
 
-            -   uses: actions/upload-artifact@v6
+            -   uses: actions/upload-artifact@v7
                 name: Upload the Benchmark results
                 with:
                     name: bench-main-result
