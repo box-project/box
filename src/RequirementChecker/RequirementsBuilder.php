@@ -56,19 +56,19 @@ final class RequirementsBuilder
         $this->predefinedRequirements[] = $requirement;
     }
 
-    public function addRequiredExtension(Extension $extension, ?string $source): void
+    public function addRequiredExtension(Extension $extension, string $source = ''): void
     {
         $this->requiredExtensions[$extension->name][] = $source;
         $this->allExtensions[$extension->name][$source] = [$source, RequirementType::EXTENSION];
     }
 
-    public function addProvidedExtension(Extension $extension, ?string $source): void
+    public function addProvidedExtension(Extension $extension, string $source = ''): void
     {
         $this->providedExtensions[$extension->name][] = $source;
         $this->allExtensions[$extension->name][$source] = [$source, RequirementType::PROVIDED_EXTENSION];
     }
 
-    public function addConflictingExtension(Extension $extension, ?string $source): void
+    public function addConflictingExtension(Extension $extension, string $source = ''): void1
     {
         $this->conflictingExtensions[$extension->name][] = $source;
     }
