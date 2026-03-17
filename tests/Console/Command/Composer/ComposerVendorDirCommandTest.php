@@ -68,7 +68,6 @@ class ComposerVendorDirCommandTest extends TestCase
     public static function composerExecutableProvider(): iterable
     {
         $compatibleComposerPath = Path::normalize(__DIR__.'/compatible-composer.phar');
-        $incompatibleComposerPath = Path::normalize(__DIR__.'/incompatible-composer.phar');
 
         yield 'normal verbosity' => [
             [
@@ -99,7 +98,7 @@ class ComposerVendorDirCommandTest extends TestCase
             ExitCode::SUCCESS,
         ];
 
-        yield 'incompatible composer executable; quiet verbosity' => [
+        yield 'incompatible composer executable (unsupported version); quiet verbosity' => [
             [
                 '--composer-bin' => 'incompatible-composer.phar',
             ],
