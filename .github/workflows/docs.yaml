@@ -21,10 +21,10 @@ jobs:
         timeout-minutes: 1
         steps:
             -   name: Checkout repository
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
             -   name: Check Markdown formatting
-                uses: DavidAnson/markdownlint-cli2-action@v22.0.0
+                uses: DavidAnson/markdownlint-cli2-action@07035fd053f7be764496c0f8d8f9f41f98305101 # v22.0.0
                 with:
                     globs: "*.md|doc/**/*.md"
 
@@ -34,17 +34,17 @@ jobs:
         timeout-minutes: 1
         steps:
             -   name: Checkout repository
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
             -   name: Restore lychee cache
-                uses: actions/cache@v5
+                uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
                 with:
                     path: .lycheecache
                     key: cache-lychee-${{ github.sha }}
                     restore-keys: cache-lychee-
 
             -   name: Run Lychee
-                uses: lycheeverse/lychee-action@v2.7.0
+                uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
                 with:
                     # To keep in sync with Makefile#lychee
                     args: "--no-progress '*.md' 'doc/**/*.md' --cache --max-cache-age 1d ."
@@ -58,10 +58,10 @@ jobs:
             contents: write
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
             -   name: Setup Python
-                uses: actions/setup-python@v6
+                uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
                 with:
                     python-version: '3.8'
 
@@ -115,7 +115,7 @@ jobs:
                     path: dist/website
 
             -   name: Deploy
-                uses: peaceiris/actions-gh-pages@v4
+                uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
                 with:
                     github_token: ${{ secrets.GITHUB_TOKEN }}
                     publish_dir: dist/website
