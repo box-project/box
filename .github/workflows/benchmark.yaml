@@ -32,7 +32,7 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
@@ -43,7 +43,7 @@ jobs:
             -   name: Run PHPBench
                 run: make phpbench_main
 
-            -   uses: actions/upload-artifact@v6
+            -   uses: actions/upload-artifact@v7
                 name: Upload the Benchmark results
                 with:
                     name: bench-main-result
@@ -68,7 +68,7 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
