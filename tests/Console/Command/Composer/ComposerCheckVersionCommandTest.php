@@ -78,7 +78,7 @@ class ComposerCheckVersionCommandTest extends TestCase
             [],
             <<<OUTPUT
                 [info] '{$compatibleComposerPath}' '--version' '--no-ansi'
-                [info] Version detected: 2.6.3 (Box requires ^2.2.0)
+                [info] Version detected: 2.9.5 (Box requires ^2.2.0)
 
                 OUTPUT,
             ExitCode::SUCCESS,
