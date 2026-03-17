@@ -35,13 +35,13 @@ jobs:
                     coverage: none
 
             -   name: Install the Composer (root) dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
             -   name: Install PHP-CS-Fixer
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: vendor-bin/php-cs-fixer
 
@@ -49,7 +49,7 @@ jobs:
                 run: make php_cs_fixer_install
 
             -   name: Install Rector
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: vendor-bin/rector
 
@@ -57,7 +57,7 @@ jobs:
                 run: make rector_install
 
             -   name: Install the Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: requirement-checker
 
@@ -82,7 +82,7 @@ jobs:
                     coverage: none
 
             -   name: Install the Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: requirement-checker
 
@@ -133,7 +133,7 @@ jobs:
                     coverage: none
 
             -   name: Install the Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: requirement-checker
                     dependency-versions: ${{ matrix.dependency }}
@@ -143,7 +143,7 @@ jobs:
                 run: cd requirement-checker; make _vendor_install
 
             -   name: Install the Composer (root) dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
@@ -152,7 +152,7 @@ jobs:
                 run: make _vendor_install
 
             -   name: Install the Composer (requirement checker bin namespace) dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: vendor-bin/requirement-checker
                     dependency-versions: highest
@@ -233,7 +233,7 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@5c98f0b039f36ef966fdb7dfa9779262785ecb05 # v14
+                uses: dawidd6/action-download-artifact@1f8785ff7a5130826f848e7f72725c85d241860f # v18
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
@@ -256,7 +256,7 @@ jobs:
                 run: bin/box.phar --ansi --version
 
             -   name: Login to GitHub Container Registry
-                uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+                uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
                 with:
                     registry: ghcr.io
                     username: ${{ github.actor }}
@@ -312,7 +312,7 @@ jobs:
                     coverage: none
 
             -   name: Install the Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: requirement-checker
                     dependency-versions: ${{ matrix.php.dependency }}
@@ -324,7 +324,7 @@ jobs:
                 run: cd requirement-checker; make _vendor_install
 
             -   name: Install the Composer (root) dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
@@ -335,7 +335,7 @@ jobs:
                 run: make _vendor_install
 
             -   name: Install the Composer (requirement checker bin namespace) dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: vendor-bin/requirement-checker
                     dependency-versions: highest

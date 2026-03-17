@@ -32,13 +32,13 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
             -   name: Install PHP-CS-Fixer
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: vendor-bin/php-cs-fixer
 
@@ -46,7 +46,7 @@ jobs:
                 run: make php_cs_fixer_install
 
             -   name: Install Rector
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
                 with:
                     working-directory: vendor-bin/rector
 
@@ -86,7 +86,7 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
@@ -108,7 +108,7 @@ jobs:
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
