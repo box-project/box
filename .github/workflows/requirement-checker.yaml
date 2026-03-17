@@ -117,6 +117,9 @@ jobs:
                     -   php: '8.4'
                         dependency: highest
                         composer-options: --ignore-platform-req=php+
+                    -   php: '8.5'
+                        dependency: highest
+                        composer-options: --ignore-platform-req=php+
 
         steps:
             -   name: Checkout
