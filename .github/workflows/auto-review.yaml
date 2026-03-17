@@ -22,23 +22,23 @@ jobs:
         name: Lint CS
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
             -   name: Setup PHP
-                uses: shivammathur/setup-php@v2
+                uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
                 with:
                     php-version: '8.2'
                     tools: composer
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v3
+                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
             -   name: Install PHP-CS-Fixer
-                uses: ramsey/composer-install@v3
+                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
                 with:
                     working-directory: vendor-bin/php-cs-fixer
 
@@ -46,7 +46,7 @@ jobs:
                 run: make php_cs_fixer_install
 
             -   name: Install Rector
-                uses: ramsey/composer-install@v3
+                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
                 with:
                     working-directory: vendor-bin/rector
 
@@ -60,10 +60,10 @@ jobs:
         name: Composer Validate
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
             -   name: Setup PHP
-                uses: shivammathur/setup-php@v2
+                uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
                 with:
                     php-version: '8.2'
                     tools: composer
@@ -76,17 +76,17 @@ jobs:
         name: Box Validate
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
             -   name: Setup PHP
-                uses: shivammathur/setup-php@v2
+                uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
                 with:
                     php-version: '8.2'
                     tools: composer
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v3
+                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
@@ -98,17 +98,17 @@ jobs:
         name: AutoReview Tests
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
             -   name: Setup PHP
-                uses: shivammathur/setup-php@v2
+                uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
                 with:
                     php-version: '8.2'
                     tools: composer
                     coverage: none
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v3
+                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install

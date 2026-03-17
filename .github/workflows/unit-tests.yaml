@@ -87,12 +87,12 @@ jobs:
 
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
                 with:
                     fetch-depth: 0
 
             -   name: Setup PHP
-                uses: shivammathur/setup-php@v2
+                uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
                 with:
                     php-version: ${{ matrix.php.version }}
                     ini-values: ${{ matrix.phar-readonly && 'phar.readonly=1' || 'phar.readonly=0' }}, display_errors=On, error_reporting=-1
@@ -105,7 +105,7 @@ jobs:
                 run: composer config platform.php --unset
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v3
+                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
                 with:
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
@@ -125,12 +125,12 @@ jobs:
         if: github.event_name == 'pull_request' || github.event_name == 'push'
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
                 with:
                     fetch-depth: 0
 
             -   name: Setup PHP
-                uses: shivammathur/setup-php@v2
+                uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
                 with:
                     php-version: ${{ matrix.php }}
                     # The phar.readonly value is adjusted in the Makefile command for
@@ -156,13 +156,13 @@ jobs:
                     echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$INFECTION_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@v3
+                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
             -   name: Install Infection
-                uses: ramsey/composer-install@v3
+                uses: ramsey/composer-install@a8d0d959dab41457692a5e2041bd9b757a119e3f # 3.2.1
 
             -   name: Ensure that the Infection make target is up to date
                 run: make infection_install
