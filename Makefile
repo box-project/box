@@ -348,7 +348,7 @@ lychee:
 	@echo "$(YELLOW_COLOR)Ensure you have the lychee command installed. For more information, check:$(NO_COLOR)"
 	@echo "https://github.com/lycheeverse/lychee"
 	@# To keep in sync with .github/workflows/gh-pages.yaml#check-links
-	lychee --verbose --no-progress '*.md' 'docs/**/*.md'
+	lychee '*.md' 'doc/**/*.md' --root-dir=doc --no-progress --verbose
 
 .PHONY: website_build
 website_build:		 ## Builds the website
