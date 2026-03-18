@@ -551,27 +551,26 @@
         },
         {
             "name": "fidry/makefile",
-            "version": "1.1.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/theofidry/makefile.git",
-                "reference": "8466e995e43d96cfe81cb9086bb50032896f4f5e"
+                "reference": "3d0350840eeeda8127e014f0f7f86917c7f7b4f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/theofidry/makefile/zipball/8466e995e43d96cfe81cb9086bb50032896f4f5e",
-                "reference": "8466e995e43d96cfe81cb9086bb50032896f4f5e",
+                "url": "https://api.github.com/repos/theofidry/makefile/zipball/3d0350840eeeda8127e014f0f7f86917c7f7b4f1",
+                "reference": "3d0350840eeeda8127e014f0f7f86917c7f7b4f1",
                 "shasum": ""
             },
             "require": {
-                "ext-mbstring": "*",
-                "php": "^8.3"
+                "php": "^8.1"
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.4",
                 "ergebnis/composer-normalize": "^2.28",
-                "infection/infection": "^0.32",
-                "phpunit/phpunit": "^12.0"
+                "infection/infection": "^0.29",
+                "phpunit/phpunit": "^10.3"
             },
             "type": "library",
             "extra": {
@@ -604,7 +603,7 @@
             ],
             "support": {
                 "issues": "https://github.com/theofidry/makefile/issues",
-                "source": "https://github.com/theofidry/makefile/tree/1.1.2"
+                "source": "https://github.com/theofidry/makefile/tree/1.0.3"
             },
             "funding": [
                 {
@@ -612,7 +611,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-02T11:45:09+00:00"
+            "time": "2025-02-13T22:15:57+00:00"
         },
         {
             "name": "justinrainbow/json-schema",
