@@ -154,6 +154,6 @@ Note that as a result you may want to use the [`force-autodiscovery`][force-auto
 [httpoxy]: https://httpoxy.org/
 [force-autodiscovery]: ./configuration.md#force-auto-discovery-force-autodiscovery
 [phar-running]: https://www.php.net/manual/en/phar.running.php
-[phpdbg]: https://www.php.net/manual/en/intro.phpdbg.php
+[phpdbg]: https://www.php.net/manual/en/book.phpdbg.php
 [php-sapi-name]: https://www.php.net/manual/en/function.php-sapi-name.php
 
