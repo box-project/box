@@ -1,9 +1,9 @@
 <?php
 
-namespace HumbugBox4610\Composer;
+namespace HumbugBox470\Composer;
 
-use HumbugBox4610\Composer\Autoload\ClassLoader;
-use HumbugBox4610\Composer\Semver\VersionParser;
+use HumbugBox470\Composer\Autoload\ClassLoader;
+use HumbugBox470\Composer\Semver\VersionParser;
 class InstalledVersions
 {
     private static $selfDir = null;
@@ -185,7 +185,7 @@ class InstalledVersions
     private static function getInstalled()
     {
         if (null === self::$canGetVendors) {
-            self::$canGetVendors = method_exists('HumbugBox4610\Composer\Autoload\ClassLoader', 'getRegisteredLoaders');
+            self::$canGetVendors = method_exists('HumbugBox470\Composer\Autoload\ClassLoader', 'getRegisteredLoaders');
         }
         $installed = array();
         $copiedLocalDir = \false;
