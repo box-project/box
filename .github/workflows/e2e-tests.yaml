@@ -110,7 +110,7 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@1f8785ff7a5130826f848e7f72725c85d241860f # v18
+                uses: dawidd6/action-download-artifact@8a338493df3d275e4a7a63bcff3b8fe97e51a927 # v19
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
@@ -165,7 +165,7 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@1f8785ff7a5130826f848e7f72725c85d241860f # v18
+                uses: dawidd6/action-download-artifact@8a338493df3d275e4a7a63bcff3b8fe97e51a927 # v19
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
