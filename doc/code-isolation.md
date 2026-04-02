@@ -8,7 +8,7 @@
 ## Why/Explanation
 
 When bundling the code in a PHAR, it is equivalent to compacting all the code in a single file. However unlike in a
-compiled language, the code does not change. This, when the PHAR _loads_ external code, can lead to dependency
+compiled language, the code does not change. Thus, when the PHAR _loads_ external code, can lead to dependency
 conflicts.
 
 To illustrate that issue with an example: we are building a console application `myapp.phar` which relies on the library
