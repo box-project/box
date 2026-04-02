@@ -31,7 +31,7 @@ requirements are passing on the right in debug verbosity.
 
 Box will retrieve all the (non-dev) requirements including the ones of the dependencies if there is any. When a
 `composer.lock` file is present, it will take the information from it. If not found, it will fallback on the
-`composer.json` but that it will not be able to retrieve any information regarding the dependencies requirements in this
+`composer.json` but that it will not be able to retrieve any information regarding the dependencies' requirements in this
 case.
 
 This behaviour can be forcefully enabled or disabled via the [check requirements] setting.
