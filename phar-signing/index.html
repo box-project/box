@@ -1134,7 +1134,7 @@ of a PHAR is as follows:</p>
 if the content of the PHAR has been tempered with, e.g. code was injected in the archive, PHP will see that the content
 of the archive does not match the signature of the PHAR and will bail out.</p>
 <h3 id="why-it-is-bad">Why it is bad<a class="headerlink" href="#why-it-is-bad" title="Permanent link">&para;</a></h3>
-<p>There is a few downsides from this signing mechanisms:</p>
+<p>There are a few downsides to this signing mechanism:</p>
 <ul>
 <li>You cannot run the PHAR without its associated public key file laying right next to it. As a result, if you were to
   move your PHAR under <code>/usr/local/bin</code>, the PHAR would no longer work due to the missing public key file.</li>
@@ -1321,7 +1321,7 @@ only. The following is an example of <a href="https://docs.github.com/en/actions
 <span class="w">                </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">...</span>
 
 <span class="w">            </span><span class="c1"># Smoke test.</span>
-<span class="w">            </span><span class="c1"># It is recommended ot have some sorts of tests for your PHAR.</span>
+<span class="w">            </span><span class="c1"># It is recommended to have some sorts of tests for your PHAR.</span>
 <span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Ensure the PHAR works</span>
 <span class="w">                </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bin/command.phar --version</span>
 
