@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Console\Command;
 
+use Closure;
 use DirectoryIterator;
 use Fidry\Console\Bridge\Command\SymfonyCommand;
 use Fidry\Console\Command\Command;
@@ -913,7 +914,7 @@ class CompileCommandTest extends FileSystemTestCase
         $this->assertSameOutput(
             $expected,
             ExitCode::SUCCESS,
-            self::createComposerPathNormalizer(),
+            self::normalizeComposerPath(...),
         );
     }
 
@@ -1050,7 +1051,7 @@ class CompileCommandTest extends FileSystemTestCase
         $this->assertSameOutput(
             $expected,
             ExitCode::SUCCESS,
-            self::createComposerPathNormalizer(),
+            self::normalizeComposerPath(...),
         );
     }
 
@@ -2997,79 +2998,75 @@ class CompileCommandTest extends FileSystemTestCase
         yield [false];
     }
 
-    private function createCompilerDisplayNormalizer(): callable
+    private function normalizeCompilerDisplay(string $output): string
     {
-        $tmp = $this->tmp;
+        $output = str_replace($this->tmp, '/path/to/tmp', $output);
 
-        return static function (string $output) use ($tmp): string {
-            $output = str_replace($tmp, '/path/to/tmp', $output);
+        $output = preg_replace(
+            '/Loading the configuration file[\s\n]+.*[\s\n\/]+.*box\.json[comment\<\>\n\s\/]*"\./',
+            'Loading the configuration file "/path/to/box.json.dist".',
+            $output,
+        );
 
+        $output = preg_replace(
+            '/You can inspect the generated PHAR( | *\n *\/\/ *)with( | *\n *\/\/ *)the( | *\n *\/\/ *)"info"( | *\n *\/\/ *)command/',
+            'You can inspect the generated PHAR with the "info" command',
+            $output,
+        );
+
+        $output = preg_replace(
+            '/\/\/ PHAR: (\d+ files?) \(\d+\.\d{2}K?B\)/',
+            '// PHAR: $1 (100B)',
+            $output,
+        );
+
+        $output = preg_replace(
+            '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*(sec|s|ms)/',
+            '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
+            $output,
+        );
+
+        $output = str_replace(
+            'Xdebug',
+            'xdebug',
+            $output,
+        );
+
+        $output = preg_replace(
+            '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)'.PHP_EOL.'/',
+            '',
+            $output,
+        );
+
+        $output = str_replace(
+            '[debug] Restored the maximum number of open file descriptors'.PHP_EOL,
+            '',
+            $output,
+        );
+
+        if (extension_loaded('xdebug')) {
             $output = preg_replace(
-                '/Loading the configuration file[\s\n]+.*[\s\n\/]+.*box\.json[comment\<\>\n\s\/]*"\./',
-                'Loading the configuration file "/path/to/box.json.dist".',
-                $output,
-            );
-
-            $output = preg_replace(
-                '/You can inspect the generated PHAR( | *\n *\/\/ *)with( | *\n *\/\/ *)the( | *\n *\/\/ *)"info"( | *\n *\/\/ *)command/',
-                'You can inspect the generated PHAR with the "info" command',
-                $output,
-            );
-
-            $output = preg_replace(
-                '/\/\/ PHAR: (\d+ files?) \(\d+\.\d{2}K?B\)/',
-                '// PHAR: $1 (100B)',
-                $output,
-            );
-
-            $output = preg_replace(
-                '/\/\/ Memory usage: \d+\.\d{2}MB \(peak: \d+\.\d{2}MB\), time: .*(sec|s|ms)/',
-                '// Memory usage: 5.00MB (peak: 10.00MB), time: 0.00s',
-                $output,
-            );
-
-            $output = str_replace(
-                'Xdebug',
-                'xdebug',
-                $output,
-            );
-
-            $output = preg_replace(
-                '/\[debug\] Increased the maximum number of open file descriptors from \([^\)]+\) to \([^\)]+\)'.PHP_EOL.'/',
+                '/'.PHP_EOL.'You are running composer with xdebug enabled. This has a major impact on runtime performance. See https:\/[^\s]+'.PHP_EOL.'/',
                 '',
                 $output,
             );
+        }
 
-            $output = str_replace(
-                '[debug] Restored the maximum number of open file descriptors'.PHP_EOL,
-                '',
-                $output,
-            );
-
-            if (extension_loaded('xdebug')) {
-                $output = preg_replace(
-                    '/'.PHP_EOL.'You are running composer with xdebug enabled. This has a major impact on runtime performance. See https:\/[^\s]+'.PHP_EOL.'/',
-                    '',
-                    $output,
-                );
-            }
-
-            return $output;
-        };
+        return $output;
     }
 
-    private static function createComposerPathNormalizer(): callable
+    private static function normalizeComposerPath(string $output): string
     {
-        return static fn (string $output): string => preg_replace(
+        return preg_replace(
             '/(\/.*?composer(?:\.phar)?)/',
             '/usr/local/bin/composer',
             $output,
         );
     }
 
-    private static function createComposerVersionNormalizer(): callable
+    private static function normalizeComposerVersion(string $output): string
     {
-        return static fn (string $output): string => preg_replace(
+        return preg_replace(
             '/> Version detected: ([\d.]+) \(Box requires \^2\.2\.0\)/',
             '> Version detected: 2.2.22 (Box requires ^2.2.0)',
             $output,
@@ -3120,21 +3117,21 @@ class CompileCommandTest extends FileSystemTestCase
     }
 
     /**
-     * @param callable(string):string $extraNormalizers
+     * @param Closure(string):string $extraNormalizers
      */
     private function assertSameOutput(
         string $expectedOutput,
         int $expectedStatusCode,
-        callable ...$extraNormalizers,
+        Closure ...$extraNormalizers,
     ): void {
         OutputAssertions::assertSameOutput(
             $expectedOutput,
             $expectedStatusCode,
             $this->commandTester,
-            BoxDisplayNormalizer::createReplaceBoxVersionNormalizer(),
-            $this->createCompilerDisplayNormalizer(),
-            self::createComposerPathNormalizer(),
-            self::createComposerVersionNormalizer(),
+            BoxDisplayNormalizer::normalizeBoxVersion(...),
+            $this->normalizeCompilerDisplay(...),
+            self::normalizeComposerPath(...),
+            self::normalizeComposerVersion(...),
             ...$extraNormalizers,
         );
     }
