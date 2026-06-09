@@ -2013,16 +2013,16 @@
         },
         {
             "name": "symfony/runtime",
-            "version": "v6.4.26",
+            "version": "v6.4.40",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/runtime.git",
-                "reference": "59933ca737fd60fad548241b6d879cd0e4be31ab"
+                "reference": "08ab3298d601b0f3220ff837723aafcc5269cb61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/runtime/zipball/59933ca737fd60fad548241b6d879cd0e4be31ab",
-                "reference": "59933ca737fd60fad548241b6d879cd0e4be31ab",
+                "url": "https://api.github.com/repos/symfony/runtime/zipball/08ab3298d601b0f3220ff837723aafcc5269cb61",
+                "reference": "08ab3298d601b0f3220ff837723aafcc5269cb61",
                 "shasum": ""
             },
             "require": {
@@ -2072,7 +2072,7 @@
                 "runtime"
             ],
             "support": {
-                "source": "https://github.com/symfony/runtime/tree/v6.4.26"
+                "source": "https://github.com/symfony/runtime/tree/v6.4.40"
             },
             "funding": [
                 {
@@ -2092,7 +2092,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-11T15:30:54+00:00"
+            "time": "2026-05-20T07:08:27+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -2527,5 +2527,5 @@
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
