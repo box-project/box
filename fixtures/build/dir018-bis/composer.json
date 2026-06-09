@@ -9,7 +9,7 @@
         "symfony/dotenv": "7.3.*",
         "symfony/flex": "^2.0",
         "symfony/framework-bundle": "7.3.*",
-        "symfony/runtime": "7.3.*",
+        "symfony/runtime": "7.4.*",
         "symfony/yaml": "7.3.*"
     },
     "config": {

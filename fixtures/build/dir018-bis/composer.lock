@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "63ff09b9b7819c2891287faa3a8627c4",
+    "content-hash": "43d5eac9783ebccbe0a49e24d4bb3f6b",
     "packages": [
         {
             "name": "psr/cache",
@@ -2021,16 +2021,16 @@
         },
         {
             "name": "symfony/runtime",
-            "version": "v7.3.4",
+            "version": "v7.4.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/runtime.git",
-                "reference": "3550e2711e30bfa5d808514781cd52d1cc1d9e9f"
+                "reference": "0b032fa77359745db793df5aff626779180c5f3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/runtime/zipball/3550e2711e30bfa5d808514781cd52d1cc1d9e9f",
-                "reference": "3550e2711e30bfa5d808514781cd52d1cc1d9e9f",
+                "url": "https://api.github.com/repos/symfony/runtime/zipball/0b032fa77359745db793df5aff626779180c5f3b",
+                "reference": "0b032fa77359745db793df5aff626779180c5f3b",
                 "shasum": ""
             },
             "require": {
@@ -2042,10 +2042,11 @@
             },
             "require-dev": {
                 "composer/composer": "^2.6",
-                "symfony/console": "^6.4|^7.0",
-                "symfony/dotenv": "^6.4|^7.0",
-                "symfony/http-foundation": "^6.4|^7.0",
-                "symfony/http-kernel": "^6.4|^7.0"
+                "symfony/console": "^6.4|^7.0|^8.0",
+                "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+                "symfony/dotenv": "^6.4|^7.0|^8.0",
+                "symfony/http-foundation": "^6.4|^7.0|^8.0",
+                "symfony/http-kernel": "^6.4|^7.0|^8.0"
             },
             "type": "composer-plugin",
             "extra": {
@@ -2080,7 +2081,7 @@
                 "runtime"
             ],
             "support": {
-                "source": "https://github.com/symfony/runtime/tree/v7.3.4"
+                "source": "https://github.com/symfony/runtime/tree/v7.4.12"
             },
             "funding": [
                 {
@@ -2100,7 +2101,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-11T15:31:28+00:00"
+            "time": "2026-05-20T07:20:23+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -2535,5 +2536,5 @@
     "platform-overrides": {
         "php": "8.2"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
