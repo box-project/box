@@ -10,7 +10,7 @@
         "symfony/flex": "^2.0",
         "symfony/framework-bundle": "7.3.*",
         "symfony/runtime": "7.3.*",
-        "symfony/yaml": "7.3.*"
+        "symfony/yaml": "7.4.*"
     },
     "config": {
         "sort-packages": true,
