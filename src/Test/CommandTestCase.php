@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Test;
 
+use Closure;
 use Fidry\Console\Bridge\Command\SymfonyCommand;
 use Fidry\Console\Command\Command;
 use Fidry\Console\Test\CommandTester;
@@ -61,12 +62,12 @@ abstract class CommandTestCase extends FileSystemTestCase
     abstract protected function getCommand(): Command;
 
     /**
-     * @param callable(string):string $extraNormalizers
+     * @param Closure(string):string $extraNormalizers
      */
     public function assertSameOutput(
         string $expectedOutput,
         int $expectedStatusCode,
-        callable ...$extraNormalizers,
+        Closure ...$extraNormalizers,
     ): void {
         OutputAssertions::assertSameOutput(
             $expectedOutput,
