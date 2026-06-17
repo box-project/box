@@ -9,7 +9,7 @@
         "symfony/dotenv": "7.3.*",
         "symfony/flex": "^1.9",
         "symfony/framework-bundle": "7.3.*",
-        "symfony/yaml": "7.3.*"
+        "symfony/yaml": "7.4.*"
     },
     "config": {
         "preferred-install": {
