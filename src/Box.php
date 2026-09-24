@@ -165,9 +165,14 @@ final class Box implements Countable
                 $this->phar->buildFromDirectory($tmp);
             }
         } finally {
-            FS::remove($tmp);
-            // Must happen _after_ the remove as the latter has higher priority.
-            chdir($cwd);
+            if (PHP_OS_FAMILY === 'Windows') {
+                chdir($cwd);
+                FS::remove($tmp);
+            } else {
+                FS::remove($tmp);
+                // Must happen _after_ the remove as the latter has higher priority.
+                chdir($cwd);
+            }
         }
 
         $this->buffering = false;
