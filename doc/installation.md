@@ -89,7 +89,7 @@ The official docker image for the project is [`boxproject/box`][docker-image]:
 
 ```shell
 docker pull boxproject/box
-docker run --rm -v $(pwd):/app boxproject/box
+docker run --rm -v $(pwd):/local boxproject/box
 ```
 
 Beware that with the above you may be limited with the Composer binary used. If you need your own
