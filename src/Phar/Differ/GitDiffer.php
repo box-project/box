@@ -55,7 +55,7 @@ final class GitDiffer implements Differ
 
         $filteredLines = array_filter(
             $diffLines,
-            static fn (string $line) => !str_starts_with($line, $pharMetaLine)
+            static fn (string $line) => !str_starts_with($line, $pharMetaLine),
         );
 
         $filteredDiff = implode($separator, $filteredLines);

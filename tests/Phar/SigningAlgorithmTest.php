@@ -31,7 +31,7 @@ final class SigningAlgorithmTest extends TestCase
     #[DataProvider('signingAlgorithmLabelsProvider')]
     public function test_it_can_tell_be_created_from_its_label(
         ?string $label,
-        SigningAlgorithm $expected
+        SigningAlgorithm $expected,
     ): void {
         $actual = SigningAlgorithm::fromLabel($label);
 

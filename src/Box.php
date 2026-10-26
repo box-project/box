@@ -240,7 +240,7 @@ final class Box implements Countable
      */
     private static function createFileSortedIterator(
         array $bufferedFiles,
-        iterable $remainingFiles
+        iterable $remainingFiles,
     ): Traversable {
         $files = [...$bufferedFiles, ...$remainingFiles];
         uksort($files, strcmp(...));

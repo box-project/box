@@ -53,7 +53,7 @@ final readonly class ComposerArtifacts
         return array_values(
             array_filter(
                 array_map(
-                    static fn (null|ComposerArtifact|ComposerJson|ComposerLock $file): ?string => $file?->path,
+                    static fn (ComposerArtifact|ComposerJson|ComposerLock|null $file): ?string => $file?->path,
                     [$this->composerJson, $this->composerLock, $this->installedJson],
                 ),
             ),

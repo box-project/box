@@ -57,7 +57,7 @@ class PhpTest extends CompactorTestCase
     public function test_it_compacts_php_files(
         DocblockAnnotationParser $annotationParser,
         string $content,
-        string $expected
+        string $expected,
     ): void {
         $file = 'foo.php';
 
