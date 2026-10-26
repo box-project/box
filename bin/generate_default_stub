@@ -18,7 +18,7 @@ $phar->setDefaultStub();
 
 file_put_contents(
     __DIR__.'/../dist/default_stub.php',
-    $phar->getStub()
+    $phar->getStub(),
 );
 
 unlink('tmp.phar');

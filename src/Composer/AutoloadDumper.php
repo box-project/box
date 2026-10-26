@@ -64,7 +64,7 @@ final class AutoloadDumper
         );
 
         $mergedAutoloadContents = preg_replace(
-            '/(\s*\\$loader \= .*autoload\.php.*)/',
+            '/(\s*\$loader \= .*autoload\.php.*)/',
             $indentedAutoloadContents,
             $scoperStatements,
         );
@@ -118,7 +118,7 @@ final class AutoloadDumper
 
     private static function getLoaderStatementIndent(string $scoperStatements): string
     {
-        if (1 !== preg_match('/(?<indent> *)\\$loader \= .*autoload\.php.*/', $scoperStatements, $matches)) {
+        if (1 !== preg_match('/(?<indent> *)\$loader \= .*autoload\.php.*/', $scoperStatements, $matches)) {
             throw new UnexpectedValueException('Could not process the scoper autoloader statements');
         }
 

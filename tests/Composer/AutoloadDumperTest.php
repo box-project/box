@@ -428,7 +428,7 @@ final class AutoloadDumperTest extends TestCase
      */
     private static function createRegistry(
         array $functions,
-        array $classes
+        array $classes,
     ): SymbolsRegistry {
         $registry = new SymbolsRegistry();
 

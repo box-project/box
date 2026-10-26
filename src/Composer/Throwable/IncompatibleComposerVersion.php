@@ -26,7 +26,7 @@ final class IncompatibleComposerVersion extends RuntimeException
                 'The Composer version "%s" does not satisfy the constraint "%s".',
                 $version,
                 $constraints,
-            )
+            ),
         );
     }
 }
