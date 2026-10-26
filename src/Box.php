@@ -414,9 +414,7 @@ final class Box implements Countable
     {
         Assert::true($this->buffering, 'Cannot add files if the buffering has not started.');
 
-        if (null === $contents) {
-            $contents = FS::getFileContents($file);
-        }
+        $contents ??= FS::getFileContents($file);
 
         $local = ($this->mapFile)($file);
 

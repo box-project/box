@@ -26,9 +26,7 @@ final class MakefileE2ECollector
     {
         static $e2eRule;
 
-        if (!isset($e2eRule)) {
-            $e2eRule = self::findE2ERule();
-        }
+        $e2eRule ??= self::findE2ERule();
 
         return $e2eRule;
     }

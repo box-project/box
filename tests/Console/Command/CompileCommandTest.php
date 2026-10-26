@@ -3080,9 +3080,7 @@ class CompileCommandTest extends FileSystemTestCase
     {
         $root = 'phar://'.str_replace('\\', '/', realpath($phar->getPath())).'/';
 
-        if (null === $traversable) {
-            $traversable = $phar;
-        }
+        $traversable ??= $phar;
 
         $collectedPaths = [];
 
