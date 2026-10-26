@@ -159,6 +159,7 @@ box_validate: $(BOX_BIN)
 
 .PHONY: zizmor
 zizmor:			 ## Runs zizmor to check the GitHub Actions workflows
+zizmor:
 	docker compose run --rm zizmor
 
 .PHONY: phpunit_autoreview
