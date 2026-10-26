@@ -18,7 +18,7 @@ return static function (RectorConfig $rectorConfig) use ($applyCommonConfig): vo
 
     $rectorConfig->sets([
         LevelSetList::UP_TO_PHP_82,
-        PHPUnitSetList::PHPUNIT_100,
+        PHPUnitSetList::ANNOTATIONS_TO_ATTRIBUTES,
     ]);
 
     $rectorConfig->skip([
