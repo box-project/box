@@ -124,6 +124,9 @@ clean:
 		|| true
 	$(MAKE) dist
 
+.PHONY: sbx_create
+sbx_create:
+	sbx run claude --kit=.sbx/otel --kit=.sbx/php
 
 .PHONY: compile
 compile: 		 ## Compiles the application into the PHAR
