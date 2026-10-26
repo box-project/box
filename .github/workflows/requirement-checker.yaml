@@ -13,6 +13,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
+permissions:
+    contents: read
+
 env:
     POLLING_INTERVALS_SEC: 30
     SLEEP_TIME_SEC: 60s
@@ -26,6 +29,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -73,6 +78,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -124,6 +131,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -221,6 +230,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -303,6 +314,7 @@ jobs:
                     ref: ${{ github.head_ref }}
                     fetch-depth: '0'  # Ensures the tags are fetched
                     token: ${{ secrets.GITHUB_TOKEN }}
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0

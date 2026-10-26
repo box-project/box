@@ -20,12 +20,14 @@ env:
 
 permissions:
     contents: read
-    packages: write
 
 jobs:
     docker-build:
         runs-on: ubuntu-latest
         name: Publish the Docker image ${{ matrix.name }}
+        permissions:
+            contents: read
+            packages: write  # Required to push the image to the GitHub Container Registry.
         # See https://github.com/phpstan/phpstan/commit/4a535193101975e50fbaeea92ca6eca8c7a349b1
         concurrency: docker-build-${{ github.ref }}-${{ matrix.docker-file }}
         strategy:
@@ -44,6 +46,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Set up QEMU
                 uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0

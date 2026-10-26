@@ -15,6 +15,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
+permissions:
+    contents: read
+
 env:
     TERM: xterm
 
@@ -90,6 +93,7 @@ jobs:
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
                 with:
                     fetch-depth: 0
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -105,7 +109,7 @@ jobs:
                 run: composer config platform.php --unset
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0 # zizmor: ignore[cache-poisoning] No artefact is published by this workflow
                 with:
                     dependency-versions: ${{ matrix.php.dependency }}
                     composer-options: ${{ matrix.php.composer-options }}
@@ -128,6 +132,7 @@ jobs:
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
                 with:
                     fetch-depth: 0
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -156,13 +161,13 @@ jobs:
                     echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$INFECTION_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
 
             -   name: Install Composer dependencies
-                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0 # zizmor: ignore[cache-poisoning] No artefact is published by this workflow
 
             -   name: Ensure that the make target is up to date
                 run: make _vendor_install
 
             -   name: Install Infection
-                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+                uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0 # zizmor: ignore[cache-poisoning] No artefact is published by this workflow
 
             -   name: Ensure that the Infection make target is up to date
                 run: make infection_install

@@ -13,6 +13,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
+permissions:
+    contents: read
+
 env:
     TERM: xterm
 
@@ -23,6 +26,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -61,6 +66,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -77,6 +84,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -99,6 +108,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup PHP
                 uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
@@ -116,6 +127,22 @@ jobs:
             -   run: make phpunit_autoreview
 
 
+    zizmor:
+        runs-on: ubuntu-latest
+        name: zizmor
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
+
+            -   name: Run zizmor
+                uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+                with:
+                    # Report the findings as annotations and fail the job instead of
+                    # uploading them to the GitHub Security tab.
+                    advanced-security: false
+
     # This is a "trick", a meta task which does not change, and we can use in
     # the protected branch rules as opposed to the tests one above which
     # may change regularly.
@@ -127,6 +154,7 @@ jobs:
             - composer-validate
             - box-config-validate
             - autoreview-test
+            - zizmor
         if: always()
         steps:
             - name: Successful run

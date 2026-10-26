@@ -11,6 +11,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
+permissions:
+    contents: read
+
 env:
     TERM: xterm
 
@@ -22,6 +25,8 @@ jobs:
         steps:
             -   name: Checkout repository
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Check Markdown formatting
                 uses: DavidAnson/markdownlint-cli2-action@ce4853d43830c74c1753b39f3cf40f71c2031eb9 # v23.0.0
@@ -35,6 +40,8 @@ jobs:
         steps:
             -   name: Checkout repository
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Restore lychee cache
                 uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
@@ -59,6 +66,8 @@ jobs:
         steps:
             -   name: Checkout
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                with:
+                    persist-credentials: false
 
             -   name: Setup Python
                 uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
@@ -74,7 +83,7 @@ jobs:
             -   name: Rebuild website
                 run: make _website_build
 
-            -   uses: actions/upload-artifact@v7
+            -   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
                 name: Upload the docs artifact
                 with:
                     name: docs-website
@@ -109,7 +118,7 @@ jobs:
         needs:
             - build
         steps:
-            -   uses: actions/download-artifact@v8
+            -   uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
                 with:
                     name: docs-website
                     path: dist/website
