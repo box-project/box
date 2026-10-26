@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox4610\KevinGH\RequirementChecker;
+namespace HumbugBox470\KevinGH\RequirementChecker;
 
 use InvalidArgumentException;
 use function count;

@@ -78,7 +78,7 @@ of the archive does not match the signature of the PHAR and will bail out.
 
 ### Why it is bad
 
-There is a few downsides from this signing mechanisms:
+There are a few downsides to this signing mechanism:
 
 - You cannot run the PHAR without its associated public key file laying right next to it. As a result, if you were to
   move your PHAR under `/usr/local/bin`, the PHAR would no longer work due to the missing public key file.
@@ -338,7 +338,7 @@ jobs:
                 run: ...
 
             # Smoke test.
-            # It is recommended ot have some sorts of tests for your PHAR.
+            # It is recommended to have some sorts of tests for your PHAR.
             -   name: Ensure the PHAR works
                 run: bin/command.phar --version
 

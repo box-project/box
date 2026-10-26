@@ -26,7 +26,7 @@ great things:
 
 ## Docs
 
-Go do the [documentation](installation.md#installation).
+Find out more about [installation](installation.md#installation) and [configuration](configuration.md#configuration).
 
 
 ## Usage

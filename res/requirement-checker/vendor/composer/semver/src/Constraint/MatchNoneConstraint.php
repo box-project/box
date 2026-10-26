@@ -1,6 +1,6 @@
 <?php
 
-namespace HumbugBox4610\Composer\Semver\Constraint;
+namespace HumbugBox470\Composer\Semver\Constraint;
 
 class MatchNoneConstraint implements ConstraintInterface
 {
