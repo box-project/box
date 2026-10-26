@@ -1,0 +1,12 @@
+services:
+    zizmor:
+        image: ghcr.io/zizmorcore/zizmor:1.31.1@sha256:42d409dbb851d4c5d35a058cf042b828bea1e3f2884378c526eb0974780e18d9
+        working_dir: /workspace
+        volumes:
+            - ./.github:/workspace/.github:ro
+        environment:
+            # Without a token, the audits requiring the GitHub API are skipped.
+            - ZIZMOR_OFFLINE=${ZIZMOR_OFFLINE:-true}
+            # Only passed through if set on the host.
+            - ZIZMOR_GITHUB_TOKEN
+        command: [ '--format=plain', '.github' ]
