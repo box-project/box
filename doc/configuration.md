@@ -778,7 +778,7 @@ compression affects the individual files within the PHAR and not the PHAR as a w
 
 ### Signing algorithm (`algorithm`)
 
-The algorithm (`string`|`null` default `SHA1`) setting is the signing algorithm to use when the PHAR is built
+The algorithm (`string`|`null` default `SHA512`) setting is the signing algorithm to use when the PHAR is built
 ([`Phar::setSignatureAlgorithm()`][phar.setsignaturealgorithm]). The following is a list of the signature algorithms
 available:
 
@@ -788,7 +788,7 @@ available:
 - `SHA512`
 - `OPENSSL` (deprecated)
 
-By default, PHARs are `SHA1` signed.
+By default, PHARs are `SHA512` signed.
 
 The `OPENSSL` algorithm will require to provide [a key][key].
 
