@@ -26,7 +26,7 @@ final readonly class Extensions implements IteratorAggregate, Countable
      * @param list<Extension> $extensions
      */
     public function __construct(
-        public array $extensions = []
+        public array $extensions = [],
     ) {
     }
 

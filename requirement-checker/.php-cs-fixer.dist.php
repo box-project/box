@@ -40,7 +40,9 @@ $overriddenRules = [
         'location' => 'after_declare_strict',
     ],
     'mb_str_functions' => false,
+    'new_with_parentheses' => false,    // Should be done in fidry/php-cs-fixer-config
     'no_trailing_whitespace_in_string' => false,
+    'php_unit_data_provider_method_order' => false,
     'use_arrow_functions' => false,
     'trailing_comma_in_multiline' => [
         'elements' => ['arrays'],

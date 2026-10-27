@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\PHPUnit\Set\PHPUnitSetList;
-use Rector\Set\ValueObject\LevelSetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -17,11 +15,8 @@ return RectorConfig::configure()
     ])
     ->withImportNames(removeUnusedImports: true)
     ->withPhpSets(php82: true)
-    ->withSets([
-        PHPUnitSetList::PHPUNIT_100,
-    ])
+    ->withAttributesSets(phpunit: true)
     ->withSkip([
-        \Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector::class,
         \Rector\Php55\Rector\String_\StringClassNameToClassConstantRector::class => [
             __DIR__.'/src/Configuration/Configuration.php',
         ],

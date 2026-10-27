@@ -45,6 +45,7 @@ final class MakefileTest extends BaseMakefileTestCase
             [33mcompile:[0m 		  Compiles the application into the PHAR
             [33mdump_requirement_checker:[0m Dumps the requirement checker
             [33mautoreview:[0m 		  AutoReview checks
+            [33mzizmor:[0m			  Runs zizmor to check the GitHub Actions workflows
             [33mcs:[0m	 		  Fixes CS
             [33mcs_lint:[0m 	 	  Lints CS
             [33mtest:[0m		  	  Runs all the tests

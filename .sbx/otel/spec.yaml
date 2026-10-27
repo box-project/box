@@ -1,0 +1,24 @@
+---
+schemaVersion: "2"
+kind: mixin
+name: box
+displayName: Box
+description: Project for the Composer package `humbug/box`.
+
+permissions:
+    network:
+        allow:
+            # For OpenTelemetry
+            - "host.docker.internal:4318"
+
+environment:
+    variables:
+        OTEL_RESOURCE_ATTRIBUTES: "project=box,deployment.environment=sandbox"
+        CLAUDE_CODE_ENABLE_TELEMETRY: '1'
+        CLAUDE_CODE_ENHANCED_TELEMETRY_BETA: '1'
+        OTEL_EXPORTER_OTLP_PROTOCOL: 'http/protobuf'
+        OTEL_EXPORTER_OTLP_ENDPOINT: 'http://host.docker.internal:4318'
+        OTEL_TRACES_EXPORTER: 'otlp'
+        OTEL_METRICS_EXPORTER: 'otlp'
+        OTEL_LOGS_EXPORTER: 'otlp'
+        OTEL_SERVICE_NAME: 'claude-code'

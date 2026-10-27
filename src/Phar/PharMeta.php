@@ -147,7 +147,7 @@ final readonly class PharMeta
         array &$filesMeta,
     ): void {
         foreach ($source as $path => $pharFileInfo) {
-            if (!($pharFileInfo instanceof PharFileInfo)) {
+            if (!$pharFileInfo instanceof PharFileInfo) {
                 $pharFileInfo = new PharFileInfo($path);
             }
 

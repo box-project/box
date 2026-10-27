@@ -103,7 +103,7 @@ final readonly class ExportableConfiguration
      */
     private static function createPathNormalizer(string $basePath): Closure
     {
-        return static function (null|SplFileInfo|string $path) use ($basePath): ?string {
+        return static function (SplFileInfo|string|null $path) use ($basePath): ?string {
             if (null === $path) {
                 return null;
             }
@@ -131,7 +131,7 @@ final readonly class ExportableConfiguration
         private bool $excludeDevFiles,
         private array|Compactors $compactors,
         private string $compressionAlgorithm,
-        private null|int|string $fileMode,
+        private int|string|null $fileMode,
         private ?string $mainScriptPath,
         private ?string $mainScriptContents,
         private MapFile $fileMapper,
