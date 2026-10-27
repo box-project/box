@@ -2401,7 +2401,7 @@ at all.</p>
 </div>
 <h2 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h2>
 <h3 id="signing-algorithm-algorithm">Signing algorithm (<code>algorithm</code>)<a class="headerlink" href="#signing-algorithm-algorithm" title="Permanent link">&para;</a></h3>
-<p>The algorithm (<code>string</code>|<code>null</code> default <code>SHA1</code>) setting is the signing algorithm to use when the PHAR is built
+<p>The algorithm (<code>string</code>|<code>null</code> default <code>SHA512</code>) setting is the signing algorithm to use when the PHAR is built
 (<a href="https://secure.php.net/manual/en/phar.setsignaturealgorithm.php"><code>Phar::setSignatureAlgorithm()</code></a>). The following is a list of the signature algorithms
 available:</p>
 <ul>
@@ -2411,7 +2411,7 @@ available:</p>
 <li><code>SHA512</code></li>
 <li><code>OPENSSL</code> (deprecated)</li>
 </ul>
-<p>By default, PHARs are <code>SHA1</code> signed.</p>
+<p>By default, PHARs are <code>SHA512</code> signed.</p>
 <p>The <code>OPENSSL</code> algorithm will require to provide <a href="#the-private-key-key">a key</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
