@@ -147,18 +147,23 @@ jobs:
 
             -   name: Configure the base ref (pull request)
                 if: github.event_name == 'pull_request'
-                run: echo "INFECTION_BASE_REF=$GITHUB_BASE_REF" >> $GITHUB_ENV
+                run: |
+                    echo "INFECTION_FETCH_REF=$GITHUB_BASE_REF" >> $GITHUB_ENV
+                    echo "INFECTION_BASE_REF=origin/$GITHUB_BASE_REF" >> $GITHUB_ENV
 
+            # Do not prefix the base with "origin/": it is a commit SHA, not a branch.
             -   name: Configure the base ref (push/release event)
                 if: github.event_name == 'push'
-                run: echo "INFECTION_BASE_REF=${{ github.event.before }}" >> $GITHUB_ENV
+                run: |
+                    echo "INFECTION_FETCH_REF=${{ github.event.before }}" >> $GITHUB_ENV
+                    echo "INFECTION_BASE_REF=${{ github.event.before }}" >> $GITHUB_ENV
 
             # Do this before using the Makefile just to avoid accidentally resolving the deferred variables using
             # INFECTION_FLAGS.
             -   name: Configure Infection for the CI
                 run: |
-                    git fetch origin $INFECTION_BASE_REF
-                    echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=origin/$INFECTION_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
+                    git fetch origin $INFECTION_FETCH_REF
+                    echo "INFECTION_FLAGS=--git-diff-lines --git-diff-base=$INFECTION_BASE_REF --ignore-msi-with-no-mutations --logger-github" >> "$GITHUB_ENV"
 
             -   name: Install Composer dependencies
                 uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0 # zizmor: ignore[cache-poisoning] No artefact is published by this workflow
