@@ -31,6 +31,8 @@ use function Safe\getcwd;
 #[CoversClass(ComposerVendorDirCommand::class)]
 class ComposerVendorDirCommandTest extends TestCase
 {
+    use IsolatesComposerHome;
+
     private CommandTester $commandTester;
     private string $cwd;
 
@@ -40,10 +42,13 @@ class ComposerVendorDirCommandTest extends TestCase
 
         $this->cwd = getcwd();
         chdir(__DIR__);
+
+        $this->isolateComposerHome();
     }
 
     protected function tearDown(): void
     {
+        $this->restoreComposerHome();
         chdir($this->cwd);
     }
 

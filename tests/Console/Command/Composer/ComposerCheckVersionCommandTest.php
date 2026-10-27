@@ -33,6 +33,8 @@ use function Safe\getcwd;
 #[CoversClass(ComposerCheckVersionCommand::class)]
 class ComposerCheckVersionCommandTest extends TestCase
 {
+    use IsolatesComposerHome;
+
     private CommandTester $commandTester;
     private string $cwd;
 
@@ -42,10 +44,13 @@ class ComposerCheckVersionCommandTest extends TestCase
 
         $this->cwd = getcwd();
         chdir(__DIR__);
+
+        $this->isolateComposerHome();
     }
 
     protected function tearDown(): void
     {
+        $this->restoreComposerHome();
         chdir($this->cwd);
     }
 
