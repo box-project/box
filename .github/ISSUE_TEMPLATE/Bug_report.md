@@ -20,8 +20,6 @@ with the correct information when relevant and include if relevant:
 - The steps to reproduce your issue
 - The exact command run
 - Your configuration file
-
-For general support, please use the #humbug Slack channel: https://symfony.com/slack-invite.
 -->
 
 <details>

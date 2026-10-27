@@ -136,7 +136,7 @@ class DocumentationSchemaTest extends TestCase
     private function retrieveDocKeys(): array
     {
         preg_match_all(
-            '/#+ [\p{L}\\-\s]+\(`(.*?)`(?:[\p{L}\\-\s]+`(.*?)`)?\)/u',
+            '/#+ [\p{L}\-\s]+\(`(.*?)`(?:[\p{L}\-\s]+`(.*?)`)?\)/u',
             FS::getFileContents(self::CONFIGURATION_DOC_PATH),
             $matches,
         );

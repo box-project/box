@@ -470,7 +470,7 @@ _e2e_dockerfile_no_extension: $(SCOPED_BOX_BIN)
 e2e_custom_composer_bin: $(SCOPED_BOX_BIN) $(E2E_CUSTOM_COMPOSER_BIN_DIR)/vendor
 	@mkdir -p $(E2E_CUSTOM_COMPOSER_BIN_OUTPUT_DIR)
 
-	$(SCOPED_BOX) compile \
+	COMPOSER_HOME=$(E2E_CUSTOM_COMPOSER_BIN_DIR) $(SCOPED_BOX) compile \
 		--working-dir=$(E2E_CUSTOM_COMPOSER_BIN_DIR) \
 		--config=box.json.dist \
 		--composer-bin=composer.phar \

@@ -430,7 +430,7 @@ final class Configuration
         private readonly bool $excludeDevFiles,
         private readonly array|Compactors $compactors,
         private readonly CompressionAlgorithm $compressionAlgorithm,
-        private readonly null|int|string $fileMode,
+        private readonly int|string|null $fileMode,
         ?string $mainScriptPath,
         ?string $mainScriptContents,
         private readonly MapFile $fileMapper,

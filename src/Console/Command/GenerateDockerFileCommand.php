@@ -99,9 +99,7 @@ final class GenerateDockerFileCommand implements CommandAware
     {
         $pharFilePath = $io->getTypedArgument(self::PHAR_ARG)->asNullableNonEmptyString();
 
-        if (null === $pharFilePath) {
-            $pharFilePath = $this->guessPharPath($io);
-        }
+        $pharFilePath ??= $this->guessPharPath($io);
 
         if (null === $pharFilePath) {
             return null;

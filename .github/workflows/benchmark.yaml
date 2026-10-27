@@ -8,6 +8,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
+permissions:
+    contents: read
+
 env:
     TERM: xterm
 
@@ -21,9 +24,10 @@ jobs:
                 with:
                     ref: main
                     fetch-depth: 0
+                    persist-credentials: false
 
             -   name: Setup PHP
-                uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+                uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
                 with:
                     php-version: '8.2'
                     ini-values: phar.readonly=0, opcache.enable_cli=1
@@ -43,7 +47,7 @@ jobs:
             -   name: Run PHPBench
                 run: make phpbench_main
 
-            -   uses: actions/upload-artifact@v7
+            -   uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
                 name: Upload the Benchmark results
                 with:
                     name: bench-main-result
@@ -57,9 +61,10 @@ jobs:
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
                 with:
                     fetch-depth: 0
+                    persist-credentials: false
 
             -   name: Setup PHP
-                uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # 2.37.0
+                uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
                 with:
                     php-version: '8.2'
                     ini-values: phar.readonly=0, opcache.enable_cli=1

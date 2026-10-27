@@ -8,6 +8,8 @@ updates:
             dependencies:
                 patterns:
                     - "*"
+        cooldown:
+            default-days: 7
 
     -   package-ecosystem: "composer"
         directory: "requirement-checker"
@@ -17,6 +19,8 @@ updates:
             dependencies:
                 patterns:
                     - "*"
+        cooldown:
+            default-days: 7
 
     -   package-ecosystem: "composer"
         directory: "vendor-bin/*/"
@@ -26,11 +30,26 @@ updates:
             dependencies:
                 patterns:
                     - "*"
+        cooldown:
+            default-days: 7
 
     -   package-ecosystem: "github-actions"
         directory: ".github/workflows"
         schedule:
             interval: "weekly"
+        groups:
+            dependencies:
+                patterns:
+                    - "*"
+        cooldown:
+            default-days: 7
+
+    -   package-ecosystem: "docker-compose"
+        directory: "."
+        schedule:
+            interval: "weekly"
+        cooldown:
+            default-days: 7
         groups:
             dependencies:
                 patterns:

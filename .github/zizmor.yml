@@ -1,0 +1,5 @@
+rules:
+    # The self-repository syntax (`uses: $/...`) is not supported yet by PhpStorm
+    # and actionlint, and fails to resolve the action on pull requests from forks.
+    self-repository:
+        disable: true

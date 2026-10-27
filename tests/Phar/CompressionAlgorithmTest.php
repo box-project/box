@@ -30,7 +30,7 @@ final class CompressionAlgorithmTest extends TestCase
     #[DataProvider('compressionAlgorithmLabelsProvider')]
     public function test_it_can_tell_be_created_from_its_label(
         ?string $label,
-        CompressionAlgorithm $expected
+        CompressionAlgorithm $expected,
     ): void {
         $actual = CompressionAlgorithm::fromLabel($label);
 
@@ -74,7 +74,7 @@ final class CompressionAlgorithmTest extends TestCase
 
     #[DataProvider('compressionAlgorithmProvider')]
     public function test_it_can_tell_what_php_extension_is_required_for_a_given_compression_algorithm(
-        CompressionAlgorithm $compressionAlgorithm
+        CompressionAlgorithm $compressionAlgorithm,
     ): void {
         $compressionAlgorithm->getRequiredExtension();
 

@@ -15,6 +15,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
+permissions:
+    contents: read
+
 env:
     TERM: xterm
 
@@ -27,6 +30,7 @@ jobs:
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
                 with:
                     fetch-depth: 0
+                    persist-credentials: false
 
             -   name: Cache the vulnerability database
                 uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
@@ -34,6 +38,7 @@ jobs:
                 with:
                     path: ~/.symfony/cache
                     key: db
+                    lookup-only: true
 
             -   name: Checks dependencies for known vulnerabilities
                 uses: symfonycorp/security-checker-action@258311ef7ac571f1310780ef3d79fc5abef642b5 # v5
