@@ -5,11 +5,11 @@
         "php": "^8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "symfony/console": "7.3.*",
-        "symfony/dotenv": "7.3.*",
-        "symfony/flex": "^1.9",
-        "symfony/framework-bundle": "7.3.*",
-        "symfony/yaml": "7.3.*"
+        "symfony/console": "7.4.*",
+        "symfony/dotenv": "7.4.*",
+        "symfony/flex": "^2.10",
+        "symfony/framework-bundle": "7.4.*",
+        "symfony/yaml": "7.4.*"
     },
     "config": {
         "preferred-install": {
@@ -67,7 +67,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.3.*"
+            "require": "7.4.*"
         }
     }
 }
