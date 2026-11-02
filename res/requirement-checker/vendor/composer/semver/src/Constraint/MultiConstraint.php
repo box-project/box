@@ -170,8 +170,14 @@ class MultiConstraint implements ConstraintInterface
             if ($constraint->getLowerBound()->compareTo($this->lowerBound, $this->isConjunctive() ? '>' : '<')) {
                 $this->lowerBound = $constraint->getLowerBound();
             }
-            if ($constraint->getUpperBound()->compareTo($this->upperBound, $this->isConjunctive() ? '<' : '>')) {
-                $this->upperBound = $constraint->getUpperBound();
+            $upperBound = $constraint->getUpperBound();
+            $cmp = version_compare($upperBound->getVersion(), $this->upperBound->getVersion());
+            if (0 === $cmp) {
+                if ($upperBound->isInclusive() === $this->isDisjunctive()) {
+                    $this->upperBound = $upperBound;
+                }
+            } elseif ($cmp === ($this->isConjunctive() ? -1 : 1)) {
+                $this->upperBound = $upperBound;
             }
         }
     }

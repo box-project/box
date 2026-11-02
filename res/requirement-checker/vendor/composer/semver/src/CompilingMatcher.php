@@ -29,23 +29,22 @@ class CompilingMatcher
     */
     public static function match(ConstraintInterface $constraint, $operator, $version)
     {
-        $resultCacheKey = $operator . $constraint . ';' . $version;
-        if (isset(self::$resultCache[$resultCacheKey])) {
-            return self::$resultCache[$resultCacheKey];
+        $constraintString = (string) $constraint;
+        $resultCache =& self::$resultCache[$operator][$constraintString];
+        if (isset($resultCache[$version])) {
+            return $resultCache[$version];
         }
         if (self::$enabled === null) {
             self::$enabled = !\in_array('eval', explode(',', (string) ini_get('disable_functions')), \true);
         }
         if (!self::$enabled) {
-            return self::$resultCache[$resultCacheKey] = $constraint->matches(new Constraint(self::$transOpInt[$operator], $version));
+            return $resultCache[$version] = $constraint->matches(new Constraint(self::$transOpInt[$operator], $version));
         }
-        $cacheKey = $operator . $constraint;
-        if (!isset(self::$compiledCheckerCache[$cacheKey])) {
+        $compiledCheckerCache =& self::$compiledCheckerCache[$operator][$constraintString];
+        if (null === $compiledCheckerCache) {
             $code = $constraint->compile($operator);
-            self::$compiledCheckerCache[$cacheKey] = $function = eval('return function($v, $b){return ' . $code . ';};');
-        } else {
-            $function = self::$compiledCheckerCache[$cacheKey];
+            $compiledCheckerCache = eval('return function($v, $b){return ' . $code . ';};');
         }
-        return self::$resultCache[$resultCacheKey] = $function($version, strpos($version, 'dev-') === 0);
+        return $resultCache[$version] = $compiledCheckerCache($version, strpos($version, 'dev-') === 0);
     }
 }
