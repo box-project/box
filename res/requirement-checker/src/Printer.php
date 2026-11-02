@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace HumbugBox470\KevinGH\RequirementChecker;
+namespace HumbugBox471\KevinGH\RequirementChecker;
 
 use function array_shift;
 use function count;
