@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -871,7 +871,7 @@ doc.</p>
 <span class="o">...</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">getProjectDir</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">&#39;/../&#39;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">'/../'</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -895,26 +895,26 @@ prevent the issue, you need to make sure of the following:</p>
 <ul>
 <li>Change the following part of the <code>composer.json</code> file:</li>
 </ul>
-<div class="highlight"><pre><span></span><code><span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;auto-scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;cache:clear&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;symfony-cmd&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="nt">&quot;assets:install %PUBLIC_DIR%&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;symfony-cmd&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nt">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"auto-scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"cache:clear"</span><span class="p">:</span><span class="w"> </span><span class="s2">"symfony-cmd"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"assets:install %PUBLIC_DIR%"</span><span class="p">:</span><span class="w"> </span><span class="s2">"symfony-cmd"</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;post-install-cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;@auto-scripts&quot;</span>
+<span class="w">    </span><span class="nt">"post-install-cmd"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"@auto-scripts"</span>
 <span class="w">    </span><span class="p">],</span>
-<span class="w">    </span><span class="nt">&quot;post-update-cmd&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;@auto-scripts&quot;</span>
+<span class="w">    </span><span class="nt">"post-update-cmd"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"@auto-scripts"</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="p">},</span>
 </code></pre></div>
 <p>For:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;auto-scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;cache:clear&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;symfony-cmd&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nt">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">"auto-scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"cache:clear"</span><span class="p">:</span><span class="w"> </span><span class="s2">"symfony-cmd"</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;post-autoload-dump&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;@auto-scripts&quot;</span>
+<span class="w">    </span><span class="nt">"post-autoload-dump"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"@auto-scripts"</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="p">},</span>
 </code></pre></div>
@@ -1005,10 +1005,10 @@ prevent the issue, you need to make sure of the following:</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>

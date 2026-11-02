@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1825,47 +1825,47 @@ specified through the <code>--config|-c option</code>, one of the following file
 <p>The configuration file is a JSON object saved to a file. Note that <strong>all settings are optional</strong>. If a setting is set
 to <code>null</code>, then its default value will be picked and is strictly equivalent to not setting the value.</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;algorithm&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;alias&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;annotations&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;banner&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;banner-file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;base-path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;blacklist&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;check-requirements&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;chmod&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;compactors&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;compression&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;datetime&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;datetime-format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;directories&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;directories-bin&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;dump-autoload&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;exclude-composer-files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;exclude-dev-files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;files&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;files-bin&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;finder&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;finder-bin&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;force-autodiscovery&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;git&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;git-commit&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;git-commit-short&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;git-tag&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;git-version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;intercept&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;key-pass&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;main&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;map&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;output&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;php-scoper&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;replacement-sigil&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;replacements&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;shebang&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;stub&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;?&quot;</span>
+<span class="w">    </span><span class="nt">"algorithm"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"alias"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"annotations"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"banner"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"banner-file"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"base-path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"blacklist"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"check-requirements"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"chmod"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"compactors"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"compression"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"datetime"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"datetime-format"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"directories"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"directories-bin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"dump-autoload"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"exclude-composer-files"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"exclude-dev-files"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"files"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"files-bin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"finder"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"finder-bin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"force-autodiscovery"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"git"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"git-commit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"git-commit-short"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"git-tag"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"git-version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"intercept"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"key-pass"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"main"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"map"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"output"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"php-scoper"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"replacement-sigil"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"replacements"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"shebang"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"stub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"?"</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="base-path-base-path">Base-path (<code>base-path</code>)<a class="headerlink" href="#base-path-base-path" title="Permanent link">&para;</a></h2>
@@ -1880,8 +1880,8 @@ bootstrapping file).</p>
 <p>When you have a main script file that can be used as a <a href="#stub">stub</a>, you can disable the main script by setting it to
 false:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;stub&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bin/acme.php&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="nt">&quot;main&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="nt">"stub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bin/acme.php"</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">"main"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>When the parameter is not given or set to <code>null</code>, Box tries to guess the binary of the application with the
@@ -2006,22 +2006,22 @@ are a union of the directives.</p>
 </div>
 <p>Example:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;finder&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="nt">"finder"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">          </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;notName&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;exclude&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">                  </span><span class="s2">&quot;doc&quot;</span><span class="p">,</span>
-<span class="w">                  </span><span class="s2">&quot;test&quot;</span><span class="p">,</span>
-<span class="w">                  </span><span class="s2">&quot;test_old&quot;</span><span class="p">,</span>
-<span class="w">                  </span><span class="s2">&quot;tests&quot;</span><span class="p">,</span>
-<span class="w">                  </span><span class="s2">&quot;Tests&quot;</span><span class="p">,</span>
-<span class="w">                  </span><span class="s2">&quot;vendor-bin&quot;</span>
+<span class="w">              </span><span class="nt">"notName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/"</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">"exclude"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">                  </span><span class="s2">"doc"</span><span class="p">,</span>
+<span class="w">                  </span><span class="s2">"test"</span><span class="p">,</span>
+<span class="w">                  </span><span class="s2">"test_old"</span><span class="p">,</span>
+<span class="w">                  </span><span class="s2">"tests"</span><span class="p">,</span>
+<span class="w">                  </span><span class="s2">"Tests"</span><span class="p">,</span>
+<span class="w">                  </span><span class="s2">"vendor-bin"</span>
 <span class="w">              </span><span class="p">],</span>
-<span class="w">              </span><span class="nt">&quot;in&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;vendor&quot;</span>
+<span class="w">              </span><span class="nt">"in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"vendor"</span>
 <span class="w">          </span><span class="p">},</span>
 <span class="w">          </span><span class="p">{</span>
-<span class="w">              </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;composer.json&quot;</span><span class="p">,</span>
-<span class="w">              </span><span class="nt">&quot;in&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;.&quot;</span>
+<span class="w">              </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"composer.json"</span><span class="p">,</span>
+<span class="w">              </span><span class="nt">"in"</span><span class="p">:</span><span class="w"> </span><span class="s2">"."</span>
 <span class="w">          </span><span class="p">}</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="p">}</span>
@@ -2047,8 +2047,8 @@ file structure:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
 <span class="w">    </span><span class="err">#</span><span class="w"> </span><span class="err">o</span><span class="kc">t</span><span class="err">her</span><span class="w"> </span><span class="kc">n</span><span class="err">o</span><span class="kc">n</span><span class="w"> </span><span class="kc">f</span><span class="err">ile</span><span class="w"> </span><span class="err">rela</span><span class="kc">te</span><span class="err">d</span><span class="w"> </span><span class="err">se</span><span class="kc">tt</span><span class="err">i</span><span class="kc">n</span><span class="err">gs</span>
 
-<span class="w">    </span><span class="nt">&quot;blacklist&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">        </span><span class="s2">&quot;A&quot;</span>
+<span class="w">    </span><span class="nt">"blacklist"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="s2">"A"</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2073,11 +2073,11 @@ belonging to dev only packages. For example for the given project:</p>
 <summary>composer.json</summary>
 
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;require&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;beberlei/assert&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^3.0&quot;</span>
+<span class="w">    </span><span class="nt">"require"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"beberlei/assert"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^3.0"</span>
 <span class="w">    </span><span class="p">},</span>
-<span class="w">    </span><span class="nt">&quot;require-dev&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;bamarni/composer-bin-plugin&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^1.2&quot;</span>
+<span class="w">    </span><span class="nt">"require-dev"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"bamarni/composer-bin-plugin"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^1.2"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2096,9 +2096,9 @@ match, the matched segment will be replaced with the value. If the key is empty,
 (except for those already matched by an earlier key).</p>
 <p>For example, with the following configuration excerpt:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;map&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;my/test/path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;src/Test&quot;</span><span class="w"> </span><span class="p">},</span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;src/Another&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="nt">"map"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">"my/test/path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"src/Test"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="nt">""</span><span class="p">:</span><span class="w"> </span><span class="s2">"src/Another"</span><span class="w"> </span><span class="p">}</span>
 <span class="w">  </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2149,9 +2149,9 @@ may have undesirable effects if you are using the generated <a href="#stub-stub"
 <span class="x">#!/usr/bin/env php</span>
 <span class="cp">&lt;?php</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="nb">class_exists</span><span class="p">(</span><span class="s1">&#39;Phar&#39;</span><span class="p">))</span> <span class="p">{</span>
-    <span class="nx">Phar</span><span class="o">::</span><span class="na">mapPhar</span><span class="p">(</span><span class="s1">&#39;alias.phar&#39;</span><span class="p">);</span>
-    <span class="k">require</span> <span class="s1">&#39;phar://&#39;</span> <span class="o">.</span> <span class="no">__FILE__</span> <span class="o">.</span> <span class="s1">&#39;/index.php&#39;</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">class_exists</span><span class="p">(</span><span class="s1">'Phar'</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">Phar</span><span class="o">::</span><span class="na">mapPhar</span><span class="p">(</span><span class="s1">'alias.phar'</span><span class="p">);</span>
+    <span class="k">require</span> <span class="s1">'phar://'</span> <span class="o">.</span> <span class="no">__FILE__</span> <span class="o">.</span> <span class="s1">'/index.php'</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="nx">__HALT_COMPILER</span><span class="p">();</span> <span class="cp">?&gt;</span>
@@ -2160,41 +2160,41 @@ may have undesirable effects if you are using the generated <a href="#stub-stub"
 <span class="x">// index.php</span>
 <span class="cp">&lt;?php</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">&#39;EXECUTE&#39;</span><span class="p">]))</span> <span class="p">{</span>
-    <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">&#39;EXECUTE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'EXECUTE'</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'EXECUTE'</span><span class="p">]</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="c1">// On the first execution, we require that other file while</span>
-<span class="c1">// on the second we will echo &quot;Hello world!&quot;</span>
-<span class="k">if</span> <span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">&#39;EXECUTE&#39;</span><span class="p">])</span> <span class="p">{</span>
-    <span class="k">require</span> <span class="s1">&#39;foo.php&#39;</span><span class="p">;</span>
+<span class="c1">// on the second we will echo "Hello world!"</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'EXECUTE'</span><span class="p">])</span> <span class="p">{</span>
+    <span class="k">require</span> <span class="s1">'foo.php'</span><span class="p">;</span>
 <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="s1">&#39;Hello world!&#39;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s1">'Hello world!'</span><span class="p">;</span>
 <span class="p">}</span>
 
 
 <span class="c1">// foo.php</span>
 <span class="o">&lt;?</span><span class="nx">php</span>
 
-<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">&#39;EXECUTE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+<span class="nv">$GLOBALS</span><span class="p">[</span><span class="s1">'EXECUTE'</span><span class="p">]</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
 
 <span class="c1">// Notice how we are using `phar://alias.phar` here. This will</span>
 <span class="c1">// always work. This allows you to not have to find where the file</span>
 <span class="c1">// is located in the PHAR neither finding the PHAR file path</span>
-<span class="k">require</span> <span class="s1">&#39;phar://alias.phar/index.php&#39;</span><span class="p">;</span>
+<span class="k">require</span> <span class="s1">'phar://alias.phar/index.php'</span><span class="p">;</span>
 </code></pre></div>
 <p>If you are using the default stub, <a href="https://secure.php.net/manual/en/phar.setalias.php"><code>Phar::setAlias()</code></a> will be used. Note however that this will behave
 slightly differently.</p>
 <p>Example:</p>
 <div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span>
 
-<span class="nv">$phar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Phar</span><span class="p">(</span><span class="s1">&#39;index.phar&#39;</span><span class="p">);</span> <span class="c1">// Warning: creating a Phar instance results in *loading* the file. From this point, the</span>
+<span class="nv">$phar</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Phar</span><span class="p">(</span><span class="s1">'index.phar'</span><span class="p">);</span> <span class="c1">// Warning: creating a Phar instance results in *loading* the file. From this point, the</span>
                                 <span class="c1">// PHAR stub file has been loaded and as a result, if the PHAR had an alias the alias</span>
                                 <span class="c1">// will be registered.</span>
-<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">setAlias</span><span class="p">(</span><span class="s1">&#39;foo.phar&#39;</span><span class="p">);</span>
-<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">addFile</span><span class="p">(</span><span class="s1">&#39;LICENSE&#39;</span><span class="p">);</span>
+<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">setAlias</span><span class="p">(</span><span class="s1">'foo.phar'</span><span class="p">);</span>
+<span class="nv">$phar</span><span class="o">-&gt;</span><span class="na">addFile</span><span class="p">(</span><span class="s1">'LICENSE'</span><span class="p">);</span>
 
-<span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">&#39;phar://foo.phar/LICENSE&#39;</span><span class="p">);</span> <span class="c1">// Will work both inside the PHAR but as well as outside as soon as the</span>
+<span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">'phar://foo.phar/LICENSE'</span><span class="p">);</span> <span class="c1">// Will work both inside the PHAR but as well as outside as soon as the</span>
                                               <span class="c1">// PHAR is loaded in-memory.</span>
 </code></pre></div>
 <p>As you can see above, loading a PHAR which has an alias result in a non-negligible side effect. A typical case where this
@@ -2225,14 +2225,14 @@ done for you.</p>
 </code></pre></div>
 <p>An array of strings can be used for multilines banner:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;banner&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">          </span><span class="s2">&quot;This file is part of the box project.&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;(c) Kevin Herrera &lt;kevin@herrera.io&gt;&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;Théo Fidry &lt;theo.fidry@gmail.com&gt;&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;This source file is subject to the MIT license that is bundled&quot;</span><span class="p">,</span>
-<span class="w">          </span><span class="s2">&quot;with this source code in the file LICENSE.&quot;</span>
+<span class="w">    </span><span class="nt">"banner"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="s2">"This file is part of the box project."</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">"(c) Kevin Herrera &lt;kevin@herrera.io&gt;"</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">"Théo Fidry &lt;theo.fidry@gmail.com&gt;"</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">"This source file is subject to the MIT license that is bundled"</span><span class="p">,</span>
+<span class="w">          </span><span class="s2">"with this source code in the file LICENSE."</span>
 <span class="w">    </span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2287,7 +2287,7 @@ example:</p>
 <span class="sd">     */</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">compact</span><span class="p">(</span><span class="nx">string</span> <span class="nv">$file</span><span class="p">,</span> <span class="nx">string</span> <span class="nv">$contents</span><span class="p">)</span><span class="o">:</span> <span class="nx">string</span>
     <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/\.txt/&#39;</span><span class="p">,</span> <span class="nx">\</span><span class="nv">$file</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">'/\.txt/'</span><span class="p">,</span> <span class="nx">\</span><span class="nv">$file</span><span class="p">))</span> <span class="p">{</span>
             <span class="k">return</span> <span class="nb">trim</span><span class="p">(</span><span class="nv">$contents</span><span class="p">);</span>
         <span class="p">}</span>
 
@@ -2324,7 +2324,7 @@ code.</p>
 <span class="sd"> * @author Théo Fidry</span>
 <span class="sd"> * @LICENSE MIT</span>
 <span class="sd"> *</span>
-<span class="sd"> * @Acme(type = &quot;function&quot;)</span>
+<span class="sd"> * @Acme(type = "function")</span>
 <span class="sd"> */</span>
 <span class="k">function</span> <span class="nf">foo</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nv">$y</span><span class="p">)</span><span class="o">:</span> <span class="nx">int</span> <span class="p">{</span>
     <span class="c1">// Compare the two values</span>
@@ -2340,7 +2340,7 @@ code.</p>
 <div class="highlight"><pre><span></span><code><span class="cp">&lt;?php</span>
 
 <span class="sd">/**</span>
-<span class="sd">@Acme(type=&quot;function&quot;)</span>
+<span class="sd">@Acme(type="function")</span>
 
 
 
@@ -2364,17 +2364,17 @@ code.</p>
 code and the code bundled in the PHAR.</p>
 <p>If you wish to keep all annotations, you can disable the annotations like so:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;annotations&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="nt">"annotations"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>For a more granular list, you can manually configure the list of annotations you wish to ignore:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;annotations&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;ignore&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
-<span class="w">            </span><span class="s2">&quot;author&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;package&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;version&quot;</span><span class="p">,</span>
-<span class="w">            </span><span class="s2">&quot;see&quot;</span>
+<span class="w">    </span><span class="nt">"annotations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"ignore"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">            </span><span class="s2">"author"</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">"package"</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">"version"</span><span class="p">,</span>
+<span class="w">            </span><span class="s2">"see"</span>
 <span class="w">        </span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
@@ -2443,13 +2443,13 @@ from the built PHAR (<a href="https://secure.php.net/manual/en/phar.getmetadata.
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">generateMetadata</span><span class="p">()</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;application_version&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;1.0.0-dev&#39;</span><span class="p">];</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">'application_version'</span> <span class="o">=&gt;</span> <span class="s1">'1.0.0-dev'</span><span class="p">];</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>With the configuration excerpt:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;metadata&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;MyCallbacks::generateMetadata&quot;</span>
+<span class="w">    </span><span class="nt">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MyCallbacks::generateMetadata"</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Then the <code>Phar::getMetadata()</code> will return <code>['application_version' =&gt; '1.0.0-dev']</code> array.</p>
@@ -2459,8 +2459,8 @@ from the built PHAR (<a href="https://secure.php.net/manual/en/phar.getmetadata.
 </div>
 <p>That means, for Composer, in previous example, we require to have such kind of declaration in your <code>composer.json</code> file.</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;autoload&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/path/to/your/callable_script.php&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="nt">"autoload"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"files"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"/path/to/your/callable_script.php"</span><span class="p">]</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2474,13 +2474,13 @@ the PHAR.</p>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">getVersion</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="s1">&#39;@git_commit_short@&#39;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="s1">'@git_commit_short@'</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>With the configuration excerpt:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;git-commit-short&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;git_commit_short&quot;</span>
+<span class="w">    </span><span class="nt">"git-commit-short"</span><span class="p">:</span><span class="w"> </span><span class="s2">"git_commit_short"</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Then the actual code shipped in the PHAR will be:</p>
@@ -2490,7 +2490,7 @@ the PHAR.</p>
 <span class="p">{</span>
     <span class="k">public</span> <span class="k">function</span> <span class="nf">getVersion</span><span class="p">()</span><span class="o">:</span> <span class="nx">string</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="s1">&#39;a6c5d93&#39;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="s1">'a6c5d93'</span><span class="p">;</span>
     <span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2505,8 +2505,8 @@ command ✨.</p>
 placeholders are replaced in all <a href="#including-files">non-binary files</a> with the specified values.</p>
 <p>For example:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">    </span><span class="nt">&quot;replacements&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="nt">&quot;foo&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;bar&quot;</span>
+<span class="w">    </span><span class="nt">"replacements"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"foo"</span><span class="p">:</span><span class="w"> </span><span class="s2">"bar"</span>
 <span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
@@ -2638,10 +2638,10 @@ in all <a href="#including-files">non-binary files</a> by the current git tag of
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>

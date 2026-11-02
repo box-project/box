@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -1103,7 +1103,7 @@
 OpenSSL private key. For instance:</p>
 <div class="highlight"><pre><span></span><code>openssl<span class="w"> </span>genrsa<span class="w"> </span>-des3<span class="w"> </span>-out<span class="w"> </span>acme-phar-private.pem<span class="w"> </span><span class="m">4096</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="x">// E.g. $privateKeyPath = &#39;acme-phar-private.pem&#39; with the example above</span>
+<div class="highlight"><pre><span></span><code><span class="x">// E.g. $privateKeyPath = 'acme-phar-private.pem' with the example above</span>
 <span class="x">$privateKey = file_get_contents($privateKeyPath);</span>
 
 <span class="x">$resource = openssl_pkey_get_private($key, $privateKeyPassword);</span>
@@ -1113,8 +1113,8 @@ OpenSSL private key. For instance:</p>
 <span class="x">$phar-&gt;setSignatureAlgorithm(Phar::OPENSSL, $private);</span>
 
 <span class="x">file_put_contents(</span>
-<span class="x">    $phar-&gt;getPath().&#39;.pubkey&#39;,</span>
-<span class="x">    $details[&#39;key&#39;],</span>
+<span class="x">    $phar-&gt;getPath().'.pubkey',</span>
+<span class="x">    $details['key'],</span>
 <span class="x">);</span>
 </code></pre></div>
 <p>With the example above, you will end up with two files: your PHAR (e.g. <code>bin/command.phar</code>) and its
@@ -1227,7 +1227,7 @@ cat<span class="w"> </span><span class="k">$(</span>.decrypt-key-passphrase<span
 <p>Sign your file:</p>
 <div class="highlight"><pre><span></span><code>gpg<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>--batch<span class="w"> </span><span class="se">\</span>
-<span class="w">   </span>--passphrase<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--passphrase<span class="o">=</span><span class="s2">"</span><span class="nv">$GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>--local-user<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>--armor<span class="w"> </span><span class="se">\</span>
 <span class="w">   </span>--detach-sign<span class="w"> </span><span class="se">\</span>
@@ -1251,10 +1251,10 @@ gpg<span class="w"> </span>--verify<span class="w"> </span>bin/command.phar.asc<
 <span class="c1"># Example of output:</span>
 gpg:<span class="w"> </span>Signature<span class="w"> </span>made<span class="w"> </span>Sat<span class="w"> </span><span class="m">21</span><span class="w"> </span>Oct<span class="w"> </span><span class="m">16</span>:58:05<span class="w"> </span><span class="m">2023</span><span class="w"> </span>CEST
 gpg:<span class="w">                </span>using<span class="w"> </span>EDDSA<span class="w"> </span>key<span class="w"> </span>96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08
-gpg:<span class="w"> </span>Good<span class="w"> </span>signature<span class="w"> </span>from<span class="w"> </span><span class="s2">&quot;Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;&quot;</span><span class="w"> </span><span class="o">[</span>ultimate<span class="o">]</span>
+gpg:<span class="w"> </span>Good<span class="w"> </span>signature<span class="w"> </span>from<span class="w"> </span><span class="s2">"Théo Fidry &lt;theo.fidry+phar-signing-example@example.com&gt;"</span><span class="w"> </span><span class="o">[</span>ultimate<span class="o">]</span>
 </code></pre></div>
 <p>If the key ID was not provided before, you can try to look it up to check it was properly registered to a keyserver:</p>
-<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--keyserver<span class="w"> </span>https://keys.openpgp.org<span class="w"> </span>--search-keys<span class="w"> </span><span class="s2">&quot;theo.fidry+phar-signing-example@example.com&quot;</span>
+<div class="highlight"><pre><span></span><code>gpg<span class="w"> </span>--keyserver<span class="w"> </span>https://keys.openpgp.org<span class="w"> </span>--search-keys<span class="w"> </span><span class="s2">"theo.fidry+phar-signing-example@example.com"</span>
 </code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
@@ -1287,7 +1287,7 @@ only. The following is an example of <a href="https://docs.github.com/en/actions
 <span class="w">    </span><span class="nt">pull_request</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">~</span>
 <span class="w">    </span><span class="nt">schedule</span><span class="p">:</span>
 <span class="w">        </span><span class="c1"># Do not make it the first of the month and/or midnight since it is a very busy time</span>
-<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;*</span><span class="nv"> </span><span class="s">10</span><span class="nv"> </span><span class="s">6</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*&quot;</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cron</span><span class="p">:</span><span class="w"> </span><span class="s">"*</span><span class="nv"> </span><span class="s">10</span><span class="nv"> </span><span class="s">6</span><span class="nv"> </span><span class="s">*</span><span class="nv"> </span><span class="s">*"</span>
 <span class="w">    </span><span class="nt">release</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">types</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">created</span><span class="w"> </span><span class="p p-Indicator">]</span>
 
@@ -1309,7 +1309,7 @@ only. The following is an example of <a href="https://docs.github.com/en/actions
 <span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Setup PHP</span>
 <span class="w">                </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">shivammathur/setup-php@v2</span>
 <span class="w">                </span><span class="nt">with</span><span class="p">:</span>
-<span class="w">                    </span><span class="nt">php-version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;8.1&#39;</span>
+<span class="w">                    </span><span class="nt">php-version</span><span class="p">:</span><span class="w"> </span><span class="s">'8.1'</span>
 <span class="w">                    </span><span class="nt">ini-values</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phar.readonly=0</span>
 <span class="w">                    </span><span class="nt">tools</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">composer</span>
 <span class="w">                    </span><span class="nt">coverage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">none</span>
@@ -1327,19 +1327,19 @@ only. The following is an example of <a href="https://docs.github.com/en/actions
 
 <span class="w">            </span><span class="c1"># The following section is done only for releases</span>
 <span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Import GPG key</span>
-<span class="w">                </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == &#39;release&#39;</span>
+<span class="w">                </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == 'release'</span>
 <span class="w">                </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">crazy-max/ghaction-import-gpg@v5</span>
 <span class="w">                </span><span class="nt">with</span><span class="p">:</span>
 <span class="w">                    </span><span class="nt">gpg_private_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 }}</span>
 <span class="w">                    </span><span class="nt">passphrase</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE }}</span>
 
 <span class="w">            </span><span class="p p-Indicator">-</span><span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sign the PHAR</span>
-<span class="w">                </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == &#39;release&#39;</span>
+<span class="w">                </span><span class="nt">if</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">github.event_name == 'release'</span>
 <span class="w">                </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
 <span class="w">                    </span><span class="no">gpg --local-user 96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08 \</span>
 <span class="w">                        </span><span class="no">--batch \</span>
 <span class="w">                        </span><span class="no">--yes \</span>
-<span class="w">                        </span><span class="no">--passphrase=&quot;${{ secrets.GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE }}&quot; \</span>
+<span class="w">                        </span><span class="no">--passphrase="${{ secrets.GPG_KEY_96C8013A3CC293C465EE3FBB03B2F4DF7A20DF08_PASSPHRASE }}" \</span>
 <span class="w">                        </span><span class="no">--detach-sign \</span>
 <span class="w">                        </span><span class="no">--output bin/command.phar.asc \</span>
 <span class="w">                        </span><span class="no">bin/command.phar</span>
@@ -1451,10 +1451,10 @@ can also push it to other servers if you wish to.&#160;<a class="footnote-backre
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>

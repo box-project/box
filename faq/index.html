@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../img/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -29,10 +29,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -945,28 +945,28 @@
 <span class="k">use</span> <span class="k">const</span> <span class="no">PHP_SAPI</span><span class="p">;</span>
 <span class="k">use</span> <span class="nx">RuntimeException</span><span class="p">;</span>
 
-<span class="k">if</span> <span class="p">(</span><span class="k">false</span> <span class="o">===</span> <span class="nb">in_array</span><span class="p">(</span><span class="nx">PHP_SAPI</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;cli&#39;</span><span class="p">,</span> <span class="s1">&#39;phpdbg&#39;</span><span class="p">,</span> <span class="s1">&#39;embed&#39;</span><span class="p">],</span> <span class="k">true</span><span class="p">))</span> <span class="p">{</span>
-    <span class="k">echo</span> <span class="nx">PHP_EOL</span><span class="o">.</span><span class="s1">&#39;This app may only be invoked from a command line, got &quot;&#39;</span><span class="o">.</span><span class="nx">PHP_SAPI</span><span class="o">.</span><span class="s1">&#39;&quot;&#39;</span><span class="o">.</span><span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="k">false</span> <span class="o">===</span> <span class="nb">in_array</span><span class="p">(</span><span class="nx">PHP_SAPI</span><span class="p">,</span> <span class="p">[</span><span class="s1">'cli'</span><span class="p">,</span> <span class="s1">'phpdbg'</span><span class="p">,</span> <span class="s1">'embed'</span><span class="p">],</span> <span class="k">true</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nx">PHP_EOL</span><span class="o">.</span><span class="s1">'This app may only be invoked from a command line, got "'</span><span class="o">.</span><span class="nx">PHP_SAPI</span><span class="o">.</span><span class="s1">'"'</span><span class="o">.</span><span class="nx">PHP_EOL</span><span class="p">;</span>
 
     <span class="k">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="p">(</span><span class="k">static</span> <span class="k">function</span> <span class="p">()</span><span class="o">:</span> <span class="nx">void</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$autoload</span> <span class="o">=</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">&#39;/../../../autoload.php&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$autoload</span> <span class="o">=</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">'/../../../autoload.php'</span><span class="p">))</span> <span class="p">{</span>
         <span class="c1">// Is installed via Composer</span>
         <span class="k">include_once</span> <span class="nv">$autoload</span><span class="p">;</span>
 
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$autoload</span> <span class="o">=</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">&#39;/../vendor/autoload.php&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$autoload</span> <span class="o">=</span> <span class="no">__DIR__</span><span class="o">.</span><span class="s1">'/../vendor/autoload.php'</span><span class="p">))</span> <span class="p">{</span>
         <span class="c1">// Is installed locally</span>
         <span class="k">include_once</span> <span class="nv">$autoload</span><span class="p">;</span>
 
         <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
 
-    <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">&#39;Unable to find the Composer autoloader.&#39;</span><span class="p">);</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">'Unable to find the Composer autoloader.'</span><span class="p">);</span>
 <span class="p">})();</span>
 
 <span class="c1">// Execute the application</span>
@@ -984,8 +984,8 @@ php<span class="w"> </span>bin/acme.php<span class="w"> </span><span class="c1">
 <p>For PHP, available SAPIs are: Apache2 (mod_php), FPM, CGI, FastCGI and CLI. There is a few other variants but those are
 the most commons ones. For more information, see the <a href="https://www.php.net/manual/en/function.php-sapi-name.php">official PHP doc</a>.</p>
 <p>So the following:</p>
-<div class="highlight"><pre><span></span><code><span class="x">if (false === in_array(PHP_SAPI, [&#39;cli&#39;, &#39;phpdbg&#39;, &#39;embed&#39;], true)) {</span>
-<span class="x">    echo PHP_EOL.&#39;This app may only be invoked from a command line, got &quot;&#39;.PHP_SAPI.&#39;&quot;&#39;.PHP_EOL;</span>
+<div class="highlight"><pre><span></span><code><span class="x">if (false === in_array(PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {</span>
+<span class="x">    echo PHP_EOL.'This app may only be invoked from a command line, got "'.PHP_SAPI.'"'.PHP_EOL;</span>
 
 <span class="x">    exit(1);</span>
 <span class="x">}</span>
@@ -999,18 +999,18 @@ so prevents you to have to worry about web-server related vulnerabilities such a
 </ul>
 <h3 id="autoloading-composer">Autoloading Composer<a class="headerlink" href="#autoloading-composer" title="Permanent link">&para;</a></h3>
 <p>When developing a CLI application, you generally only need to worry about your local autoloader:</p>
-<div class="highlight"><pre><span></span><code><span class="x">include_once __DIR__.&#39;/../vendor/autoload.php&#39;;</span>
+<div class="highlight"><pre><span></span><code><span class="x">include_once __DIR__.'/../vendor/autoload.php';</span>
 </code></pre></div>
 <p>However, if the application is also published as a Composer package, then the autoloader may be found in a different
 location:</p>
-<div class="highlight"><pre><span></span><code><span class="x">include_once __DIR__.&#39;/../../../autoload.php&#39;;</span>
+<div class="highlight"><pre><span></span><code><span class="x">include_once __DIR__.'/../../../autoload.php';</span>
 </code></pre></div>
 <p>In either cases however, it could be the autoloader file is missing (e.g. if the dependencies are not installed yet).
 So it is wise to wrap them in a <code>file_exist()</code> check and provide a user-friendly error when no autoloader could be
 found.</p>
 <h2 id="detecting-that-you-are-inside-a-phar">Detecting that you are inside a PHAR<a class="headerlink" href="#detecting-that-you-are-inside-a-phar" title="Permanent link">&para;</a></h2>
 <p>The easiest way to know if your script is executed from within a PHAR is to run the following:</p>
-<div class="highlight"><pre><span></span><code><span class="x">$isInPhar = &#39;&#39; !== Phar::running(false);</span>
+<div class="highlight"><pre><span></span><code><span class="x">$isInPhar = '' !== Phar::running(false);</span>
 </code></pre></div>
 <p>See <a href="https://www.php.net/manual/en/phar.running.php">Phar::running()</a> for more information.</p>
 <h2 id="building-a-phar-with-box-as-a-dependency">Building a PHAR with Box as a dependency<a class="headerlink" href="#building-a-phar-with-box-as-a-dependency" title="Permanent link">&para;</a></h2>
@@ -1018,12 +1018,12 @@ found.</p>
 the following issue when building your PHAR:</p>
 <div class="highlight"><pre><span></span><code>Could not dump the autoloader.
 [...]
-Could not scan for classes inside &quot;/path/to/vendor/humbug/php-scoper/vendor-hotfix/&quot; which does not appear to be a file nor a folder
+Could not scan for classes inside "/path/to/vendor/humbug/php-scoper/vendor-hotfix/" which does not appear to be a file nor a folder
 </code></pre></div>
 <p>This is because by default, Box does not include VCS or dot files which results in the directory <code>vendor/humbug/php-scoper/vendor-hotfix/</code>
 to be excluded (as it becomes an empty directory). To circumvent that, you will likely need:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-<span class="w">   </span><span class="nt">&quot;directories&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;vendor/humbug/php-scoper/vendor-hotfix&quot;</span><span class="p">]</span>
+<span class="w">   </span><span class="nt">"directories"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"vendor/humbug/php-scoper/vendor-hotfix"</span><span class="p">]</span>
 <span class="p">}</span>
 </code></pre></div>
 <p>Note that as a result you may want to use the <a href="../configuration/#force-auto-discovery-force-autodiscovery"><code>force-autodiscovery</code></a> setting.</p>
@@ -1108,10 +1108,10 @@ to be excluded (as it becomes an empty directory). To circumvent that, you will 
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "navigation.tabs", "navigation.top"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>
