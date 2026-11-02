@@ -16,10 +16,15 @@ class Intervals
     /**
     @phpstan-var
     */
+    private static $compactedCache = array();
+    /**
+    @phpstan-var
+    */
     private static $opSortOrder = array('>=' => -3, '<' => -2, '>' => 2, '<=' => 3);
     public static function clear()
     {
         self::$intervalsCache = array();
+        self::$compactedCache = array();
     }
     public static function isSubsetOf(ConstraintInterface $candidate, ConstraintInterface $constraint)
     {
@@ -74,6 +79,14 @@ class Intervals
         if (!$constraint instanceof MultiConstraint) {
             return $constraint;
         }
+        $key = (string) $constraint;
+        if (!isset(self::$compactedCache[$key])) {
+            self::$compactedCache[$key] = self::doCompactConstraint($constraint);
+        }
+        return self::$compactedCache[$key];
+    }
+    private static function doCompactConstraint(MultiConstraint $constraint)
+    {
         $intervals = self::generateIntervals($constraint);
         $constraints = array();
         $hasNumericMatchAll = \false;
@@ -81,11 +94,23 @@ class Intervals
             $constraints[] = $intervals['numeric'][0]->getStart();
             $hasNumericMatchAll = \true;
         } else {
+            $numeric = $intervals['numeric'];
+            $count = \count($numeric);
+            $skipNotEqual = \false;
+            if (!$intervals['branches']['exclude'] && $count > 1 && (string) $numeric[0]->getStart() === (string) Interval::fromZero() && (string) $numeric[$count - 1]->getEnd() === (string) Interval::untilPositiveInfinity()) {
+                $skipNotEqual = \true;
+                for ($i = 0; $i < $count - 1; $i++) {
+                    if ($numeric[$i]->getEnd()->getOperator() !== '<' || $numeric[$i + 1]->getStart()->getOperator() !== '>' || $numeric[$i]->getEnd()->getVersion() !== $numeric[$i + 1]->getStart()->getVersion()) {
+                        $skipNotEqual = \false;
+                        break;
+                    }
+                }
+            }
             $unEqualConstraints = array();
-            for ($i = 0, $count = \count($intervals['numeric']); $i < $count; $i++) {
-                $interval = $intervals['numeric'][$i];
-                if ($interval->getEnd()->getOperator() === '<' && $i + 1 < $count) {
-                    $nextInterval = $intervals['numeric'][$i + 1];
+            for ($i = 0; $i < $count; $i++) {
+                $interval = $numeric[$i];
+                if (!$skipNotEqual && $interval->getEnd()->getOperator() === '<' && $i + 1 < $count) {
+                    $nextInterval = $numeric[$i + 1];
                     if ($interval->getEnd()->getVersion() === $nextInterval->getStart()->getVersion() && $nextInterval->getStart()->getOperator() === '>') {
                         if (\count($unEqualConstraints) === 0 && (string) $interval->getStart() !== (string) Interval::fromZero()) {
                             $unEqualConstraints[] = $interval->getStart();
@@ -293,6 +318,9 @@ class Intervals
             return array('numeric' => array(new Interval($constraint, Interval::untilPositiveInfinity())), 'branches' => Interval::noDev());
         }
         if ($op[0] === '<') {
+            if ($op === '<' && $constraint->getVersion() === '0.0.0.0-dev') {
+                return array('numeric' => array(), 'branches' => Interval::noDev());
+            }
             return array('numeric' => array(new Interval(Interval::fromZero(), $constraint)), 'branches' => Interval::noDev());
         }
         if ($op === '!=') {
