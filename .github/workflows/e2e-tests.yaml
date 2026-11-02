@@ -93,7 +93,7 @@ jobs:
                         tools: 'composer:2.4'
         steps:
             -   name: Checkout
-                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
                 with:
                     fetch-depth: 0
                     persist-credentials: false
@@ -114,7 +114,7 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@8a338493df3d275e4a7a63bcff3b8fe97e51a927 # v19
+                uses: dawidd6/action-download-artifact@eab87c9830c39eff17e5a6eadb20bfb4bc880477 # v27
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
@@ -153,7 +153,7 @@ jobs:
                     - _e2e_php_settings_checker_memory_limit_higher
         steps:
             -   name: Checkout
-                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
                 with:
                     fetch-depth: 0
                     persist-credentials: false
@@ -170,7 +170,7 @@ jobs:
             # in a different workflow.
             # See https://github.com/actions/download-artifact/issues/172
             -   name: Retrieve built PHAR
-                uses: dawidd6/action-download-artifact@8a338493df3d275e4a7a63bcff3b8fe97e51a927 # v19
+                uses: dawidd6/action-download-artifact@eab87c9830c39eff17e5a6eadb20bfb4bc880477 # v27
                 with:
                     github_token: ${{secrets.GITHUB_TOKEN}}
                     workflow: release.yaml
@@ -193,7 +193,7 @@ jobs:
                 run: bin/box.phar --ansi --version
 
             -   name: Login to GitHub Container Registry
-                uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+                uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
                 with:
                     registry: ghcr.io
                     username: ${{ github.actor }}
