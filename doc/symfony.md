@@ -4,8 +4,11 @@
 1. [Project directory](#project-directory)
 2. [Cache](#cache)
 
-Examples of Symfony applications can be found in the project under `fixtures/build/dir012` (Symfony5) and
-`fixtures/build/dir018` (Symfony6 with the Runtime component).
+Examples of Symfony applications can be found in the project:
+- `fixtures/build/dir018-bis`: a Symfony 7.3 application using the Runtime component.
+- `fixtures/build/dir018`: a Symfony 6.4 application using the Runtime component.
+- `fixtures/build/dir012-bis`: a Symfony 7.3 application without the Runtime component.
+- `fixtures/build/dir012`: a Symfony 6.4 application without the Runtime component.
 
 They may slightly vary to what you want to do since they are here for testing purposes, but they should be good enough
 to show-case a working scenario if this doc does not prove to be enough.
@@ -20,10 +23,23 @@ As a result, you will likely need to add them via `directories`, `files` or thei
 to use the `force-autodiscovery` setting. For more information you can find check the [Including files](./configuration.md#including-files)
 doc.
 
+For example (not guaranteed to be up to date):
+
+```json
+"files-bin": [
+    ".env.local.php"
+],
+"directories": [
+    "config",
+    "public",
+    "var"
+],
+```
+
 
 ## Project directory
 
-Symfony 5.1+ defines the "project dir" as the directory where the composer.json file is. Because box deletes it during PHAR compilation, you need to redefine it in your Kernel. It is usually located in `src/Kernel.php` and can be defined as follow:
+Symfony 5.1+ defines the `project dir` as the directory where the `composer.json` file is. Because Box deletes it (the `composer.json`) during PHAR compilation, you need to redefine it in your `Kernel`. It is usually located in `src/Kernel.php` and can be defined as follows:
 
 ```php
 <?php
@@ -31,12 +47,16 @@ Symfony 5.1+ defines the "project dir" as the directory where the composer.json 
 class Kernel extends BaseKernel
 {
 ...
-    public function getProjectDir()
+    public function getProjectDir(): string
     {
         return __DIR__.'/../';
     }
 }
 ```
+
+Alternatively, you can disable the deletion of the Composer files with `exclude-composer-files`. It is not
+rare for a Symfony application to rely on them one way or another.
+
 
 ## Cache
 
@@ -44,13 +64,13 @@ What makes Symfony a bit special for shipping it into a PHAR is its compilation 
 be dumped depending on multiple parameters such the application environment, whether it is in debug mode or not and if
 the cache is fresh.
 
-A PHAR however is a readonly only environment, which means the container _cannot_ be dumped once inside the PHAR. To
+A PHAR, however, is a readonly only environment, which means the container _cannot_ be dumped once inside the PHAR. To
 prevent the issue, you need to make sure of the following:
 
 - The cache is warmed up before being shipped within the PHAR
 - The application within the PHAR is running in production mode
 
-To achieve this with the least amount of changes is to:
+To achieve this with the least number of changes is to:
 
 - Create the `.env.local.php` file by running the following command:
 
@@ -83,6 +103,7 @@ For:
 "scripts": {
     "auto-scripts": {
         "cache:clear": "symfony-cmd"
+        # no more assets install, unless necessary
     },
     "post-autoload-dump": [
         "@auto-scripts"
