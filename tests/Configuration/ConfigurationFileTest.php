@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace KevinGH\Box\Configuration;
 
+use Closure;
 use Fidry\FileSystem\FS;
 use InvalidArgumentException;
 use KevinGH\Box\Json\JsonValidationException;
@@ -139,7 +140,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     #[DataProvider('configWithMainScriptProvider')]
-    public function test_the_main_script_file_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
+    public function test_the_main_script_file_is_always_ignored(Closure $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
     {
         $setUp();
 
@@ -153,7 +154,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
     }
 
     #[DataProvider('configWithGeneratedArtefactProvider')]
-    public function test_the_generated_artefact_is_always_ignored(callable $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
+    public function test_the_generated_artefact_is_always_ignored(Closure $setUp, array $config, array $expectedFiles, array $expectedBinFiles): void
     {
         $setUp();
 
@@ -1552,7 +1553,7 @@ class ConfigurationFileTest extends ConfigurationTestCase
 
     #[DataProvider('filesAutodiscoveryConfigProvider')]
     public function test_files_are_autodiscovered_unless_directory_or_finder_config_is_provided(
-        callable $setUp,
+        Closure $setUp,
         array $config,
         bool $expectedFilesAutodiscovery,
     ): void {
